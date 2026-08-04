@@ -169,13 +169,58 @@ body.fitfull #top,body.fitfull #addfab{display:none}
 .cups{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
 .cups .cup{font-size:23px;filter:grayscale(1);opacity:.35;cursor:pointer;transition:.15s;-webkit-tap-highlight-color:transparent}
 .cups .cup.on{filter:none;opacity:1}
-.acttiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
-.actt{border:1.5px solid var(--line);border-radius:16px;padding:12px 6px;text-align:center;cursor:pointer;background:var(--paper);-webkit-tap-highlight-color:transparent}
-.actt:active{transform:scale(.97)}
-.actt i{font-style:normal;font-size:22px;display:block}
-.actt span{font-size:11.5px;font-weight:700;display:block;margin-top:4px}
-.actt.run{background:linear-gradient(145deg,#FC4C02,#F2803C);border-color:transparent;color:#fff}
+/* v1.5: las tarjetas gigantes de actividad salieron de la vista principal.
+   Ahora la lista vive adentro del sheet de «＋ Registrar actividad», con las
+   mismas píldoras que el resto de la app. */
+.pillrow i.emo{font-style:normal;font-size:21px;line-height:1}
 .kmbig{font-family:var(--mono);font-size:34px !important;font-weight:800;text-align:center;color:#FC4C02}
+/* ---------- historial de nutrición (diario alimentario, v1.5) ---------- */
+.nhday{position:relative;margin-left:5px;padding:0 0 15px 15px;border-left:2px solid var(--line)}
+.nhday:last-child{border-left-color:transparent;padding-bottom:2px}
+.nhday:before{content:'';position:absolute;left:-6px;top:3px;width:10px;height:10px;border-radius:50%;background:var(--mid);border:2px solid var(--paper)}
+.nhday.hoy:before{background:var(--deep)}
+.nhday .nhd{font-family:var(--mono);font-size:10px;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink2)}
+.nhday .nhf{font-size:13.5px;line-height:1.55;margin-top:4px}
+.nhday .nhw{font-family:var(--mono);font-size:11.5px;color:var(--ink2);margin-top:5px}
+/* ---------- banner teaser de Texma Plus (v1.5) ---------- */
+.plusban{
+  position:relative;overflow:hidden;border-radius:20px;margin-top:16px;padding:17px 18px;color:#F6EEDF;
+  background:linear-gradient(140deg,#241E19 0%,#3D3025 52%,#221C17 100%);
+  border:1px solid rgba(201,162,74,.55);box-shadow:0 12px 28px rgba(28,22,18,.24);
+}
+.plusban:before{
+  content:'';position:absolute;top:-70%;left:-35%;width:55%;height:240%;transform:rotate(17deg);pointer-events:none;
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,214,138,.15),rgba(255,255,255,0));
+}
+.plusban>*{position:relative;z-index:1}
+.plusban .pk{
+  display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;
+  color:#2A2118;background:linear-gradient(135deg,#F4D79B,#C9A24A);padding:4px 11px;border-radius:99px;
+}
+.plusban h4{font-family:var(--serif);font-style:italic;font-weight:700;font-size:22px;line-height:1.15;margin:11px 0 6px}
+.plusban h4 em{font-style:italic;color:#F2D08A}
+.plusban p{font-size:12.5px;line-height:1.55;color:#DCCFB9}
+.plusban .pfeat{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.plusban .pfeat span{font-size:11px;padding:4px 10px;border-radius:99px;border:1px solid rgba(242,208,138,.38);color:#F2D08A}
+/* ---------- tratamientos · galería de progreso (v1.5) ---------- */
+.tratc{border:1px solid var(--line);border-radius:20px;background:var(--paper);padding:14px 15px;margin-bottom:12px;cursor:pointer;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+.tratc:active{transform:scale(.995)}
+.tratc .th{display:flex;align-items:flex-start;gap:10px}
+.tratc .th .t{font-weight:700;font-size:16px}
+.tstrip{display:flex;gap:7px;overflow-x:auto;margin-top:11px;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.tstrip .tsq{flex:0 0 62px;height:78px;border-radius:12px;overflow:hidden;background:var(--linen);border:1px solid var(--line);position:relative}
+.tstrip .tsq img{width:100%;height:100%;object-fit:cover;display:block}
+.tstrip .tsq b{position:absolute;left:0;right:0;bottom:0;font-family:var(--mono);font-size:8px;letter-spacing:.4px;text-align:center;
+  color:#FFF;padding:9px 2px 3px;background:linear-gradient(180deg,rgba(20,16,13,0),rgba(20,16,13,.8))}
+.tgal{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.tgal figure{position:relative;margin:0;aspect-ratio:3/4;border-radius:14px;overflow:hidden;background:var(--linen);border:1px solid var(--line);cursor:pointer}
+.tgal img{width:100%;height:100%;object-fit:cover;display:block}
+.tgal figcaption{position:absolute;left:0;right:0;bottom:0;color:#FFF;font-family:var(--mono);font-size:8.5px;letter-spacing:.4px;
+  text-align:center;padding:13px 3px 4px;background:linear-gradient(180deg,rgba(20,16,13,0),rgba(20,16,13,.82))}
+.tgal .tbad{position:absolute;top:5px;left:5px;font-family:var(--mono);font-size:8px;letter-spacing:.5px;font-weight:700;
+  background:rgba(255,255,255,.92);color:var(--aink);padding:2px 7px;border-radius:99px}
+.tsem{font-family:var(--mono);font-size:10px;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink2);margin:16px 0 2px}
 /* ---------- overlay de descarga de la actualización (v1.4.2) ---------- */
 #updv{position:fixed;inset:0;z-index:130;background:rgba(28,22,18,.62);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);display:grid;place-items:center;padding:22px}
 #updv .ubox{width:100%;max-width:390px;background:var(--paper);border-radius:26px;padding:30px 24px 24px;text-align:center;box-shadow:0 22px 60px rgba(28,22,18,.3)}
@@ -203,9 +248,17 @@ body.fitfull #top,body.fitfull #addfab{display:none}
 #wel .wimg{position:relative;height:clamp(120px,26vh,240px);flex:0 0 auto;background:linear-gradient(150deg,var(--ban),var(--ban2))}
 #wel .wimg img{width:100%;height:100%;object-fit:cover}
 #wel .wimg .sh{position:absolute;inset:0;background:linear-gradient(180deg,rgba(28,22,18,0) 40%,var(--linen) 100%)}
+/* el cuerpo se centra si sobra lugar; si el celu es MUY chico y no entra,
+   scrollea adentro en vez de recortar el botón (que era el bug) */
 #wel .wbd{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;
   padding:clamp(4px,1.4vh,12px) 22px calc(clamp(12px,2.4vh,22px) + env(safe-area-inset-bottom));
-  text-align:center;max-width:520px;margin:0 auto;width:100%}
+  text-align:center;max-width:520px;margin:0 auto;width:100%;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+/* pantallas bajas (celu apaisado o muy chico): la foto se achica sola */
+@media (max-height:600px){
+  #wel .wimg{height:clamp(78px,15vh,120px)}
+  #wel .wrow span{display:none}
+}
 #wel h2{font-family:var(--serif);font-size:clamp(23px,4.2vh,31px);line-height:1.1;margin-bottom:clamp(5px,1vh,10px)}
 #wel .wsub{font-size:clamp(12.5px,1.7vh,14px);color:var(--ink2);line-height:1.45;margin-bottom:clamp(10px,2vh,18px)}
 #wel .wlist{text-align:left;display:flex;flex-direction:column;gap:clamp(6px,1.1vh,11px);margin-bottom:clamp(12px,2.4vh,22px)}
@@ -920,7 +973,7 @@ body.fitfull #top,body.fitfull #addfab{display:none}
      · package.json y el versionName/versionCode del APK
        (los sincroniza scripts/build-web.mjs en cada npm run sync)
    Al sacar un parche: cambiar el número acá y nada más.        */
-const APP_VER='1.4.3';
+const APP_VER='1.5.0';
 
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -946,6 +999,12 @@ function weekStart(){ const d=new Date(); d.setDate(d.getDate()-((d.getDay()+6)%
 
 /* ---------- estado ---------- */
 const KEY='texma';
+/* v1.5: el frasco de inversiones ya no es «persona 1 y persona 2»: es una
+   lista de hasta 10. Estos son los colores de fábrica que se van repartiendo
+   a medida que se suma gente (cooperativas, proyectos entre varios). */
+const INV_MAX=10;
+const INV_COLORS=['#EC1968','#3B7BD4','#2F9E6B','#C08A3C','#8B6CD9',
+                  '#E06A6A','#3FA3A3','#D9A02B','#C2568F','#6E8BB5'];
 const DEF={
   settings:{pal:'rosa',name:'',photo:'',banner:'#F2803C',notif:false,customPal:'',cats:{in:[],out:[]},
     onboarded:false,profiled:false,welcomed:false,tutorDone:false,invBanner:'',invTitle:'',
@@ -956,29 +1015,49 @@ const DEF={
     fit:{on:false,age:'',sex:'f',weight:'',height:''},fitActs:[],
     nMods:{events:true,meds:true,pagos:true,pagosDias:2,grat:false,gratTime:'20:00',entreno:false,entrenoTime:'19:00',ciclo:false}},
   events:[],tasks:[],notes:[],routines:[],workoutLogs:[],trainLogs:[],
-  meds:[],medLog:{},hobbies:[],hobbyLogs:[],finance:[],investments:[],sewing:[],
+  meds:[],medLog:{},hobbies:[],hobbyLogs:[],finance:[],investments:[],sewing:[],treatments:[],
   shopping:[],gratitude:[],recurring:[],priceBook:[],stock:[],stockMoves:[],periods:[],cycleLogs:[],
   fitDays:{},
   fired:{}
 };
 function migrate(d){
   const st={...JSON.parse(JSON.stringify(DEF.settings)),...(d.settings||{})};
-  if(!st.cats||!Array.isArray(st.cats.out)) st.cats={in:[],out:[]};
-  if(!Array.isArray(st.shopCats)) st.shopCats=[];
-  if(!Array.isArray(st.stockCats)) st.stockCats=[];
-  st.cycle={...DEF.settings.cycle,...(st.cycle||{})};
-  st.nMods={...DEF.settings.nMods,...(st.nMods||{})};
+  /* Esto va ANTES del blindaje de abajo: son banderas que se deducen de que la
+     clave venga SIN definir (copia vieja = usuaria que ya usaba TEXMA). Si el
+     blindaje las completa primero con el false de fábrica, se pierde el dato y
+     le vuelven a salir la bienvenida y el tutorial. */
+  const crudo=d.settings||{};
+  if(crudo.profiled===undefined) st.profiled=!!(st.name||'').trim();
+  if(crudo.welcomed===undefined) st.welcomed=!!st.profiled;
+  if(crudo.tutorDone===undefined) st.tutorDone=!!st.profiled;
+  /* v1.4.4 · MISMO blindaje que las claves de nivel 1, pero DENTRO de settings.
+     Una copia vieja no trae `fit`, ni `nMods`, ni lo que se agregue mañana, y
+     cada módulo nuevo se venía anotando a mano acá abajo: el día que uno se
+     olvidaba, la copia vieja reventaba en el primer acceso y se perdía TODO
+     porque la importación quedaba a medias. Ahora sale solo de DEF.settings.
+     Ojo con el orden: primero el default, después lo del archivo, así lo que
+     la usuaria tenía guardado SIEMPRE gana sobre el valor de fábrica. */
+  Object.keys(DEF.settings).forEach(k=>{
+    const def=DEF.settings[k];
+    if(Array.isArray(def)){ if(!Array.isArray(st[k])) st[k]=JSON.parse(JSON.stringify(def)); }
+    else if(def&&typeof def==='object'){
+      st[k]=(st[k]&&typeof st[k]==='object'&&!Array.isArray(st[k]))
+        ? {...JSON.parse(JSON.stringify(def)),...st[k]}
+        : JSON.parse(JSON.stringify(def));
+    }
+    else if(st[k]===undefined||st[k]===null) st[k]=def;
+  });
+  /* cats es el único caso especial: son DOS listas adentro de un objeto */
+  if(!Array.isArray(st.cats.in)) st.cats.in=[];
+  if(!Array.isArray(st.cats.out)) st.cats.out=[];
   /* el modo oscuro se eliminó: TEXMA es siempre clara */
   delete st.theme; delete st.dark; delete st.fixDark;
   if(typeof st.photo!=='string') st.photo='';
   if(typeof st.invBanner!=='string') st.invBanner='';
   if(typeof st.invTitle!=='string') st.invTitle='';
   if(!/^#[0-9a-f]{6}$/i.test(st.banner||'')) st.banner='#F2803C';
-  if(st.profiled===undefined) st.profiled=!!(st.name||'').trim();
-  /* v1.4.2: bienvenida + tutorial son SOLO para quien recién instala.
-     A quien ya venía usando TEXMA no se le muestran nunca. */
-  if(st.welcomed===undefined) st.welcomed=!!st.profiled;
-  if(st.tutorDone===undefined) st.tutorDone=!!st.profiled;
+  /* (profiled / welcomed / tutorDone se resolvieron arriba, antes del blindaje:
+     v1.4.2 · bienvenida y tutorial son SOLO para quien recién instala) */
   const s={...JSON.parse(JSON.stringify(DEF)),...d,settings:st};
   /* Blindaje: toda clave del estado tiene que tener la FORMA que espera el
      código. Antes se listaban a mano las claves nuevas y era cuestión de
@@ -1007,6 +1086,18 @@ function migrate(d){
     const usado=s.investments.some(m=>(m.hist||[]).some(h=>h.who===p2.id));
     if(!usado&&p2.name==='Mi amor') s.settings.invMembers=s.settings.invMembers.slice(0,1);
   }
+  /* v1.5 · el frasco pasa de 2 personas fijas a una lista de hasta 10.
+     OJO: los `id` que YA existen no se tocan nunca — cada aporte viejo apunta
+     al suyo con h.who y renombrarlos dejaría la plata sin dueño. Acá solo se
+     completa lo que falta (un id vacío, un color inválido) y se recorta si
+     alguien metiera a mano más de 10. */
+  s.settings.invMembers=s.settings.invMembers
+    .filter(p=>p&&typeof p==='object').slice(0,INV_MAX);
+  s.settings.invMembers.forEach((p,i)=>{
+    if(!p.id) p.id='p'+uid();
+    if(typeof p.name!=='string') p.name='';
+    if(!/^#[0-9a-f]{6}$/i.test(p.color||'')) p.color=INV_COLORS[i%INV_COLORS.length];
+  });
   s.investments.forEach(m=>{
     if(m.currency!=='USD') m.currency='ARS';
     m.hist.forEach(h=>{ if(h.who===undefined) h.who=''; }); /* '' = aporte viejo, "juntos" */
@@ -1021,6 +1112,25 @@ function migrate(d){
   if(!Array.isArray(s.settings.fitActs)) s.settings.fitActs=[];
   if(!s.fitDays||typeof s.fitDays!=='object') s.fitDays={};
   if(!s.fired||typeof s.fired!=='object') s.fired={};
+  /* v1.5 · tratamientos (acné, ortodoncia, dermatología…).
+     Las fotos de un tratamiento duran meses o años: NO pueden vivir en el
+     estado. En el celular se guardan como archivos con @capacitor/filesystem
+     y acá adentro queda SOLO la ruta. En el navegador (PWA / probar en la
+     compu) no hay disco propio, así que ahí cae en la foto embebida. */
+  s.treatments.forEach(t=>{
+    if(typeof t.name!=='string') t.name='Tratamiento';
+    if(t.kind===undefined) t.kind='';
+    if(t.start===undefined) t.start='';
+    if(t.note===undefined) t.note='';
+    if(!t.created) t.created=Date.now();
+    if(!Array.isArray(t.photos)) t.photos=[];
+    t.photos=t.photos.filter(p=>p&&typeof p==='object'&&(p.path||p.data));
+    t.photos.forEach(p=>{
+      if(!p.id) p.id=uid();
+      if(!p.date) p.date=hoyISO();
+      if(typeof p.note!=='string') p.note='';
+    });
+  });
   s.shopping.forEach(i=>{ if(i.cat===undefined) i.cat='General'; });
   s.sewing.forEach(p=>{
     if(p.price===undefined) p.price='';
@@ -1277,6 +1387,54 @@ function dowPick(days){
 }
 function delBtn(txt){ return `<button class="btn danger" data-del>${txt||'Eliminar'}</button>`; }
 
+/* ---------- pulsación larga (hold) ----------
+   Medio segundo con el dedo apretado = menú de acciones, como en iOS y
+   Android. Se cancela si el dedo se mueve (era un scroll) y se traga el
+   click que el navegador manda al soltar, para que no se abra ADEMÁS lo
+   que la tarjeta hace al tocarla.
+   OJO: hay que llamarlo ANTES de agregarle el listener de 'click' al
+   elemento — en el mismo nodo los listeners corren en orden de alta.   */
+function holdPress(el,fn,ms){
+  let t=null, x0=0, y0=0, disparo=false;
+  const cancelar=()=>{ if(t){ clearTimeout(t); t=null; } };
+  el.addEventListener('click',e=>{
+    if(disparo){ disparo=false; e.preventDefault(); e.stopImmediatePropagation(); }
+  });
+  el.addEventListener('pointerdown',e=>{
+    if(e.pointerType==='mouse'&&e.button!==0) return;
+    disparo=false; x0=e.clientX; y0=e.clientY; cancelar();
+    t=setTimeout(()=>{
+      t=null; disparo=true;
+      try{ navigator.vibrate&&navigator.vibrate(18); }catch(_){}
+      fn(e);
+    },ms||500);
+  });
+  el.addEventListener('pointermove',e=>{
+    if(t&&Math.hypot(e.clientX-x0,e.clientY-y0)>12) cancelar();   /* estaba scrolleando */
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>el.addEventListener(ev,cancelar));
+  el.addEventListener('contextmenu',e=>e.preventDefault());
+}
+
+/* ---------- menú de acciones (sube de abajo, como el nativo) ----------
+   acciones: [{ico,txt,danger,run}] */
+function accionesSheet(titulo,sub,acciones){
+  const b=sheet(titulo,`
+    ${sub?`<div class="s muted vc" style="margin:-4px 0 15px;text-align:center">${esc(sub)}</div>`:''}
+    ${acciones.map((a,i)=>`<button class="btn ${a.danger?'danger':''}" data-act="${i}"
+        style="width:100%;margin-bottom:9px">${a.ico?esc(a.ico)+'  ':''}${esc(a.txt)}</button>`).join('')}
+    <button class="btn" data-act="x" style="width:100%;margin-top:4px">Cancelar</button>`);
+  b.querySelectorAll('[data-act]').forEach(x=>x.addEventListener('click',()=>{
+    const i=x.dataset.act;
+    closeSheet();
+    if(i==='x') return;
+    /* que termine de bajar antes de abrir lo que sigue: si no, el sheet
+       nuevo se pisa con la animación de salida del viejo */
+    setTimeout(()=>acciones[+i].run(),260);
+  }));
+  return b;
+}
+
 /* ============================================================
    NAVEGACIÓN
 ============================================================ */
@@ -1364,6 +1522,7 @@ const MICONS={
   entreno:'<path d="M7.2 8.2v7.6M4.6 10v4M16.8 8.2v7.6M19.4 10v4M7.2 12h9.6"/>',
   meds:'<rect x="4" y="8.75" width="16" height="6.5" rx="3.25" transform="rotate(-30 12 12)"/><path d="M9.7 16 14.3 8"/>',
   hobbies:'<path d="M12 4.6l2.2 4.5 4.9.7-3.6 3.5.9 4.9L12 15.9l-4.4 2.3.9-4.9-3.6-3.5 4.9-.7Z"/>',
+  trata:'<rect x="3.2" y="7.2" width="17.6" height="12.6" rx="3.2"/><circle cx="12" cy="13.5" r="3.5"/><path d="M8.4 7.2 9.8 4.6h4.4l1.4 2.6"/>',
   fin:'<circle cx="12" cy="12" r="8.2"/><path d="M12 7.6v8.8M14.6 9.6c-.5-.9-1.5-1.4-2.6-1.4-1.6 0-2.9.9-2.9 2.1 0 2.7 5.6 1.3 5.6 4 0 1.2-1.3 2.1-2.9 2.1-1.2 0-2.2-.6-2.7-1.5"/>',
   inv:'<path d="M4 20V4.5M4 20h16"/><path d="M7.6 15.4 11.2 10.7l2.9 2.4 4.6-6"/><path d="M15.6 7.1h3.1v3.1"/>',
   tareas:'<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 12.2l2.8 2.8L16.2 9"/>',
@@ -1386,6 +1545,7 @@ const TILES=[
   ['tareas','Tareas','#6E8BB5'],
   ['notas','Notas','#D9A02B'],
   ['meds','Remedios','#3FA3A3'],
+  ['trata','Tratamientos','#5E9E8F'],
   ['gracias','Gracias','#E06A6A'],
 ];
 function tilesHTML(){
@@ -1409,6 +1569,7 @@ function masSheet(){
     ...(S.settings.cycleOn?[['ciclo','Ciclo menstrual','Registro informativo']]:[]),
     ['notas','Notas','Ideas y apuntes'],
     ['meds','Remedios','Tomas del día'],
+    ['trata','Tratamientos','Fotos del antes y el después'],
     ['gracias','Agradecimientos','Costumbre diaria'],
     ['hobbies','Pasatiempos','Metas semanales'],
     ['ajustes','Perfil y ajustes','Tu foto, colores y datos'],
@@ -1586,18 +1747,124 @@ const CALC={busto:4,cintura:4,cadera:4,cuello:6,espalda:2,sepbusto:2,anchomanga:
 function maniqui(){
   return `<img class="mqi" src="maniqui.png" alt="Maniquí de modista" width="200" height="199">`;
 }
-function shrinkImg(file,cb,max){
-  const img=new Image();
-  img.onload=()=>{
-    const sc=Math.min(1,(max||800)/Math.max(img.width,img.height));
-    const c=document.createElement('canvas');
-    c.width=Math.max(1,Math.round(img.width*sc)); c.height=Math.max(1,Math.round(img.height*sc));
-    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-    URL.revokeObjectURL(img.src);
-    cb(c.toDataURL('image/jpeg',.7));
-  };
-  img.onerror=()=>{ URL.revokeObjectURL(img.src); toast('No pude leer esa imagen'); };
-  img.src=URL.createObjectURL(file);
+/* ============================================================
+   IMÁGENES · leer, achicar y dejar SIEMPRE un JPEG
+   ------------------------------------------------------------
+   La galería del celular devuelve lo que se le canta: HEIC/HEIF de una
+   cámara nueva, WebP de WhatsApp, PNG de 12 MP, o un archivo que ni
+   siquiera es una imagen. La versión vieja hacía todo adentro de un
+   `img.onload` sin try/catch: si `drawImage` o `toDataURL` tiraban (fotos
+   enormes = canvas sin memoria), la excepción se perdía, el callback nunca
+   se llamaba y la app quedaba muda. Eso era «romperse en silencio».
+   Ahora: dos caminos de decodificación, achicado en mitades, fondo blanco
+   (si no, un PNG transparente sale con fondo negro al pasar a JPEG) y
+   SIEMPRE un toast con el motivo real.
+============================================================ */
+const IMG_LADO_MAX=4096;              /* arriba de esto la WebView se queda sin canvas */
+const IMG_PESO_MAX=60*1024*1024;      /* 60 MB: eso ya no es una foto */
+
+const imgEsHeic=f=>{
+  const t=String(f&&f.type||'').toLowerCase(), n=String(f&&f.name||'').toLowerCase();
+  return /hei[cf]/.test(t)||/\.(heic|heif)$/.test(n);
+};
+
+/* camino 1: <img> + objectURL. Es el que respeta la orientación del EXIF. */
+function imgDesdeTag(file){
+  return new Promise((res,rej)=>{
+    let url;
+    try{ url=URL.createObjectURL(file); }
+    catch(e){ return rej(new Error('no-abre')); }
+    const im=new Image(); im.decoding='async';
+    let listo=false;
+    const cerrar=()=>{ try{ URL.revokeObjectURL(url); }catch(e){} };
+    im.onload =()=>{ listo=true; cerrar(); res(im); };
+    im.onerror=()=>{ listo=true; cerrar(); rej(new Error('no-decodifica')); };
+    setTimeout(()=>{ if(!listo){ cerrar(); rej(new Error('tarda-demasiado')); } },25000);
+    im.src=url;
+  });
+}
+/* camino 2: createImageBitmap, que en algunas WebView entiende formatos que
+   el <img> no. `from-image` para que no salga rotada. */
+async function imgDecodificar(file){
+  try{ return await imgDesdeTag(file); }
+  catch(e1){
+    if(window.createImageBitmap){
+      try{
+        const bm=await createImageBitmap(file,{imageOrientation:'from-image'});
+        if(bm&&bm.width) return bm;
+      }catch(e2){ /* tampoco: cae en el error de abajo */ }
+    }
+    throw e1;
+  }
+}
+function imgLienzo(src,w,h){
+  const c=document.createElement('canvas');
+  c.width=w; c.height=h;
+  const x=c.getContext('2d',{alpha:false});
+  if(!x) throw new Error('Este celular no me dio un canvas para trabajar la foto');
+  x.imageSmoothingQuality='high';
+  x.fillStyle='#ffffff'; x.fillRect(0,0,w,h);   /* transparencia → blanco, no negro */
+  x.drawImage(src,0,0,w,h);
+  return c;
+}
+/* file → dataURL JPEG. Tira Error con motivo si algo falla. */
+async function imgAJpeg(file,max){
+  if(!file) throw new Error('No llegó ningún archivo');
+  if(file.size>IMG_PESO_MAX)
+    throw new Error(`Esa foto pesa ${Math.round(file.size/1048576)} MB: es demasiado grande`);
+
+  const src=await imgDecodificar(file);
+  const w0=src.width||src.naturalWidth||0, h0=src.height||src.naturalHeight||0;
+  if(!w0||!h0) throw new Error('La imagen vino vacía (0 × 0 píxeles)');
+
+  const lim=Math.min(max||800,IMG_LADO_MAX);   /* 800 = el default de siempre */
+  /* bajar de 12 MP a 900 px de un saque pide un drawImage carísimo y deja
+     bordes sucios: se va por mitades hasta quedar cerca, que es barato. */
+  let cur=src, cw=w0, ch=h0;
+  while(Math.max(cw,ch)>lim*2){
+    cw=Math.max(1,Math.round(cw/2)); ch=Math.max(1,Math.round(ch/2));
+    cur=imgLienzo(cur,cw,ch);
+  }
+  const sc=Math.min(1,lim/Math.max(cw,ch));
+  const c=imgLienzo(cur,Math.max(1,Math.round(cw*sc)),Math.max(1,Math.round(ch*sc)));
+  if(src.close){ try{ src.close(); }catch(e){} }   /* ImageBitmap: liberar ya */
+
+  let out='';
+  for(const q of [.72,.6,.45]){                    /* si sale gigante, se aprieta más */
+    out=c.toDataURL('image/jpeg',q);
+    if(out.length<=6e6) break;
+  }
+  if(!out||out.indexOf('data:image/jpeg')!==0||out.length<128)
+    throw new Error('No pude convertir esa foto a JPEG');
+  return out;
+}
+/* el motivo, en castellano y con el dato que sirve para entender qué pasó */
+function imgMotivo(e,file){
+  const m=String(e&&e.message||e||'');
+  const tipo=String(file&&file.type||'').trim()||'formato desconocido';
+  if(m==='no-decodifica'||m==='no-abre'||m==='tarda-demasiado'){
+    /* adentro del APK esto ya casi no pasa: la conversión la hace Android.
+       Queda para la PWA, donde no hay plugin que decodifique HEIC. */
+    if(imgEsHeic(file))
+      return NATIVO
+        ? 'Esa foto es HEIC y no la pude convertir. Probá sacándola de nuevo desde TEXMA'
+        : 'Esa foto es HEIC y el navegador no la convierte. Instalá TEXMA en el celu (ahí entran todas) o poné la cámara en «JPEG / Máxima compatibilidad»';
+    if(m==='tarda-demasiado') return 'Esa foto tardó demasiado en abrirse — probá con una más chica';
+    return `No pude leer esa imagen (${tipo})`;
+  }
+  return m||'No pude leer esa imagen';
+}
+/* API de siempre: shrinkImg(file, cb, max). `onErr` es opcional. */
+function shrinkImg(file,cb,max,onErr){
+  imgAJpeg(file,max).then(d=>{
+    try{ cb(d); }
+    catch(e){ console.error('[TEXMA] la foto se procesó pero falló al guardarse:',e); toast('No pude guardar esa foto'); }
+  }).catch(e=>{
+    const msg=imgMotivo(e,file);
+    console.warn('[TEXMA] imagen rechazada:',{nombre:file&&file.name,tipo:file&&file.type,peso:file&&file.size,error:e});
+    toast(msg);
+    if(onErr) onErr(e,msg);
+  });
 }
 function photoView(src){
   const w=document.createElement('div'); w.id='pv';
@@ -1741,14 +2008,31 @@ function projForm(pr){
     phG.querySelectorAll('[data-px]').forEach(x=>x.addEventListener('click',()=>{
       photos.splice(+x.dataset.px,1); sheetDirty=true; renderPh();
     }));
-    phG.querySelector('[data-phadd]')?.addEventListener('click',()=>phF.click());
+    phG.querySelector('[data-phadd]')?.addEventListener('click',sumarFotos);
+  };
+  const meterFoto=f=>shrinkImg(f,d=>{
+    if(photos.length>=4) return;
+    photos.push(d); sheetDirty=true; renderPh();
+  });
+  /* adentro del APK, la galería del sistema: elige varias de una y las
+     entrega convertidas a JPEG (chau HEIC). En la web, el input de siempre. */
+  const sumarFotos=()=>{
+    const libres=4-photos.length;
+    if(libres<=0) return;
+    const C=camPlug();
+    if(C&&C.pickImages){
+      pedirVariasNativas(libres).then(bs=>(bs||[]).forEach(meterFoto)).catch(e=>{
+        if(CAM_CANCEL.test(String(e&&e.message||e))) return;
+        console.warn('[TEXMA] la galería nativa falló, voy por el selector web:',e);
+        phF.click();
+      });
+      return;
+    }
+    phF.click();
   };
   renderPh();
   phF.addEventListener('change',()=>{
-    [...phF.files].slice(0,4-photos.length).forEach(f=>shrinkImg(f,d=>{
-      if(photos.length>=4) return;
-      photos.push(d); sheetDirty=true; renderPh();
-    }));
+    [...phF.files].slice(0,4-photos.length).forEach(meterFoto);
     phF.value='';
   });
   b.querySelector('[data-ok]').addEventListener('click',()=>{
@@ -2958,24 +3242,29 @@ function fitForm(){
     toast(`Listo ♥ tu día: ${NF_ARS.format(g.kcal)} kcal y ${g.vasos} vasos de agua`);
   });
 }
+/* macros opcionales: null = "todavía no lo sabemos" (≠ 0), lo va a completar la IA en el plan PRO */
+const fitNum=v=>(v===null||v===undefined||v==='')?'':v;
+const fitVal=el=>{const t=el.value.trim(); if(t==='') return null; const n=+t; return isFinite(n)&&n>=0?n:null;};
 function fitFoodForm(item){
   const today=hoyISO();
   const b=sheet(item?'Editar comida':'Anotar comida',`
     <div class="fld"><label>Qué comiste</label><input id="cN" value="${esc(item?item.name:'')}" placeholder="Almuerzo, milanesa con puré…"></div>
+    <div class="s muted" style="margin:-4px 0 10px">Los números son opcionales: si no los sabés, dejalos vacíos y guardá igual ♥</div>
     <div class="grid2">
-      <div class="fld"><label>Calorías · kcal</label><input id="cK" type="number" inputmode="numeric" min="0" value="${item?item.kcal:''}" placeholder="0"></div>
-      <div class="fld"><label>Proteínas · g</label><input id="cP" type="number" inputmode="numeric" min="0" value="${item?item.prot||'':''}" placeholder="opcional"></div>
+      <div class="fld"><label>Calorías · kcal</label><input id="cK" type="number" inputmode="numeric" min="0" value="${fitNum(item&&item.kcal)}" placeholder="opcional"></div>
+      <div class="fld"><label>Proteínas · g</label><input id="cP" type="number" inputmode="numeric" min="0" value="${fitNum(item&&item.prot)}" placeholder="opcional"></div>
     </div>
     <div class="grid2">
-      <div class="fld"><label>Grasas · g</label><input id="cG" type="number" inputmode="numeric" min="0" value="${item?item.fat||'':''}" placeholder="opcional"></div>
-      <div class="fld"><label>Carbos · g</label><input id="cC" type="number" inputmode="numeric" min="0" value="${item?item.carb||'':''}" placeholder="opcional"></div>
+      <div class="fld"><label>Grasas · g</label><input id="cG" type="number" inputmode="numeric" min="0" value="${fitNum(item&&item.fat)}" placeholder="opcional"></div>
+      <div class="fld"><label>Carbos · g</label><input id="cC" type="number" inputmode="numeric" min="0" value="${fitNum(item&&item.carb)}" placeholder="opcional"></div>
     </div>
     <div class="btnrow">${item?delBtn():''}<button class="btn primary" data-ok>Guardar</button></div>`);
   b.querySelector('[data-ok]').addEventListener('click',()=>{
-    const kcal=+b.querySelector('#cK').value;
-    if(!kcal) return toast('Faltan las calorías');
-    const data={name:b.querySelector('#cN').value.trim()||'Comida',kcal,
-      prot:+b.querySelector('#cP').value||0,fat:+b.querySelector('#cG').value||0,carb:+b.querySelector('#cC').value||0};
+    /* macros opcionales: vacío queda en null, listo para que la IA PRO los complete después */
+    const data={name:b.querySelector('#cN').value.trim()||'Comida',
+      kcal:fitVal(b.querySelector('#cK')),prot:fitVal(b.querySelector('#cP')),
+      fat:fitVal(b.querySelector('#cG')),carb:fitVal(b.querySelector('#cC'))};
+    data.macrosPend=data.kcal===null&&data.prot===null&&data.fat===null&&data.carb===null;
     if(item) Object.assign(item,data); else fitDay(today).food.push({id:uid(),...data});
     save(); closeSheet(); go('entreno'); toast('Comida anotada ✓');
   });
@@ -2983,6 +3272,85 @@ function fitFoodForm(item){
     const d=fitDay(today); d.food=d.food.filter(x=>x.id!==item.id);
     save(); closeSheet(); go('entreno'); toast('Comida eliminada');
   });
+}
+/* ---- teaser de Texma Plus ----
+   Solo anuncia lo que viene. NO cobra, no pide datos y no promete fecha:
+   es un aviso, no una venta. Se toca y explica un poco más. */
+function plusBanner(){
+  return `<div class="plusban" data-plus>
+    <span class="pk">Próximamente</span>
+    <h4>Texma <em>Plus</em></h4>
+    <p>Escribí lo que comiste, en criollo, y la Inteligencia Artificial calcula sola las calorías y los macronutrientes. Sin pesar nada, sin tablas.</p>
+    <div class="pfeat"><span>✦ Macros automáticos</span><span>✦ Foto del plato</span><span>✦ Informe para tu nutricionista</span></div>
+  </div>`;
+}
+function wirePlusBanner(root){
+  root.querySelector('[data-plus]')?.addEventListener('click',()=>{
+    dlg({title:'Texma Plus está en camino ♥',
+      msg:'Vas a poder anotar «milanesa con puré y una manzana» y TEXMA sola te completa las calorías, las proteínas, las grasas y los carbos. Todo lo que anotes hasta entonces se aprovecha: cuando llegue, los días viejos también se calculan.',
+      okTxt:'¡Qué ganas!',oneBtn:true});
+  });
+}
+/* ---- historial de nutrición · el «diario alimentario» ----
+   Lista larga y simple, del día más nuevo al más viejo: qué comió y cuánta
+   agua tomó. Nada de fotos acá a propósito — esto se abre para mostrárselo a
+   un nutricionista y tiene que scrollear liviano, no cargar 200 imágenes. */
+function fitHistSheet(){
+  const g=fitGoals(), hoy=hoyISO();
+  const dias=Object.keys(S.fitDays||{})
+    .filter(ds=>{
+      const d=S.fitDays[ds]||{};
+      return (Array.isArray(d.food)&&d.food.length)||(+d.water||0)>0;
+    })
+    .sort((a,b)=>b.localeCompare(a));
+  /* totales rápidos para el pie */
+  const conComida=dias.filter(ds=>(S.fitDays[ds].food||[]).length).length;
+  sheet('Diario alimentario',`
+    <div class="s muted" style="margin:-6px 0 16px">Todo lo que anotaste, del día más nuevo al más viejo. Se lo podés mostrar así, tal cual, a tu nutricionista ♥</div>
+    ${dias.length?dias.map(ds=>{
+      const d=S.fitDays[ds], comidas=d.food||[];
+      const kcal=comidas.reduce((a,x)=>a+(+x.kcal||0),0);
+      const agua=+d.water||0;
+      return `<div class="nhday ${ds===hoy?'hoy':''}">
+        <div class="nhd">${fLong(ds)}${ds===hoy?' · hoy':''}</div>
+        <div class="nhf">${comidas.length
+          ? comidas.map(x=>esc(x.name)).join(' · ')
+          : '<span class="muted">sin comidas anotadas</span>'}</div>
+        <div class="nhw">💧 ${agua}${g?' / '+g.vasos:''} vaso${agua===1?'':'s'}${kcal?' · '+NF_ARS.format(kcal)+' kcal':''}</div>
+      </div>`;
+    }).join(''):'<div class="empty">Todavía no anotaste ningún día. Empezá con «🍽 Anotar comida» ♥</div>'}
+    ${dias.length?`<div class="s muted" style="margin-top:14px;text-align:center;font-size:11.5px">
+      ${dias.length} día${dias.length===1?'':'s'} registrado${dias.length===1?'':'s'} · ${conComida} con comidas anotadas</div>`:''}`);
+}
+/* ---- ＋ Registrar actividad ----
+   v1.5: antes esto eran tarjetas gigantes clavadas en la pantalla principal y
+   se comían media vista. Ahora es un botón y la lista aparece solo cuando la
+   usuaria realmente quiere anotar el entrenamiento. */
+function fitActSheet(){
+  const acts=fitActList();
+  const b=sheet('¿Qué entrenaste?',`
+    <div class="pillist">
+      ${acts.map(a=>`<div class="pillrow" data-pact="${esc(a.id)}" style="--c:${a.id==='run'?'#FC4C02':'#F2803C'}">
+        <i class="emo">${a.emoji}</i>
+        <div class="pgrow"><div class="t">${esc(a.name)}</div>
+          <div class="s">${a.id==='run'?'kilómetros y minutos':'minutos'}</div></div>
+        <span class="ch">›</span>
+      </div>`).join('')}
+      <div class="pillrow" data-pnew style="--c:#8C7F68">
+        <i class="emo">＋</i>
+        <div class="pgrow"><div class="t">Otra actividad</div>
+          <div class="s">Natación, yoga, bici… queda guardada para la próxima</div></div>
+        <span class="ch">›</span>
+      </div>
+    </div>
+    <div class="btnrow"><button class="btn ghost" data-pfree style="width:100%">✎ Anotarlo a mano</button></div>`);
+  b.querySelectorAll('[data-pact]').forEach(r=>r.addEventListener('click',()=>{
+    const a=fitActList().find(x=>x.id===r.dataset.pact); if(a) fitActForm(a);
+  }));
+  b.querySelector('[data-pnew]').addEventListener('click',()=>fitNewAct());
+  b.querySelector('[data-pfree]').addEventListener('click',()=>trainForm());
+  const g=G();
+  if(g) g.from(b.querySelectorAll('.pillrow'),{y:14,opacity:0,duration:.3,stagger:.03,ease:'power2.out',delay:.06});
 }
 /* actividad rápida: Running pide kilómetros a lo grande; el resto, minutos */
 function fitActForm(act){
@@ -3057,7 +3425,6 @@ VIEWS.entreno={
     const goals=fitGoals(), eaten=fitTotals(today), day=fitDay(today);
     const pctK=goals?Math.min(100,eaten.kcal/goals.kcal*100):0;
     const ARC=282.8;   /* largo del medio anillo (π·r, r=90) */
-    const acts=fitActList();
     const hoyActs=S.trainLogs.filter(l=>l.date===today);
     /* semana en curso · lunes a domingo */
     const ws=pDate(weekStart());
@@ -3128,25 +3495,27 @@ VIEWS.entreno={
             <div class="bar"><i style="width:${Math.min(100,g2?v/g2*100:0)}%;background:${c}"></i></div>
           </div>`).join('')}
         </div>
-        <div class="btnrow" style="margin-top:12px"><button class="btn primary" data-food>🍽 Anotar comida</button></div>
+        <div class="btnrow" style="margin-top:12px">
+          <button class="btn primary" data-food>🍽 Anotar comida</button>
+          <button class="btn" data-fhist>📖 Historial</button>
+        </div>
         ${day.food.length?`<div class="lbl" style="margin-top:14px">Comidas de hoy</div>
           ${day.food.map(x=>`<div class="item" data-fd="${x.id}" style="cursor:pointer">
             <div class="grow"><div class="t" style="font-weight:600">${esc(x.name)}</div></div>
-            <span class="s mono">${NF_ARS.format(x.kcal)} kcal</span></div>`).join('')}`:''}
+            <span class="s mono ${x.kcal?'':'muted'}">${x.kcal?NF_ARS.format(x.kcal)+' kcal':'sin datos'}</span></div>`).join('')}`:''}
+        ${plusBanner()}
       </div>
       <div class="card vc"><div class="lbl">Agua · ${NF_ARS.format(goals.aguaMl)} ml por día</div>
         <div class="cups">${[...Array(goals.vasos)].map((_,i)=>`<span class="cup ${i<day.water?'on':''}" data-cup="${i}">🥤</span>`).join('')}</div>
         <div class="s muted" style="margin-top:8px">${day.water>=goals.vasos?'¡Agua completa! 💧♥':`${day.water} de ${goals.vasos} vasos (250 ml) · tocá los vasos`}</div>
       </div>`:''}
-      <div class="card vc"><div class="lbl">¿Qué entrenaste hoy?</div>
-        <div class="acttiles">
-          ${acts.map(a=>`<div class="actt ${a.id==='run'?'run':''}" data-act="${a.id}"><i>${a.emoji}</i><span>${esc(a.name)}${a.id==='run'?' · km':''}</span></div>`).join('')}
-          <div class="actt" data-newact style="border-style:dashed"><i>＋</i><span>Nuevo</span></div>
-        </div>
+      <div class="card vc"><div class="lbl">Actividad de hoy</div>
+        <div class="btnrow" style="margin-top:8px"><button class="btn primary" data-actadd style="width:100%">＋ Registrar actividad</button></div>
         ${hoyActs.length?`<div style="margin-top:12px">${hoyActs.map(l=>`<div class="item" data-tl="${l.id}" style="cursor:pointer">
           <div class="grow"><div class="t" style="font-weight:600">${esc(l.title)}</div>
           ${l.note?`<div class="s">${esc(l.note)}</div>`:''}</div>
-          <span class="s mono">${l.minutes?l.minutes+' min':''}</span></div>`).join('')}</div>`:''}
+          <span class="s mono">${l.minutes?l.minutes+' min':''}</span></div>`).join('')}</div>`
+          :'<div class="s muted" style="margin-top:10px;text-align:center;font-size:11.5px">Todavía no anotaste nada hoy — tocá arriba y sumá a tu racha 🔥</div>'}
       </div>
       <div class="card vc">
         <div class="calhead">
@@ -3189,11 +3558,10 @@ VIEWS.entreno={
       d.water=(i+1===d.water)?i:i+1;   /* tocar el último vaso lleno lo vacía */
       save(); VIEWS.entreno.render();
     }));
-    V.querySelectorAll('[data-act]').forEach(t=>t.addEventListener('click',()=>{
-      const a=fitActList().find(x=>x.id===t.dataset.act); if(a) fitActForm(a);
-    }));
-    V.querySelector('[data-newact]')?.addEventListener('click',()=>fitNewAct());
+    V.querySelector('[data-fhist]')?.addEventListener('click',()=>fitHistSheet());
+    V.querySelector('[data-actadd]')?.addEventListener('click',()=>fitActSheet());
     V.querySelector('[data-lognow]')?.addEventListener('click',()=>trainForm());
+    wirePlusBanner(V);
     V.querySelectorAll('[data-enav]').forEach(b=>b.addEventListener('click',()=>{
       entM+=+b.dataset.enav;
       if(entM<0){entM=11;entY--;} if(entM>11){entM=0;entY++;}
@@ -3473,14 +3841,108 @@ function animJars(root){
   });
 }
 /* pedir una imagen sin dejar un <input file> colgado en el HTML */
-function pedirFoto(cb,max){
+/* ============================================================
+   PEDIR UNA FOTO
+   ------------------------------------------------------------
+   Adentro del APK va por @capacitor/camera: abre la cámara o la galería
+   del sistema y Android nos devuelve SIEMPRE un JPEG en base64, sea cual
+   sea el formato del archivo original. Ese es el arreglo de los HEIC:
+   la conversión la hace el decodificador del sistema operativo, que sí
+   sabe leerlos, y a la WebView le llega algo que entiende siempre.
+   Encima resuelve la rotación (correctOrientation) y achica de entrada,
+   así el celular no tiene que decodificar 12 MP adentro del canvas.
+   En el navegador (PWA) el plugin no existe: sigue el <input type=file>
+   de siempre, con la tubería de shrinkImg como red.
+============================================================ */
+const camPlug=()=>{ try{ return NATIVO?plug('Camera'):null; }catch(e){ return null; } };
+const CAM_CANCEL=/cancel|denied|no image|not picked|no photo/i;
+
+async function pedirFotoNativa(max){
+  const C=camPlug();
+  if(!C) return null;
+  /* se pide un poco más grande que el destino final: el ajuste fino y el
+     tope de peso los sigue haciendo shrinkImg, que ya sabe cómo dejarlo */
+  const lado=Math.min(Math.round((max||900)*1.3),2600);
+  const f=await C.getPhoto({
+    resultType:'base64',           /* base64 = ya convertido a JPEG por Android */
+    source:'PROMPT',               /* «Sacar una foto» o «Elegir de la galería» */
+    quality:88,
+    width:lado, height:lado,       /* entra en un cuadrado de ese lado, sin deformar */
+    correctOrientation:true,
+    saveToGallery:false,
+    allowEditing:false,
+    promptLabelHeader:'Foto',
+    promptLabelCancel:'Cancelar',
+    promptLabelPhoto:'Elegir de la galería',
+    promptLabelPicture:'Sacar una foto',
+  });
+  const b64=f&&f.base64String;
+  if(!b64) throw new Error('El celular no devolvió ninguna foto');
+  const fmt=String(f.format||'jpeg').toLowerCase();
+  return `data:image/${fmt==='png'?'png':'jpeg'};base64,${b64}`;
+}
+/* varias de una (galería). Devuelve Blobs ya pasados a JPEG por Android. */
+async function pedirVariasNativas(limite,max){
+  const C=camPlug();
+  if(!C||!C.pickImages) return null;
+  const lado=Math.min(Math.round((max||800)*1.3),2600);
+  const r=await C.pickImages({
+    quality:88, width:lado, height:lado, correctOrientation:true, limit:limite||1,
+  });
+  const fotos=((r&&r.photos)||[]).slice(0,limite||1);
+  const out=[];
+  for(const f of fotos){
+    /* pickImages devuelve un archivo temporal (ya JPEG), no base64 */
+    const src=f.webPath||(window.Capacitor&&window.Capacitor.convertFileSrc
+      ? window.Capacitor.convertFileSrc(f.path) : f.path);
+    out.push(await (await fetch(src)).blob());
+  }
+  return out;
+}
+/* dataURL → Blob, para poder pasar la foto nativa por la misma tubería */
+function dataURLaBlob(d){
+  const [cab,b64]=String(d).split(',');
+  const tipo=(cab.match(/data:([^;]+)/)||[,'image/jpeg'])[1];
+  const bin=atob(b64||'');
+  const u=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i);
+  return new Blob([u],{type:tipo});
+}
+
+function pedirFoto(cb,max,onErr){
+  /* ---- camino del APK ---- */
+  if(camPlug()){
+    pedirFotoNativa(max).then(d=>{
+      if(!d) return;
+      shrinkImg(dataURLaBlob(d),cb,max||900,onErr);
+    }).catch(e=>{
+      const m=String(e&&e.message||e||'');
+      if(CAM_CANCEL.test(m)) return;          /* tocó «Cancelar»: no es un error */
+      /* algo raro con el plugin: en vez de dejarla sin poder cargar la foto,
+         cae al selector de archivos de la WebView */
+      console.warn('[TEXMA] la cámara nativa falló, voy por el selector web:',e);
+      pedirFotoWeb(cb,max,onErr);
+    });
+    return;
+  }
+  pedirFotoWeb(cb,max,onErr);
+}
+
+function pedirFotoWeb(cb,max,onErr){
   const i=document.createElement('input');
-  i.type='file'; i.accept='image/*'; i.style.display='none';
+  i.type='file';
+  /* con `image/*` a secas hay galerías de Android que ni ofrecen los HEIC:
+     nombrarlos hace que aparezcan y que podamos dar un error claro */
+  i.accept='image/*,.heic,.heif,.webp';
+  i.style.display='none';
   document.body.appendChild(i);
   const limpiar=()=>{ try{ i.remove(); }catch(e){} };
   i.addEventListener('change',()=>{
-    const f=i.files[0];
-    if(f) shrinkImg(f,d=>{ cb(d); limpiar(); },max||900); else limpiar();
+    const f=i.files&&i.files[0];
+    limpiar();                       /* el File sigue vivo aunque saquemos el input */
+    if(!f) return;                   /* canceló */
+    if(f.size>2*1024*1024) toast('Preparando la foto…');
+    shrinkImg(f,cb,max||900,onErr);
   });
   setTimeout(limpiar,120000);   /* si cancela, no queda basura en el DOM */
   i.click();
@@ -3591,7 +4053,7 @@ function invBannerSheet(){
       <input id="ibT" value="${esc(S.settings.invTitle||'')}" placeholder="Nuestra casa, Mi auto, El viaje…" maxlength="34"></div>
     <button class="btn" id="ibPic">📷 Elegir la imagen</button>
     ${S.settings.invBanner?'<button class="btn ghost" id="ibDel" style="margin-top:10px">Quitar la imagen</button>':''}
-    <div class="lbl" style="margin-top:18px">¿Quién ahorra? · nombre y color del frasco</div>
+    <div class="lbl" style="margin-top:18px">¿Quiénes ahorran? · ${S.settings.invMembers.length} de ${INV_MAX}</div>
     ${S.settings.invMembers.map((p,i)=>`
       <div class="grid2" style="position:relative">
         <div class="fld"><label>Persona ${i+1}</label>
@@ -3600,8 +4062,10 @@ function invBannerSheet(){
           <input class="ibCol" data-i="${i}" type="color" value="${p.color}" style="height:44px;padding:4px;cursor:pointer"></div>
         ${i>0?`<button class="btn sm danger" data-quitar="${p.id}" style="position:absolute;top:-4px;right:0">✕</button>`:''}
       </div>`).join('')}
-    ${S.settings.invMembers.length<2?`<button class="btn ghost" id="ibMas" style="margin-bottom:6px">＋ Añadir a otra persona</button>
-      <div class="s muted" style="margin:-2px 0 10px;font-size:11.5px">Si ahorrás en pareja, acá se suma. Con una sola persona, el frasco es todo tuyo.</div>`:''}
+    ${S.settings.invMembers.length<INV_MAX
+      ? `<button class="btn ghost" id="ibMas" style="margin-bottom:6px">＋ Añadir a otra persona</button>
+         <div class="s muted" style="margin:-2px 0 10px;font-size:11.5px">Cada persona tiene su color y su capa adentro del frasco. Sirve igual para ahorrar en pareja que para una cooperativa o un proyecto entre varios — entran hasta ${INV_MAX}.</div>`
+      : `<div class="s muted" style="margin:-2px 0 10px;font-size:11.5px">Llegaste a ${INV_MAX} personas, el máximo de un frasco.</div>`}
     <div class="btnrow"><button class="btn primary" data-ok>Guardar</button></div>
     <div class="s muted" style="margin-top:10px;font-size:11.5px;text-align:center">
       La imagen se guarda achicada en este celular, como las fotos de costura.</div>`);
@@ -3618,9 +4082,17 @@ function invBannerSheet(){
   b.querySelector('#ibDel')?.addEventListener('click',()=>{
     S.settings.invBanner=''; save(); closeSheet(); go('inv'); toast('Imagen quitada');
   });
-  /* sumar a la segunda persona: aparece recién cuando la usuaria lo pide */
+  /* sumar gente: aparece recién cuando la usuaria lo pide.
+     v1.5 · el id sale de uid() y NO del largo de la lista: con el esquema
+     viejo ('p'+largo), quitar a alguien y volver a agregar reciclaba el mismo
+     id y los aportes de la persona que se fue se le colgaban a la nueva. */
   b.querySelector('#ibMas')?.addEventListener('click',()=>{
-    S.settings.invMembers.push({id:'p'+(S.settings.invMembers.length+1),name:'',color:'#3B7BD4'});
+    const mem=S.settings.invMembers;
+    if(mem.length>=INV_MAX) return toast(`Un frasco aguanta hasta ${INV_MAX} personas`);
+    /* color: el primero de la paleta que no esté usado */
+    const usados=mem.map(p=>(p.color||'').toLowerCase());
+    const libre=INV_COLORS.find(c=>!usados.includes(c.toLowerCase()))||INV_COLORS[mem.length%INV_COLORS.length];
+    mem.push({id:'p'+uid(),name:'',color:libre});
     save(); invBannerSheet();   /* el sheet se redibuja con los campos nuevos */
   });
   b.querySelectorAll('[data-quitar]').forEach(bt=>bt.addEventListener('click',()=>{
@@ -3793,6 +4265,258 @@ function aporteForm(id,ap){
   b.querySelector('[data-del]')?.addEventListener('click',()=>{
     m.hist=m.hist.filter(x=>x.id!==ap.id);
     save(); closeSheet(); go('inv'); toast('Aporte eliminado');
+  });
+}
+
+/* ============================================================
+   TRATAMIENTOS · galería de progreso   (v1.5)
+   ------------------------------------------------------------
+   Acné, ortodoncia, dermatología, kinesiología: cosas que duran MESES o
+   AÑOS y se siguen con fotos. Por eso acá las fotos NO van al estado.
+
+   · En el celular (APK / Capacitor) cada foto se escribe como archivo real
+     con @capacitor/filesystem en Directory.Data, adentro de `texma/trat`.
+     En S.treatments queda SOLO {path, uri}: cuatro renglones de texto.
+     Así el localStorage —que tiene ~5 MB y ya carga las fotos de costura,
+     las metas y el perfil— ni se entera de que existe este módulo.
+   · En el navegador (probar en la compu, o la PWA) no hay disco propio de la
+     app: ahí, y SOLO ahí, cae en la foto embebida y se avisa en pantalla.
+
+   Contra: la copia de seguridad (Exportar) es un JSON y se lleva las rutas,
+   no los archivos. Está dicho en la vista con todas las letras.
+============================================================ */
+const TRAT_DIR='texma/trat';
+const TRAT_KINDS=['Piel / acné','Ortodoncia','Dermatología','Pelo','Kinesiología','Otro'];
+/* el plugin solo existe adentro del APK; en el navegador esto da null */
+function tratFS(){ return NATIVO?plug('Filesystem'):null; }
+const tratNativo=()=>!!tratFS();
+
+/* guarda la foto y devuelve lo MÍNIMO que hay que recordar de ella */
+async function tratGuardarFoto(dataURL){
+  const FS=tratFS();
+  if(!FS) return {data:dataURL};              /* navegador: no hay dónde escribir */
+  const b64=String(dataURL).split(',')[1]||'';
+  if(!b64) throw new Error('La foto llegó vacía al guardarse');
+  const path=`${TRAT_DIR}/${uid()}.jpg`;
+  await FS.writeFile({path,data:b64,directory:'DATA',recursive:true});
+  let uri='';
+  try{ uri=(await FS.getUri({path,directory:'DATA'})).uri||''; }catch(e){}
+  /* sin uri el <img> no tiene de dónde agarrarse: mejor fallar acá y
+     avisar, que dejar una tarjeta con una foto rota para siempre */
+  if(!uri){
+    try{ await FS.deleteFile({path,directory:'DATA'}); }catch(e){}
+    throw new Error('Guardé la foto pero Android no me dio su ruta');
+  }
+  return {path,uri};
+}
+/* de la ruta guardada al src que entiende el <img> de la WebView */
+function tratSrc(p){
+  if(!p) return '';
+  if(p.data) return p.data;
+  if(p.uri) return (window.Capacitor&&window.Capacitor.convertFileSrc)
+    ? window.Capacitor.convertFileSrc(p.uri) : p.uri;
+  return '';
+}
+async function tratBorrarFoto(p){
+  const FS=tratFS();
+  if(!FS||!p||!p.path) return;
+  try{ await FS.deleteFile({path:p.path,directory:'DATA'}); }catch(e){}
+}
+const tratFotos=t=>[...(t.photos||[])].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+function tratDias(t){
+  if(!t.start) return 0;
+  return Math.max(0,Math.round((pDate(hoyISO())-pDate(t.start))/864e5));
+}
+const TRAT_VACIO='<svg viewBox="0 0 24 24"><path d="M3.5 8.5h3.2l1.4-2.2h7.8l1.4 2.2h3.2v11h-17Z"/><circle cx="12" cy="14" r="3.4"/></svg>';
+
+VIEWS.trata={
+  fab(){ tratForm(); },
+  render(){
+    const lista=[...S.treatments].sort((a,b)=>(b.created||0)-(a.created||0));
+    V.innerHTML=`
+      <h1 class="vt vc">Tratamientos</h1>
+      <div class="s muted vc" style="margin:-6px 0 16px;text-align:center;font-size:12.5px">
+        Sacate una foto cada tanto y mirá el progreso de verdad. Para el acné, los brackets, la piel, lo que sea ♥
+        ${lista.length?'<br><span style="opacity:.8">Dejá el dedo apretado en una tarjeta para editarla o borrarla.</span>':''}</div>
+      ${lista.length?lista.map(t=>{
+        const fotos=tratFotos(t), dias=tratDias(t);
+        const tira=fotos.slice(-8);
+        return `<div class="tratc vc" data-trat="${t.id}">
+          <div class="th">
+            <div class="grow" style="flex:1;min-width:0">
+              <div class="t">${esc(t.name)}</div>
+              <div class="s muted" style="font-size:12px;margin-top:2px">
+                ${t.kind?esc(t.kind)+' · ':''}${fotos.length} foto${fotos.length===1?'':'s'}${t.start?` · día ${dias+1}`:''}</div>
+            </div>
+            <span class="muted">›</span>
+          </div>
+          ${fotos.length?`<div class="tstrip">${tira.map(p=>`<div class="tsq">
+            <img src="${tratSrc(p)}" alt="" loading="lazy"><b>${fShort(p.date)}</b></div>`).join('')}</div>`
+            :`<div class="s muted" style="margin-top:10px;font-size:12px">Todavía sin fotos — abrilo y sacá la primera, la del «antes».</div>`}
+        </div>`;
+      }).join(''):`<div class="card vc"><div class="empty">
+        Todavía no hay ningún tratamiento — tocá ＋ y armá el primero ♥</div></div>`}
+      <div class="card vc"><div class="lbl">Cómo se guardan las fotos</div>
+        <div class="s muted" style="font-size:12px;line-height:1.55">
+          ${tratNativo()
+            ? 'Las fotos de tus tratamientos se guardan como archivos adentro de TEXMA, no en la memoria del planner: podés sumar todas las que quieras sin llenar nada. Ojo con una sola cosa: la copia de seguridad (Exportar) se lleva los datos, pero no estas fotos.'
+            : 'Estás en el navegador, así que las fotos quedan en la memoria de TEXMA y ocupan lugar. Instalada como app en el celular se guardan como archivos aparte y podés sumar todas las que quieras.'}
+        </div>
+      </div>`;
+    V.querySelectorAll('[data-trat]').forEach(c=>{
+      holdPress(c,()=>tratAcciones(c.dataset.trat));          /* primero el hold… */
+      c.addEventListener('click',()=>tratSheet(c.dataset.trat)); /* …después el toque */
+    });
+  }
+};
+
+/* ---- menú de la tarjeta (pulsación larga) ---- */
+function tratAcciones(id){
+  const t=S.treatments.find(x=>x.id===id); if(!t) return;
+  const n=(t.photos||[]).length;
+  accionesSheet(t.name,`${n} foto${n===1?'':'s'} guardada${n===1?'':'s'}`,[
+    {ico:'📷',txt:'Sumar una foto',run:()=>tratFotoNueva(id)},
+    {ico:'✏️',txt:'Editar el tratamiento',run:()=>tratForm(t)},
+    {ico:'🗑',txt:'Eliminar',danger:true,run:()=>tratPreguntarEliminar(t)},
+  ]);
+}
+function tratPreguntarEliminar(t){
+  const n=(t.photos||[]).length;
+  dlg({title:`¿Eliminar «${t.name}»?`,
+       msg:n?`Se borran también sus ${n} foto${n===1?'':'s'} del celular. No se puede deshacer.`
+            :'No se puede deshacer.',
+       okTxt:'Eliminar',danger:true},async ok=>{
+    if(ok) await tratEliminar(t);
+  });
+}
+/* borra el tratamiento Y los archivos de las fotos: si no, quedarían
+   ocupando lugar en el disco del celular para siempre */
+async function tratEliminar(t){
+  for(const p of (t.photos||[])) await tratBorrarFoto(p);
+  S.treatments=S.treatments.filter(x=>x.id!==t.id);
+  save(); closeSheet(); go('trata'); toast('Tratamiento eliminado');
+}
+
+/* ---- alta / edición del tratamiento ---- */
+function tratForm(tr){
+  const t=tr||{name:'',kind:'',start:hoyISO(),note:''};
+  const b=sheet(tr?'Editar tratamiento':'Nuevo tratamiento',`
+    <div class="fld"><label>¿Qué estás tratando?</label>
+      <input id="tN" value="${esc(t.name)}" placeholder="Mi piel, los brackets…" maxlength="40"></div>
+    <div class="fld"><label>Tipo</label>
+      <div class="chips cKind">${TRAT_KINDS.map(k=>`<div class="chip ${t.kind===k?'on':''}" data-val="${esc(k)}">${esc(k)}</div>`).join('')}</div></div>
+    <div class="fld"><label>¿Cuándo empezaste?</label><input id="tS" type="date" value="${t.start||''}"></div>
+    <div class="fld"><label>Nota</label><textarea id="tNo" placeholder="El médico, la crema, cada cuánto…">${esc(t.note||'')}</textarea></div>
+    <div class="btnrow">${tr?delBtn():''}<button class="btn primary" data-ok>Guardar</button></div>`);
+  chipsWire(b,'.cKind',true);
+  b.querySelector('[data-ok]').addEventListener('click',()=>{
+    const name=b.querySelector('#tN').value.trim();
+    if(!name) return toast('Falta el nombre del tratamiento');
+    const data={name,kind:chipsVals(b,'.cKind')[0]||'',
+      start:b.querySelector('#tS').value||'',note:b.querySelector('#tNo').value.trim()};
+    if(tr) Object.assign(tr,data);
+    else S.treatments.push({id:uid(),...data,photos:[],created:Date.now()});
+    save(); closeSheet(); go('trata'); toast(tr?'Guardado ✓':'¡Tratamiento creado! ♥');
+  });
+  b.querySelector('[data-del]')?.addEventListener('click',()=>tratPreguntarEliminar(tr));
+}
+
+/* ---- el timeline de un tratamiento ---- */
+function tratSheet(id){
+  const t=S.treatments.find(x=>x.id===id); if(!t) return;
+  const fotos=tratFotos(t);           /* de la más vieja a la más nueva: así se ve el progreso */
+  /* agrupadas por mes, que es como se mira un tratamiento largo */
+  const meses=[];
+  fotos.forEach(p=>{
+    const mk=(p.date||'').slice(0,7);
+    let g=meses.find(x=>x.mk===mk);
+    if(!g){ g={mk,fotos:[]}; meses.push(g); }
+    g.fotos.push(p);
+  });
+  const dias=tratDias(t);
+  const b=sheet(t.name,`
+    <div class="card vc" style="margin-top:0">
+      <div class="item" style="border-bottom:none;padding:0">
+        <div class="grow"><div class="t">${t.kind?esc(t.kind):'Tratamiento'}</div>
+          <div class="s">${t.start?`Empezaste el ${fLong(t.start)} · día ${dias+1}`:'Sin fecha de inicio'}</div></div>
+        <span class="racha">${fotos.length} foto${fotos.length===1?'':'s'}</span>
+      </div>
+      ${t.note?`<div class="s" style="margin-top:10px">${esc(t.note)}</div>`:''}
+    </div>
+    <div class="btnrow">
+      <button class="btn" id="tEd">Editar</button>
+      <button class="btn primary" id="tAdd">📷 Sumar foto</button>
+    </div>
+    ${fotos.length?meses.map(g=>{
+      const d=pDate(g.mk+'-01');
+      return `<div class="tsem">${MES[d.getMonth()]} ${d.getFullYear()}</div>
+        <div class="tgal">${g.fotos.map((p,i)=>{
+          const n=fotos.indexOf(p);
+          return `<figure data-tph="${p.id}">
+            <img src="${tratSrc(p)}" alt="" loading="lazy">
+            ${n===0?'<span class="tbad">ANTES</span>':(n===fotos.length-1&&fotos.length>1?'<span class="tbad">HOY</span>':'')}
+            <figcaption>${fShort(p.date)}${t.start?` · d${Math.max(0,Math.round((pDate(p.date)-pDate(t.start))/864e5))+1}`:''}</figcaption>
+          </figure>`;
+        }).join('')}</div>`;
+    }).join(''):`<div class="card vc" style="margin-top:14px"><div class="empty">
+      Sacá la primera foto: esa es la del «antes» ♥</div></div>`}`);
+  b.querySelector('#tEd').addEventListener('click',()=>tratForm(t));
+  b.querySelector('#tAdd').addEventListener('click',()=>tratFotoNueva(t.id));
+  b.querySelectorAll('[data-tph]').forEach(f=>f.addEventListener('click',()=>tratFotoSheet(t.id,f.dataset.tph)));
+}
+
+/* ---- sumar una foto ---- */
+function tratFotoNueva(id){
+  const t=S.treatments.find(x=>x.id===id); if(!t) return;
+  /* 1400 px: es una foto de seguimiento, tiene que mostrar detalle.
+     Puede darse el lujo porque va a un archivo, no al localStorage. */
+  pedirFoto(async d=>{
+    let guardada;
+    try{ guardada=await tratGuardarFoto(d); }
+    catch(e){
+      console.warn('[TEXMA] no pude guardar la foto del tratamiento:',e);
+      /* el motivo real, no un «algo salió mal» */
+      return toast(String(e&&e.message||e)||'No pude guardar esa foto');
+    }
+    t.photos.push({id:uid(),date:hoyISO(),note:'',...guardada});
+    if(!save()){ /* solo puede pasar en el navegador, con la foto embebida */
+      t.photos.pop();
+      return toast('Memoria llena — instalá TEXMA en el celu para sumar fotos');
+    }
+    closeSheet(); go('trata'); toast('Foto guardada ♥');
+  },tratNativo()?1400:900);
+}
+
+/* ---- una foto: verla, cambiarle la fecha, borrarla ---- */
+function tratFotoSheet(id,pid){
+  const t=S.treatments.find(x=>x.id===id); if(!t) return;
+  const p=(t.photos||[]).find(x=>x.id===pid); if(!p) return;
+  const b=sheet('Foto del '+fShort(p.date),`
+    <div class="goal" style="cursor:pointer" id="tfBig">
+      <div class="gph" style="height:230px">
+        <img src="${tratSrc(p)}" alt="">
+        <div class="sh"></div>
+        <div class="gt">${esc(t.name)}${t.start?` · día ${Math.max(0,Math.round((pDate(p.date)-pDate(t.start))/864e5))+1}`:''}</div>
+      </div>
+    </div>
+    <div class="fld" style="margin-top:14px"><label>Fecha de la foto</label>
+      <input id="tfD" type="date" value="${p.date}"></div>
+    <div class="fld"><label>Nota</label>
+      <input id="tfN" value="${esc(p.note||'')}" placeholder="Cómo venís, qué cambió…"></div>
+    <div class="btnrow">${delBtn('Borrar foto')}<button class="btn primary" data-ok>Guardar</button></div>`);
+  b.querySelector('#tfBig').addEventListener('click',()=>photoView(tratSrc(p)));
+  b.querySelector('[data-ok]').addEventListener('click',()=>{
+    p.date=b.querySelector('#tfD').value||p.date;
+    p.note=b.querySelector('#tfN').value.trim();
+    save(); closeSheet(); go('trata'); toast('Guardado ✓');
+  });
+  b.querySelector('[data-del]').addEventListener('click',()=>{
+    dlg({title:'¿Borrar esta foto?',msg:'No se puede deshacer.',okTxt:'Borrar',danger:true},async ok=>{
+      if(!ok) return;
+      await tratBorrarFoto(p);
+      t.photos=t.photos.filter(x=>x.id!==p.id);
+      save(); closeSheet(); go('trata'); toast('Foto borrada');
+    });
   });
 }
 
@@ -4157,7 +4881,6 @@ VIEWS.ajustes={
           <div class="profpic">${S.settings.photo?`<img src="${S.settings.photo}" alt="Tu foto">`:(nm?nm[0].toUpperCase():'♥')}</div>
           <span class="cam"><svg viewBox="0 0 24 24"><path d="M3.5 8.5h3.2l1.4-2.2h7.8l1.4 2.2h3.2v11h-17Z"/><circle cx="12" cy="14" r="3.4"/></svg></span>
         </div>
-        <input type="file" id="setFile" accept="image/*" style="display:none">
         <div class="profname">${esc(nm||'Tu nombre')}</div>
         <div class="profsub">TEXMA · Planner personal</div>
         ${S.settings.photo?'<button class="btn sm ghost" id="setPicDel" style="margin-top:10px">Quitar foto</button>':''}
@@ -4289,12 +5012,10 @@ VIEWS.ajustes={
       if(!SUPA_URL||!SUPA_ANON){ toast(`TEXMA V${APP_VER}`); return; }
       toast('Buscando…'); chequearUpdate(true);
     });
-    const setFile=V.querySelector('#setFile');
-    V.querySelector('#setPic').addEventListener('click',()=>setFile.click());
-    setFile.addEventListener('change',()=>{
-      const f=setFile.files[0]; if(!f) return;
-      shrinkImg(f,d=>{ S.settings.photo=d; save(); paintTop(); go('ajustes'); toast('Foto guardada ♥'); },260);
-    });
+    /* por pedirFoto, así adentro del APK va por la cámara del sistema
+       (que convierte los HEIC sola) y en la web por el selector */
+    V.querySelector('#setPic').addEventListener('click',()=>pedirFoto(
+      d=>{ S.settings.photo=d; save(); paintTop(); go('ajustes'); toast('Foto guardada ♥'); },260));
     V.querySelector('#setPicDel')?.addEventListener('click',()=>{
       S.settings.photo=''; save(); paintTop(); go('ajustes'); toast('Foto quitada');
     });
@@ -5010,7 +5731,6 @@ function showProfileSetup(alTerminar){
       <div class="profpic"></div>
       <span class="cam"><svg viewBox="0 0 24 24"><path d="M3.5 8.5h3.2l1.4-2.2h7.8l1.4 2.2h3.2v11h-17Z"/><circle cx="12" cy="14" r="3.4"/></svg></span>
     </div>
-    <input type="file" id="pfFile" accept="image/*" style="display:none">
     <div class="pt" style="margin-top:18px">¿Cómo te llamás?</div>
     <div class="ps">Poné tu foto y tu nombre. TEXMA te va a saludar así cada vez que entres — lo podés cambiar cuando quieras.</div>
     <div class="lbl">Tu nombre</div>
@@ -5023,12 +5743,8 @@ function showProfileSetup(alTerminar){
     <button class="btn ghost" id="pfSkip" style="margin-top:8px;border:none;color:var(--ink2)">Después lo cargo</button>`;
   document.body.appendChild(w);
   pintarFoto();
-  const file=w.querySelector('#pfFile'), name=w.querySelector('#pfName');
-  w.querySelector('#pfPic').addEventListener('click',()=>file.click());
-  file.addEventListener('change',()=>{
-    const f=file.files[0]; if(!f) return;
-    shrinkImg(f,d=>{ foto=d; pintarFoto(); },260);
-  });
+  const name=w.querySelector('#pfName');
+  w.querySelector('#pfPic').addEventListener('click',()=>pedirFoto(d=>{ foto=d; pintarFoto(); },260));
   name.addEventListener('input',()=>{ if(!foto) pintarFoto(); });
   w.querySelectorAll('[data-bc]').forEach(b=>b.addEventListener('click',()=>{
     S.settings.banner=b.dataset.bc; applyTheme();
@@ -5089,32 +5805,14 @@ function updGuardar(st){
   try{ localStorage.setItem(UPDK,JSON.stringify(st)); }catch(e){}
 }
 
-async function chequearUpdate(forzar,fresco){
+async function chequearUpdate(forzar,yaTraido){
   if(!SUPA_URL||!SUPA_ANON) return;
+  /* El pedido lo hace updFetch(): ~200 bytes, una sola vez por apertura y
+     apenas carga el DOM. Acá solo se decide si sale el cartel. Con `forzar`
+     (botón de Ajustes) se vuelve a preguntar de cero, sin colchón. */
+  if(forzar) updFetchHecho=null;
+  if(!yaTraido||forzar) await updFetch();
   const st=updEstado();
-  /* Antes acá había un colchón de 6 h y por eso el cartel NO salía al abrir:
-     si la app había mirado hace un rato (aunque fuera antes de que publicáramos
-     la versión nueva), se quedaba con el número viejo guardado y no preguntaba
-     de nuevo. Ahora al arrancar SIEMPRE se pregunta: es un pedido de ~200 bytes,
-     una vez por apertura. El colchón queda solo para los chequeos de fondo. */
-  const FRESCO=6*60*60*1000;
-  if(forzar||fresco||!(st.ts&&Date.now()-st.ts<FRESCO)){
-    try{
-      const r=await fetch(
-        `${SUPA_URL}/rest/v1/apps?id=eq.${encodeURIComponent(APP_ID)}&select=version,url_descarga`,
-        {headers:{apikey:SUPA_ANON,authorization:'Bearer '+SUPA_ANON}});
-      if(!r.ok) return;
-      const fila=(await r.json())[0];
-      if(!fila||!fila.version) return;
-      /* si en la base cambió el número, se vuelve a avisar aunque
-         antes hubiera tocado «Ahora no» */
-      if(fila.version!==st.ver) st.visto='';
-      st.ver=fila.version;
-      st.url=fila.url_descarga||'';
-      st.ts=Date.now();
-      updGuardar(st);
-    }catch(e){ return; }   /* sin internet: ni se entera, no molesta */
-  }
   if(!st.ver||verCmp(st.ver,APP_VER)<=0){ if(forzar) toast('Ya tenés la última ✓'); return; }
   /* «Después» vale mientras no venza el plazo: vencido, el cartel vuelve siempre */
   if(st.visto===st.ver&&!forzar&&!updForzada(st)) return;
@@ -5128,18 +5826,50 @@ async function chequearUpdate(forzar,fresco){
    haya ninguna pantalla del primer arranque encima (van por z-index más alto
    y el cartel quedaría escondido detrás) y ahí pregunta. */
 let updEsperando=false;
-function primerArranqueVisible(){ return !!($('#wel')||$('#tut')||$('#prof')||$('#onb')); }
+function primerArranqueVisible(){ return !!($('#wel')||$('#tut')||$('#prof')||$('#onb')||$('#lic')||$('#splash')); }
+
+/* v1.4.4: la CONSULTA se separó del CARTEL.
+   Antes las dos cosas colgaban de abrirApp(), o sea de que la licencia
+   estuviera activada y de que no hubiera ninguna pantalla de primer arranque
+   encima; si algo de eso tardaba, la consulta no salía nunca y el aviso solo
+   aparecía yendo a Ajustes a mano. Ahora:
+     · updFetch()  → sale apenas carga el DOM, sin esperar nada. Guarda en UPDK.
+     · programarChequeoUpdate() → solo espera pantalla libre para mostrar el cartel,
+       y ya no se rinde a los 2 minutos. */
+let updFetchHecho=null;
+function updFetch(){
+  if(updFetchHecho) return updFetchHecho;                 /* una sola por apertura */
+  updFetchHecho=(async()=>{
+    if(!SUPA_URL||!SUPA_ANON) return;
+    const st=updEstado();
+    try{
+      const r=await fetch(
+        `${SUPA_URL}/rest/v1/apps?id=eq.${encodeURIComponent(APP_ID)}&select=version,url_descarga`,
+        {headers:{apikey:SUPA_ANON,authorization:'Bearer '+SUPA_ANON}});
+      if(!r.ok) return;
+      const fila=(await r.json())[0];
+      if(!fila||!fila.version) return;
+      if(fila.version!==st.ver) st.visto='';
+      st.ver=fila.version; st.url=fila.url_descarga||''; st.ts=Date.now();
+      updGuardar(st);
+    }catch(e){}   /* sin internet: ni se entera, no molesta */
+  })();
+  return updFetchHecho;
+}
 function programarChequeoUpdate(intento){
   if(updEsperando&&!intento) return;
   updEsperando=true;
-  setTimeout(()=>{
+  updFetch();                      /* por las dudas: si el DOM ya la disparó, no repite */
+  setTimeout(async()=>{
     if(primerArranqueVisible()){
-      if((intento||0)<40) return programarChequeoUpdate((intento||0)+1);  /* ~2 min de gracia */
-      updEsperando=false; return;
+      updEsperando=false;
+      if((intento||0)<600) return programarChequeoUpdate((intento||0)+1);  /* ~25 min */
+      return;
     }
     updEsperando=false;
-    chequearUpdate(false,true);   /* true = consulta fresca, sin el colchón de 6 h */
-  },intento?3000:1200);
+    await updFetch();
+    chequearUpdate(false,'yaTraido');
+  },intento?2500:800);
 }
 
 /* ---------- actualización forzada ----------
@@ -5529,6 +6259,11 @@ function paintTop(){
      3. Recién con licencia: alta de perfil, la app y los avisos.
 ------------------------------------------------------------ */
 async function arrancar(){
+  /* v1.4.4: lo PRIMERO de todo. No espera onboarding, ni licencia, ni splash:
+     mientras la usuaria mira la portada, la respuesta de Supabase ya está
+     guardada, y el cartel sale apenas la pantalla queda libre. */
+  updFetch();
+  programarChequeoUpdate();
   if(!S.settings.onboarded) await new Promise(seguir=>showOnb(seguir));
   const ok=await licGate();
   if(ok) abrirApp();

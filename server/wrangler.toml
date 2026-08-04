@@ -6,6 +6,15 @@ compatibility_date = "2025-01-01"
 [vars]
 APP_URL = "https://sommimarket.github.io/texma/"
 
+# De dónde saca el Worker el link del APK para el mensaje de entrega.
+# Es la misma tabla `apps` que consulta la app para avisar de versiones nuevas:
+# la escribe scripts/deploy.mjs y es de lectura pública con la anon key.
+APP_ID    = "texma"
+SUPA_URL  = "https://adwroskikbnbizagelqc.supabase.co"
+SUPA_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkd3Jvc2tpa2JuYml6YWdlbHFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2MDQxNTUsImV4cCI6MjEwMTE4MDE1NX0.HmKNizVh2VVh8bQMLs8mMnYbdKKDCKc52krOAcDruh8"
+# Respaldo por si Supabase está dormido o todavía no hay fila publicada:
+APK_URL   = ""
+
 # KV con las licencias — crear con:  npx wrangler kv namespace create LIC
 [[kv_namespaces]]
 binding = "LIC"

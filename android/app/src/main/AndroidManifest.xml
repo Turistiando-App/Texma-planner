@@ -46,4 +46,15 @@
     <!-- Actualizarse sola: TEXMA baja el APK nuevo adentro de la app y lanza
          el instalador de Android. Sin esto, Android bloquea el instalador. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <!-- Fotos (@capacitor/camera). Las saca la cámara del sistema o salen de la
+         galería, y Android nos las entrega YA convertidas a JPEG: por eso los
+         HEIC de los celulares nuevos entran sin romper nada.
+         READ_EXTERNAL_STORAGE va con maxSdkVersion 32 porque de Android 13 en
+         adelante el selector de fotos no pide permiso de almacenamiento. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <!-- La cámara es opcional: sin esto Play/algunos launchers dan por hecho
+         que el celular DEBE tener cámara y la app no le aparece a nadie más. -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 </manifest>

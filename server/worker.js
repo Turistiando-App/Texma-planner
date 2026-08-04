@@ -14,9 +14,11 @@
      GET  /admin/lista
      POST /admin/reset    {code}    libera el dispositivo
      POST /admin/revocar  {code}
+     GET  /admin/entrega?code=XXXX  → mensaje de entrega armado
    Público
      POST /activate       {code,device}  → { token }
-     GET  /d/:token       descarga de un solo uso
+     GET  /d/:token       SOLO dibuja la página (no consume nada)
+     POST /d/:token       reclamo explícito → { code, apk, app }
    Secretos (wrangler secret put)
      LIC_PRIV   JWK privada de firma de licencias (server/keygen.mjs)
    Binding KV: LIC
@@ -117,6 +119,177 @@ async function contarUsuarios(env) {
 }
 const limpioUser = s => String(s || '').trim().toLowerCase().replace(/[^a-z0-9._-]/g, '');
 
+/* ============================================================
+   LA VERSIÓN PUBLICADA (APK) — se lee de Supabase
+   ------------------------------------------------------------
+   El APK vive en el bucket público `apks` y la fila de la tabla `apps`
+   guarda `version` + `url_descarga` (lo escribe scripts/deploy.mjs).
+   Esa tabla ya es de lectura pública con la anon key, así que el Worker
+   la lee igual que la app. Se cachea 10 minutos en KV para no pegarle a
+   Supabase en cada link que se abre.
+   Si no hay Supabase configurado, cae en la var APK_URL de wrangler.toml.
+============================================================ */
+async function apkInfo(env) {
+  const appId = env.APP_ID || 'texma';
+  const cacheK = 'sys:apk:' + appId;
+  try {
+    const c = await env.LIC.get(cacheK, 'json');
+    if (c && Date.now() - c.ts < 6e5) return c.v;
+  } catch (e) { /* caché roto: se rearma solo */ }
+
+  const v = { version: '', url: env.APK_URL || '' };
+  if (env.SUPA_URL && env.SUPA_ANON) {
+    try {
+      const r = await fetch(
+        `${env.SUPA_URL}/rest/v1/apps?id=eq.${encodeURIComponent(appId)}&select=version,url_descarga`,
+        { headers: { apikey: env.SUPA_ANON, authorization: 'Bearer ' + env.SUPA_ANON } }
+      );
+      const j = await r.json();
+      if (Array.isArray(j) && j[0]) {
+        v.version = j[0].version || '';
+        v.url = j[0].url_descarga || v.url;
+      }
+    } catch (e) { /* Supabase dormido o sin red: queda el APK_URL de respaldo */ }
+  }
+  try { await env.LIC.put(cacheK, JSON.stringify({ ts: Date.now(), v }), { expirationTtl: 3600 }); } catch (e) {}
+  return v;
+}
+
+/* ---------- el mensaje que la vendedora le manda a la clienta ---------- */
+function mensajeEntrega({ code, link, apk, pwa, version, nombre }) {
+  const hola = (nombre || '').trim() ? `¡Hola ${String(nombre).trim().split(/\s+/)[0]}!` : '¡Hola!';
+  const L = [];
+  L.push(`${hola} 💗 Acá va tu TEXMA, tu planner personal.`);
+  L.push('');
+  L.push('1) INSTALÁ LA APP');
+  if (apk) L.push(`   • Android${version ? ' (v' + version + ')' : ''}: ${apk}`);
+  else L.push('   • Android: (todavía no hay APK publicado — avisale a quien te vendió)');
+  L.push(`   • iPhone o compu: ${pwa}`);
+  L.push('     (en iPhone: abrilo con Safari → Compartir → «Agregar a inicio»)');
+  L.push('');
+  L.push('2) TU CÓDIGO DE LICENCIA');
+  L.push(`   ${code}`);
+  L.push('   Se pega una sola vez, la primera vez que abrís la app.');
+  L.push('   Queda atado a ese celular: guardalo igual por las dudas.');
+  if (link) {
+    L.push('');
+    L.push('3) O ENTRÁ DIRECTO POR ACÁ');
+    L.push(`   ${link}`);
+    L.push('   Ese link te muestra el código y los botones de descarga.');
+  }
+  L.push('');
+  L.push('Cualquier cosa escribime por acá. ¡Que la disfrutes! ♥');
+  return L.join('\n');
+}
+
+/* ---------- la página del link (HTML, sin consumir nada) ----------
+   estado: 'nuevo' | 'listo' | 'vencido' | 'muerto'                */
+function paginaLink({ estado, code = '', apk = '', pwa = '', version = '', token = '' }) {
+  const esc = s => String(s || '').replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const html = `<!doctype html><html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="only light">
+<title>TEXMA · Tu licencia</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#FBF7F2;color:#2B2622;font-family:system-ui,-apple-system,Segoe UI,sans-serif;
+  line-height:1.5;padding:26px 18px 60px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:430px}
+h1{font-family:Georgia,serif;font-style:italic;font-size:27px;margin-bottom:4px}
+.sub{color:#75695C;font-size:13.5px;margin-bottom:20px}
+.card{background:#fff;border:1px solid #EFE7DC;border-radius:20px;padding:20px;margin-bottom:14px;
+  box-shadow:0 1px 2px rgba(43,38,34,.04),0 6px 18px rgba(43,38,34,.05)}
+.lbl{font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:#75695C;margin-bottom:10px}
+.code{font-family:ui-monospace,SFMono-Regular,monospace;font-size:23px;font-weight:700;letter-spacing:1.5px;
+  background:#FBD9E6;color:#A61048;border-radius:14px;padding:15px 10px;text-align:center;word-break:break-all}
+button,a.btn{display:block;width:100%;text-align:center;text-decoration:none;font:inherit;font-weight:700;
+  border:none;border-radius:14px;padding:15px;margin-top:11px;cursor:pointer}
+.p{background:#EC1968;color:#fff;box-shadow:0 4px 14px rgba(236,25,104,.28)}
+.g{background:#fff;color:#2B2622;border:1px solid #EFE7DC}
+.p:disabled{opacity:.55;box-shadow:none}
+.paso{font-size:14px;color:#4A423B;margin-top:12px}
+.paso b{display:block;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#75695C;margin-bottom:2px}
+.err{color:#9C3B2E;font-size:13.5px;margin-top:12px;min-height:18px}
+.hide{display:none!important}
+</style></head><body><div class="wrap">
+<h1>TEXMA</h1>
+<div class="sub" id="sub">Tu planner personal.</div>
+
+<div class="card ${estado === 'nuevo' ? '' : 'hide'}" id="cReclamar">
+  <div class="lbl">Tu licencia te está esperando</div>
+  <div class="paso">Tocá el botón y te muestro tu código y los links de descarga.
+    Se reclama una sola vez, así que hacelo vos desde tu celular.</div>
+  <button class="p" id="go">Reclamar mi licencia</button>
+  <div class="err" id="err"></div>
+</div>
+
+<div class="card ${estado === 'listo' ? '' : 'hide'}" id="cCodigo">
+  <div class="lbl">Tu código de licencia</div>
+  <div class="code" id="cod">${esc(code)}</div>
+  <button class="g" id="copiar">Copiar el código</button>
+  <div class="paso" style="margin-top:16px"><b>Guardalo</b>
+    Se pega una sola vez, la primera vez que abrís la app, y queda atado a ese celular.</div>
+</div>
+
+<div class="card ${estado === 'listo' ? '' : 'hide'}" id="cBajar">
+  <div class="lbl">Bajate la app</div>
+  <a class="btn p ${apk ? '' : 'hide'}" id="apk" href="${esc(apk)}">Descargar para Android${version ? ' · v' + esc(version) : ''}</a>
+  <a class="btn g" id="pwa" href="${esc(pwa)}">Abrir en iPhone o compu</a>
+  <div class="paso" style="margin-top:16px"><b>Android</b>
+    Al abrir el archivo te va a pedir permiso para «instalar apps desconocidas»: es normal, TEXMA no está en Play Store.</div>
+  <div class="paso"><b>iPhone</b>
+    Abrilo con Safari → Compartir → «Agregar a inicio».</div>
+</div>
+
+<div class="card ${estado === 'vencido' || estado === 'muerto' ? '' : 'hide'}" id="cMuerto">
+  <div class="lbl">Este link ya no sirve</div>
+  <div class="paso">${estado === 'vencido'
+    ? 'El link venció. Escribile a quien te vendió TEXMA y en un minuto te manda uno nuevo — tu licencia no se perdió.'
+    : 'No encontré este link. Puede que esté mal copiado o que sea muy viejo. Escribinos y te mandamos otro.'}</div>
+</div>
+
+<script>
+var T=${JSON.stringify(token)};
+var el=function(i){return document.getElementById(i)};
+if(el('go')) el('go').onclick=async function(){
+  var b=el('go'); b.disabled=true; b.textContent='Un segundo…'; el('err').textContent='';
+  try{
+    var r=await fetch(location.pathname,{method:'POST',headers:{'content-type':'application/json'},body:'{}'});
+    var j=await r.json();
+    if(!r.ok) throw new Error(j.error||('Error '+r.status));
+    el('cod').textContent=j.code;
+    if(j.apk){ el('apk').href=j.apk; el('apk').classList.remove('hide'); }
+    if(j.app) el('pwa').href=j.app;
+    el('cReclamar').classList.add('hide');
+    el('cCodigo').classList.remove('hide');
+    el('cBajar').classList.remove('hide');
+    el('sub').textContent='Listo ♥ Guardá el código y bajate la app.';
+  }catch(e){
+    b.disabled=false; b.textContent='Reclamar mi licencia';
+    el('err').textContent=e.message;
+  }
+};
+if(el('copiar')) el('copiar').onclick=function(){
+  var t=el('cod').textContent.trim();
+  var ok=function(){ el('copiar').textContent='¡Copiado! ✓'; setTimeout(function(){el('copiar').textContent='Copiar el código'},1800); };
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok,function(){});
+  else{ var a=document.createElement('textarea'); a.value=t; document.body.appendChild(a); a.select();
+        try{document.execCommand('copy');ok()}catch(e){} a.remove(); }
+};
+</script>
+</div></body></html>`;
+  return new Response(html, {
+    status: 200,
+    headers: {
+      'content-type': 'text/html; charset=utf-8',
+      'cache-control': 'no-store',
+      'x-robots-tag': 'noindex, nofollow',
+    },
+  });
+}
+
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
@@ -147,17 +320,52 @@ export default {
       return json({ token });
     }
 
-    if (p.startsWith('/d/') && req.method === 'GET') {
+    /* ---------- el link de entrega ----------
+       ANTES: el GET quemaba el token y redirigía. Como WhatsApp, Telegram y
+       Gmail piden una vista previa del link (un GET hecho por un bot), la
+       licencia se gastaba sola antes de que la clienta tocara nada y le
+       quedaba «Este link ya se usó o venció».
+       AHORA: el GET solo dibuja la página. Consumir es un POST, o sea una
+       acción del dedo de la persona. Los bots no hacen POST.               */
+    if (p.startsWith('/d/')) {
       const t = p.slice(3);
-      const raw = await env.LIC.get('dl:' + t);
-      if (!raw) return new Response('Este link ya se usó o venció.', { status: 410 });
-      const d = JSON.parse(raw);
-      if (Date.now() > d.exp) {
-        await env.LIC.delete('dl:' + t);
-        return new Response('Link vencido. Escribinos y te mandamos otro.', { status: 410 });
+      if (!t || !/^[a-f0-9]{16,64}$/i.test(t)) {
+        return req.method === 'POST'
+          ? json({ error: 'Link inválido' }, 400)
+          : paginaLink({ estado: 'muerto', pwa: env.APP_URL, token: t });
       }
-      await env.LIC.delete('dl:' + t);          // se quema al primer uso
-      return Response.redirect(env.APP_URL + '?k=' + d.code, 302);
+      const raw = await env.LIC.get('dl:' + t);
+      const d = raw ? JSON.parse(raw) : null;
+      const vencido = d && Date.now() > d.exp;
+
+      if (req.method === 'GET') {
+        const info = await apkInfo(env);
+        const estado = !d ? 'muerto' : vencido ? 'vencido' : (d.claimedAt ? 'listo' : 'nuevo');
+        return paginaLink({
+          estado, token: t,
+          code: estado === 'listo' ? d.code : '',
+          apk: info.url, version: info.version, pwa: env.APP_URL,
+        });
+      }
+
+      if (req.method === 'POST') {
+        if (!d) return json({ error: 'No encontré este link. Escribinos y te mandamos otro.' }, 410);
+        if (vencido) {
+          await env.LIC.delete('dl:' + t);
+          return json({ error: 'El link venció. Escribinos y te mandamos uno nuevo — tu licencia no se perdió.' }, 410);
+        }
+        if (!d.claimedAt) {
+          d.claimedAt = Date.now();
+          /* No se borra: queda 30 días marcado como reclamado. Así, si la
+             clienta refresca o vuelve a abrir el link, sigue viendo SU código
+             en vez de una pantalla negra. Reclamar de nuevo devuelve siempre
+             el mismo código: el uso único de verdad lo hace /activate, que
+             ata el código a un celular. */
+          await env.LIC.put('dl:' + t, JSON.stringify(d), { expirationTtl: 30 * 86400 });
+        }
+        const info = await apkInfo(env);
+        return json({ code: d.code, app: env.APP_URL, apk: info.url, version: info.version });
+      }
     }
 
     /* ================= cuentas ================= */
@@ -253,15 +461,50 @@ export default {
       if (p === '/admin/nueva' && req.method === 'POST') {
         const { nombre, contacto, precio } = await req.json().catch(() => ({}));
         const code = newCode();
+        const t = crypto.randomUUID().replace(/-/g, '');
         await env.LIC.put('lic:' + code, JSON.stringify({
           code, nombre: nombre || '', contacto: contacto || '',
           precio: +precio || 30000, createdAt: Date.now(), vendedor: yo.n || yo.u,
           device: '', activatedAt: 0, opens: 0, revoked: false,
+          token: t,                       // para poder rearmar el mensaje después
         }));
-        const t = crypto.randomUUID().replace(/-/g, '');
-        await env.LIC.put('dl:' + t, JSON.stringify({ code, exp: Date.now() + 7 * 864e5 }),
-          { expirationTtl: 7 * 86400 });
-        return json({ code, link: url.origin + '/d/' + t });
+        await env.LIC.put('dl:' + t, JSON.stringify({ code, exp: Date.now() + 30 * 864e5 }),
+          { expirationTtl: 30 * 86400 });
+        const link = url.origin + '/d/' + t;
+        const info = await apkInfo(env);
+        return json({
+          code, link, apk: info.url, pwa: env.APP_URL, version: info.version,
+          mensaje: mensajeEntrega({ code, link, apk: info.url, pwa: env.APP_URL, version: info.version, nombre }),
+        });
+      }
+
+      /* rearmar el mensaje de entrega de una licencia que ya existe
+         (para reenviárselo a alguien que lo perdió) */
+      if (p === '/admin/entrega' && req.method === 'GET') {
+        const code = String(url.searchParams.get('code') || '').trim().toUpperCase();
+        const raw = await env.LIC.get('lic:' + code);
+        if (!raw) return json({ error: 'No existe esa licencia' }, 404);
+        const lic = JSON.parse(raw);
+        let t = lic.token;
+        if (!t) {                          // licencias viejas: se les hace un link nuevo
+          t = crypto.randomUUID().replace(/-/g, '');
+          lic.token = t;
+          await env.LIC.put('lic:' + code, JSON.stringify(lic));
+        }
+        /* se refresca el link (o se rearma si venció): el código no cambia */
+        await env.LIC.put('dl:' + t, JSON.stringify({
+          code, exp: Date.now() + 30 * 864e5,
+          claimedAt: lic.activatedAt || undefined,
+        }), { expirationTtl: 30 * 86400 });
+        const link = url.origin + '/d/' + t;
+        const info = await apkInfo(env);
+        return json({
+          code, link, apk: info.url, pwa: env.APP_URL, version: info.version,
+          nombre: lic.nombre || '', contacto: lic.contacto || '',
+          mensaje: mensajeEntrega({
+            code, link, apk: info.url, pwa: env.APP_URL, version: info.version, nombre: lic.nombre,
+          }),
+        });
       }
 
       if (p === '/admin/lista') {

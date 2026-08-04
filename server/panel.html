@@ -118,6 +118,19 @@ code{font-family:ui-monospace,monospace;font-size:12px;background:var(--tint);pa
 
 .link{word-break:break-all;font-family:ui-monospace,monospace;font-size:12px;background:#FCFBF8;
   border:1px dashed var(--line);border-radius:12px;padding:12px;margin-top:12px;line-height:1.6}
+
+/* --- mensaje de entrega --- */
+.entrega{margin-top:16px;border-top:1px solid var(--line);padding-top:16px}
+.entrega textarea{width:100%;min-height:230px;padding:14px;border-radius:12px;border:1px solid var(--line);
+  background:#FCFBF8;color:var(--ink);font-family:ui-monospace,SFMono-Regular,monospace;font-size:12.5px;
+  line-height:1.65;resize:vertical;outline:none}
+.entrega textarea:focus{border-color:var(--deep);box-shadow:0 0 0 3px var(--tint)}
+.entrega .acc{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.entrega .acc button,.entrega .acc a{font:inherit;font-size:12px;font-weight:600;text-decoration:none;
+  padding:9px 14px;border-radius:10px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink)}
+.entrega .acc .prim{background:var(--deep);color:#fff;border-color:var(--deep)}
+.entrega .acc a.off{opacity:.45;pointer-events:none}
+.miniv{font-size:11px;color:var(--ink2);margin-top:8px}
 .err{color:#9C3B2E;font-size:13px;margin-top:6px;min-height:18px}
 
 /* --- responsive: sidebar arriba en pantallas chicas --- */
@@ -253,6 +266,17 @@ code{font-family:ui-monospace,monospace;font-size:12px;background:var(--tint);pa
           </div>
         </div>
         <div class="link hide" id="nOut"></div>
+        <div class="entrega hide" id="nEnt">
+          <div class="lbl">Mensaje para la clienta</div>
+          <div class="hint">Ya trae el APK de Android, el link para iPhone/compu y el código. Editalo si querés y mandalo.</div>
+          <textarea id="entTxt" spellcheck="false"></textarea>
+          <div class="acc">
+            <button class="prim" id="entCopy">Copiar mensaje</button>
+            <a id="entWa" target="_blank" rel="noopener">Mandar por WhatsApp</a>
+            <a id="entMail">Mandar por mail</a>
+          </div>
+          <div class="miniv" id="entVer"></div>
+        </div>
         <div class="err" id="errNueva"></div>
       </div>
 
@@ -436,9 +460,21 @@ async function lista(){
     <td>${badgeEstado(l)}</td>
     <td>${l.vendedor||'—'}</td>
     <td>$ ${Number(l.precio||0).toLocaleString('es-AR')}</td>
-    <td style="white-space:nowrap"><button class="g" data-r="${l.code}">Liberar celu</button>
+    <td style="white-space:nowrap"><button class="g" data-m="${l.code}">Mensaje</button>
+        <button class="g" data-r="${l.code}">Liberar celu</button>
         <button class="g" data-x="${l.code}">${l.revoked?'Reactivar':'Dar de baja'}</button></td>
   </tr>`).join(''):'<tr><td colspan="6" style="color:#75695C">Todavía no vendiste ninguna.</td></tr>';
+  /* rearma el mensaje de entrega de una licencia ya vendida (para reenviarlo) */
+  document.querySelectorAll('[data-m]').forEach(b=>b.onclick=async()=>{
+    $('#errNueva').textContent='';
+    try{
+      const r=await call('/admin/entrega?code='+encodeURIComponent(b.dataset.m));
+      show('#nOut',true);
+      $('#nOut').innerHTML=`Código: <b>${r.code}</b><br>Link de entrega:<br><b>${r.link}</b>`;
+      pintarEntrega(r,r.contacto);
+      $('#nEnt').scrollIntoView({behavior:'smooth',block:'center'});
+    }catch(e){ $('#errNueva').textContent=e.message; }
+  });
   document.querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{
     if(!confirm('¿Liberar el dispositivo de '+b.dataset.r+'?\nVa a poder activarse de nuevo en otro celular.')) return;
     await call('/admin/reset',{code:b.dataset.r}); lista();
@@ -450,12 +486,56 @@ async function lista(){
   if(d.yo.role==='owner') usuarios();
 }
 
+/* ---------- el mensaje de entrega ----------
+   Es lo único que la clienta recibe, así que tiene que traer las tres cosas:
+   APK de Android, link de la PWA (iPhone/compu) y el código de licencia.
+   El texto lo arma el Worker (que es el que sabe qué APK está publicado). */
+function pintarEntrega(r,contacto){
+  $('#entTxt').value=r.mensaje||'';
+  show('#nEnt',true);
+  const txt=encodeURIComponent(r.mensaje||'');
+  const c=String(contacto||r.contacto||'').trim();
+  const wa=$('#entWa'), mail=$('#entMail');
+
+  /* WhatsApp: si el contacto son números, va directo al chat; si no, al selector */
+  const tel=c.replace(/[^\d]/g,'');
+  if(tel.length>=8){
+    /* sin 0 ni 15 y con el 54 de Argentina si no vino un país */
+    const n=tel.replace(/^0/,'').replace(/^(\d{2,4})15/,'$1');
+    wa.href='https://wa.me/'+(n.length<=11?'54'+n:n)+'?text='+txt;
+  }else{
+    wa.href='https://wa.me/?text='+txt;
+  }
+  wa.classList.remove('off');
+
+  if(/@/.test(c)){
+    mail.href='mailto:'+encodeURIComponent(c)+'?subject='+encodeURIComponent('Tu TEXMA ♥')+'&body='+txt;
+    mail.classList.remove('off');
+  }else{
+    mail.href='mailto:?subject='+encodeURIComponent('Tu TEXMA ♥')+'&body='+txt;
+    mail.classList.remove('off');
+  }
+
+  $('#entVer').textContent=r.apk
+    ? `APK incluido: versión ${r.version||'?'} · ${r.apk}`
+    : '⚠ No hay APK publicado en Supabase todavía: el mensaje sale solo con el link web. Publicá uno con «node scripts/deploy.mjs texma x.y.z».';
+}
+$('#entCopy').addEventListener('click',async()=>{
+  const t=$('#entTxt');
+  try{ await navigator.clipboard.writeText(t.value); }
+  catch(e){ t.select(); document.execCommand('copy'); }
+  $('#entCopy').textContent='¡Copiado! ✓';
+  setTimeout(()=>$('#entCopy').textContent='Copiar mensaje',1800);
+});
+
 $('#nGo').addEventListener('click',async()=>{
   $('#errNueva').textContent='';
   try{
-    const r=await call('/admin/nueva',{nombre:$('#nNom').value,contacto:$('#nCon').value,precio:$('#nPre').value});
+    const contacto=$('#nCon').value;
+    const r=await call('/admin/nueva',{nombre:$('#nNom').value,contacto,precio:$('#nPre').value});
     show('#nOut',true);
-    $('#nOut').innerHTML=`Código: <b>${r.code}</b><br>Link para mandar por WhatsApp (se abre una sola vez):<br><b>${r.link}</b>`;
+    $('#nOut').innerHTML=`Código: <b>${r.code}</b><br>Link de entrega:<br><b>${r.link}</b>`;
+    pintarEntrega(r,contacto);
     $('#nNom').value=''; $('#nCon').value='';
     lista();
   }catch(e){ $('#errNueva').textContent=e.message; }

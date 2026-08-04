@@ -23,7 +23,7 @@ tabla de abajo: quien sepa programar puede sacar el muro igual.
 
 | Situación | ¿Lo frena? |
 |---|---|
-| Pasar el link de descarga a otra persona | Sí — el link se quema al primer uso |
+| Pasar el link de entrega a otra persona | A medias — el link muestra el código, pero el código sirve en un solo celular |
 | Pasar el código de activación a otra persona | Sí — queda atado al primer celular que lo canjea |
 | Copiar el HTML/APK ya activado a otro celular | Sí — la licencia no valida (ID distinto) |
 | Sacar la licencia del original y revenderla | Sí — al liberar hay que pedirnos reactivación |

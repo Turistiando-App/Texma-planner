@@ -53,6 +53,21 @@ android\app\build\outputs\apk\release\app-release.apk
 2. En el celu: abrirlo → Android va a pedir permitir *"instalar apps
    desconocidas"* para esa app (WhatsApp, Archivos, etc.). Es normal.
 3. Al primer aviso, aceptar el permiso de **notificaciones**.
+4. La primera vez que cargue una foto, aceptar **cámara / fotos**.
+
+## Fotos (desde v1.5.0)
+
+Adentro del APK las fotos las pide `@capacitor/camera`, no el `<input type=file>`
+de la WebView. Es la única forma de que entren los **HEIC** de los celulares
+nuevos: Android decodifica el archivo con el códec del sistema y nos lo entrega
+ya convertido a **JPEG**, además de corregir la rotación y achicarlo antes de
+que la WebView lo toque. En la PWA no hay plugin y sigue el selector de archivos,
+con la conversión hecha por canvas (ahí un HEIC sí puede fallar, y avisa por qué).
+
+Permisos en el manifest: `CAMERA`, `READ_EXTERNAL_STORAGE` (solo hasta Android
+12; de 13 en adelante el selector de fotos no lo necesita) y `uses-feature
+android.hardware.camera` con `required="false"`, para no dejar afuera a los
+celulares sin cámara.
 
 ## El sonido propio
 

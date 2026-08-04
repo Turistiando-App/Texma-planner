@@ -13,10 +13,16 @@ El servidor **ya está publicado y probado**:
 - Clave privada de firma cargada como secreto `LIC_PRIV`. La copia local se borró:
   vive solo en Cloudflare.
 - Clave pública ya pegada en `TEXMA.html`.
-- Probado de punta a punta: crear cuenta, generar venta, link que se quema al
-  primer uso, activación atada al celular, rechazo del segundo celular, licencia
-  firmada y verificada, y licencia adulterada rechazada. Los datos de prueba se
-  borraron.
+- Probado de punta a punta: crear cuenta, generar venta, link de entrega,
+  activación atada al celular, rechazo del segundo celular, licencia firmada y
+  verificada, y licencia adulterada rechazada. Los datos de prueba se borraron.
+
+> **El link de entrega no se quema con un GET** (desde v1.5.0). Abrirlo solo
+> dibuja la página; el código se muestra cuando la clienta toca «Reclamar mi
+> licencia», que es un POST. Antes lo consumía el primer GET y las vistas
+> previas de WhatsApp, Telegram y Gmail —que son bots haciendo GET— quemaban la
+> licencia sola: al abrirlo, la clienta veía «Este link ya se usó o venció».
+> El uso único de verdad lo hace `/activate`, que ata el código a un celular.
 
 **Lo único que falta hacer vos:**
 
