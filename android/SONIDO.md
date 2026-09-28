@@ -16,6 +16,19 @@ Reglas de Android para esa carpeta — **si no se cumplen, el build falla**:
 
 Recomendado: 1–2 segundos, mp3 o wav, menos de 100 KB.
 
+## El otro sonido: la ALARMA
+
+`alarma_texma.wav` (15 s) es el de las alarmas de la agenda, y va en la
+misma carpeta. No se baja de ningún lado: lo genera
+
+```bash
+npm run sonido:alarma
+```
+
+Un aviso de 1 segundo para una cita importante se pierde; por eso son dos
+archivos y **dos canales distintos** (`texma-avisos-2` y `texma-alarma-1`):
+en Android el sonido se define por canal, no por notificación.
+
 Después:
 
 ```bash

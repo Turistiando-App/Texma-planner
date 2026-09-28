@@ -1,6 +1,6 @@
 {
   "name": "texma",
-  "version": "1.5.1",
+  "version": "1.7.3",
   "private": true,
   "description": "TEXMA · Planner personal — PWA + APK (Capacitor)",
   "scripts": {
@@ -9,7 +9,11 @@
     "abrir:android": "npm run sync && cap open android",
     "apk:debug": "npm run sync && cd android && .\\gradlew.bat assembleDebug",
     "apk": "npm run sync && cd android && .\\gradlew.bat assembleRelease",
-    "deploy": "node scripts/deploy.mjs"
+    "deploy": "node scripts/deploy.mjs",
+    "local": "npm run build:web && vercel dev",
+    "web:deploy": "npm run build:web && vercel deploy --prod",
+    "migrar:kv": "node scripts/migrar-kv.mjs",
+    "sonido:alarma": "node scripts/hacer-alarma.mjs"
   },
   "dependencies": {
     "@capacitor-community/file-opener": "^7.0.1",

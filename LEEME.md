@@ -1,4 +1,4 @@
-# TEXMA · Planner personal · V1.3.0
+# TEXMA · Planner personal · V1.7.0
 
 Planner mobile-first, sin cuentas ni internet obligatorio. Todos los datos se
 guardan en el dispositivo (localStorage) y sobreviven al cerrar y volver a abrir.
@@ -8,7 +8,7 @@ guardan en el dispositivo (localStorage) y sobreviven al cerrar y volver a abrir
 | | Cómo | Avisos |
 |---|---|---|
 | **Android** | APK propio → [`APK.md`](APK.md) | alarmas exactas, sin internet, **sonido de TEXMA** |
-| **iPhone / web** | PWA → https://sommimarket.github.io/texma/ | a la hora, sonido del sistema |
+| **iPhone / web** | PWA → https://texma.vercel.app/ (Vercel) | a la hora, sonido del sistema |
 
 En iPhone: Safari → Compartir → *Agregar a inicio*.
 En Chrome: menú ⋮ → *Instalar app*. Funciona 100% offline después de la
@@ -39,7 +39,10 @@ no se edita a mano y no va al repo.
   que puso ella y se suman al total). Estados **pagado / entregado / cancelado**,
   cuánto hace que se terminó, cuántos días lleva **sin retirar**, y resumen por
   cliente con la **cantidad de arreglos** que pidió cada uno. Al marcar "pagado"
-  entra solo como ingreso en Finanzas.
+  entra solo como ingreso en Finanzas. Trae una **calculadora** propia (el 🧮
+  flotante de la sección, y el botón arriba de las medidas): suma, resta,
+  multiplica, divide, tiene los atajos ÷2 ÷3 ÷4 ÷6 ×½ para las fracciones de
+  tela, y el resultado se pega en la medida que elijas con **«Usar este valor»**.
 - **Lista de compras**: separada por **categorías** (Súper, Farmacia, Telas,
   Mercería, Casa + las que agregues), con **precios**, total de la lista y
   **historial de precios** por producto para armar presupuestos. Al tildar una
@@ -59,7 +62,11 @@ no se edita a mano y no va al repo.
   reventa, insumos). Cantidad, mínimo, costo, precio de venta, valor del
   inventario, alertas de reposición y movimientos de entrada/venta que pueden
   ir directo a Finanzas.
-- **Notas, Agradecimientos, Pasatiempos, Medicamentos.**
+- **Pasatiempos**: metas semanales de minutos y registro de ratos. Cada
+  pasatiempo tiene **categoría**, y si es **📖 Leer** el formulario se abre en
+  **modo reseña**: nombre del libro, autor, fecha de inicio, **rating de 1 a 5
+  estrellas** tocables y la **reseña**. Todo eso se ve prolijo en la tarjeta.
+- **Notas, Agradecimientos, Medicamentos.**
 - **Perfil y ajustes**: tu **foto y tu nombre** (TEXMA te saluda con eso),
   **color de la cabecera**, 7 paletas + color libre, secciones on/off,
   notificaciones con sonido, prueba y diagnóstico, exportar/importar copia,
@@ -96,6 +103,16 @@ carga lo que corresponda a esa pantalla.
 Remedios, citas, pagos, agradecimiento, entrenamiento y ciclo. El sonido se
 elige en Perfil → Notificaciones: **TEXMA / del celu / mudo**.
 
+**Recordatorios de la agenda** (V1.6.0): cada evento con hora elige cuándo
+avisar — *a la hora*, *10 min antes*, *1 hora antes*, *1 día antes*, y se
+pueden marcar varios a la vez. Además elige **cómo** avisa:
+
+- **Aviso normal**: el de siempre, suena una vez.
+- **Alarma ⏰**: canal aparte de prioridad máxima, sonido largo, repite hasta
+  5 veces (una por minuto) y trae los botones **Apagar** y **Posponer 10 min**.
+  Suena con la pantalla apagada. Solo en el APK de Android; en la PWA la alarma
+  cae al aviso normal.
+
 **En el APK de Android** son alarmas del sistema: hora exacta, **con la app
 cerrada, sin internet y con el sonido de TEXMA**. No hace falta ningún
 servidor. Ver [`APK.md`](APK.md) y [`android/SONIDO.md`](android/SONIDO.md).
@@ -118,7 +135,7 @@ Se restaura con "Importar copia" (acepta copias viejas de TEXMA y del viejo JIOM
 ## Venta / licencias
 
 **Desde la V1.3.0 el muro está PRENDIDO** (`LIC_ON = true` en `TEXMA.html`).
-Cloudflare Worker, ver [`server/README.md`](server/README.md).
+Servidor: funciones `/api` de Vercel + tabla `licenses` de Supabase, ver [`server/README.md`](server/README.md).
 
 Orden del arranque: onboarding → muro → app. Sin código válido en el
 `localStorage` la app **no ejecuta nada más**: no dibuja ninguna vista, no

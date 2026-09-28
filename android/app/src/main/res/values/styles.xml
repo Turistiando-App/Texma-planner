@@ -16,7 +16,15 @@
     </style>
 
 
+    <!-- Arranque en frío: rosa liso (Android < 12 usa android:background,
+         Android 12+ usa windowSplashScreen*). Después sigue el splash animado
+         del HTML, que también es rosa: la transición no se nota. -->
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
-        <item name="android:background">@drawable/splash</item>
+        <item name="android:background">@drawable/splash_rosa</item>
+        <item name="windowSplashScreenBackground">@color/texma_rosa</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_sin_icono</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+        <item name="android:statusBarColor">@color/texma_rosa</item>
+        <item name="android:navigationBarColor">@color/texma_rosa</item>
     </style>
 </resources>

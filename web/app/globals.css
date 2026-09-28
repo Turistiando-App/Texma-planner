@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+/* ============================================================
+   TEXMA · sistema visual (el mismo de la app)
+   Lino/papel, tinta cálida, rosa de la marca. Tailwind v4: los tokens
+   de @theme quedan como utilidades (bg-lino, text-tinta, font-serif…).
+============================================================ */
+@theme {
+  --color-rosa: #EC1968;
+  --color-rosa-claro: #FBD9E6;
+  --color-rosa-oscuro: #A61048;
+  --color-lino: #F3EEE5;
+  --color-papel: #FAF7F1;
+  --color-tinta: #2B2622;
+  --color-tinta-suave: #75695C;
+  --color-linea: #E4DCCD;
+  --color-naranja: #F2803C;
+
+  --font-serif: var(--font-cormorant), Georgia, serif;
+  --font-sans: var(--font-manrope), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+html { color-scheme: only light; scroll-behavior: smooth; }
+body { background: var(--color-lino); color: var(--color-tinta); }
+
+/* títulos con la serif itálica de la marca */
+.titulo { font-family: var(--font-serif); font-style: italic; font-weight: 700; letter-spacing: -0.01em; }
+.kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" fill="#EC1968"/>
+  <!-- espiral hexagonal -->
+  <path fill="none" stroke="#fff" stroke-width="72" stroke-linejoin="miter" stroke-linecap="butt"
+    d="M512 122 L849.7 317 L849.7 707 L512 902 L174.3 707 L174.3 317 L512 257
+       L732.8 384.5 L732.8 639.5 L512 767 L291.2 639.5 L291.2 384.5 L512 392
+       L615.9 452 L615.9 572 L512 632 L408.1 572 L408.1 452"/>
+  <!-- halo rosa para separar el cierre de la espiral -->
+  <g fill="#EC1968" stroke="#EC1968" stroke-width="26" stroke-linejoin="round">
+    <rect x="200" y="330" width="40" height="21" rx="7"/><rect x="240" y="357" width="40" height="21" rx="7"/>
+    <rect x="200" y="384" width="40" height="21" rx="7"/><rect x="240" y="411" width="40" height="21" rx="7"/>
+    <rect x="200" y="438" width="40" height="21" rx="7"/><rect x="240" y="465" width="40" height="21" rx="7"/>
+    <rect x="200" y="492" width="40" height="21" rx="7"/><rect x="240" y="519" width="40" height="21" rx="7"/>
+    <rect x="200" y="546" width="40" height="21" rx="7"/><rect x="240" y="573" width="40" height="21" rx="7"/>
+    <rect x="200" y="600" width="40" height="21" rx="7"/>
+    <rect x="218" y="624" width="48" height="28" rx="10"/>
+    <rect x="186" y="642" width="112" height="82" rx="24"/>
+    <rect x="222" y="726" width="40" height="86" rx="16"/>
+    <rect x="176" y="820" width="40" height="21" rx="7" transform="rotate(33 196 830)"/>
+    <rect x="152" y="854" width="40" height="21" rx="7" transform="rotate(33 172 864)"/>
+    <rect x="268" y="820" width="40" height="21" rx="7" transform="rotate(-33 288 830)"/>
+    <rect x="292" y="854" width="40" height="21" rx="7" transform="rotate(-33 312 864)"/>
+  </g>
+  <!-- cierre / zipper -->
+  <g fill="#fff">
+    <!-- dientes cerrados -->
+    <rect x="200" y="330" width="40" height="21" rx="7"/>
+    <rect x="240" y="357" width="40" height="21" rx="7"/>
+    <rect x="200" y="384" width="40" height="21" rx="7"/>
+    <rect x="240" y="411" width="40" height="21" rx="7"/>
+    <rect x="200" y="438" width="40" height="21" rx="7"/>
+    <rect x="240" y="465" width="40" height="21" rx="7"/>
+    <rect x="200" y="492" width="40" height="21" rx="7"/>
+    <rect x="240" y="519" width="40" height="21" rx="7"/>
+    <rect x="200" y="546" width="40" height="21" rx="7"/>
+    <rect x="240" y="573" width="40" height="21" rx="7"/>
+    <rect x="200" y="600" width="40" height="21" rx="7"/>
+    <!-- puente + cuerpo del deslizador -->
+    <rect x="218" y="624" width="48" height="28" rx="10"/>
+    <rect x="186" y="642" width="112" height="82" rx="24"/>
+    <circle cx="242" cy="670" r="15" fill="#EC1968"/>
+    <!-- tirador -->
+    <rect x="222" y="726" width="40" height="86" rx="16"/>
+    <rect x="236" y="742" width="12" height="52" rx="6" fill="#EC1968"/>
+    <!-- dientes abiertos en V -->
+    <rect x="176" y="820" width="40" height="21" rx="7" transform="rotate(33 196 830)"/>
+    <rect x="152" y="854" width="40" height="21" rx="7" transform="rotate(33 172 864)"/>
+    <rect x="268" y="820" width="40" height="21" rx="7" transform="rotate(-33 288 830)"/>
+    <rect x="292" y="854" width="40" height="21" rx="7" transform="rotate(-33 312 864)"/>
+  </g>
+</svg>

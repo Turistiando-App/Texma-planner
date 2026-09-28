@@ -28,6 +28,7 @@ const ARCHIVOS = [
   'splash-gym.jpg',   // fondo del splash de entrenamiento (lo sube la usuaria)
   'img_welcome.jpg',  // foto de la pantalla de bienvenida (lo sube la usuaria)
   'notif_texma.mp3',
+  'alarma_texma.wav',   // alarma larga de la agenda (la genera scripts/hacer-alarma.mjs)
   'gsap.min.js',
   'fonts',          // carpeta entera: fonts.css + los .woff2
 ];

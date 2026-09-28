@@ -156,38 +156,12 @@ code{font-family:ui-monospace,monospace;font-size:12px;background:var(--tint);pa
 <!-- ============ ENTRAR ============ -->
 <div id="scLogin">
   <h1>Maxing Agent</h1>
-  <div class="sub" id="loginSub">Entrá con tu usuario y contraseña.</div>
+  <div class="sub" id="loginSub">Entrá con la contraseña del panel.</div>
 
-  <div class="card">
-    <label class="f">Dirección del servidor</label>
-    <input id="api" placeholder="https://texma-lic.tu-cuenta.workers.dev">
-    <div class="hint">Es la URL que te dio Cloudflare al publicar el Worker. Se escribe una sola vez.</div>
-    <button class="b" id="conectar">Conectar</button>
-    <div class="err" id="errApi"></div>
-  </div>
-
-  <!-- primera vez: crear la cuenta de dueño -->
-  <div class="card hide" id="cardSetup">
-    <div class="lbl">Primera vez · creá tu cuenta</div>
-    <div class="hint">No hay ninguna cuenta todavía. La que crees acá es la de dueño: podés invitar a otras personas después.</div>
-    <label class="f">Tu nombre</label>
-    <input id="sNom" placeholder="Lucas">
-    <label class="f">Usuario</label>
-    <input id="sUser" placeholder="lucas" autocomplete="username">
-    <label class="f">Contraseña · mínimo 8 caracteres</label>
-    <div class="pw">
-      <input id="sPass" type="password" placeholder="••••••••" autocomplete="new-password">
-      <button class="eye" data-eye="sPass" type="button" title="Ver contraseña">👁</button>
-    </div>
-    <button class="b" id="crear">Crear mi cuenta</button>
-    <div class="err" id="errSetup"></div>
-  </div>
-
-  <!-- login normal -->
-  <div class="card hide" id="cardLogin">
+  <div class="card" id="cardLogin">
     <div class="lbl">Entrar</div>
-    <label class="f">Usuario</label>
-    <input id="lUser" placeholder="lucas" autocomplete="username">
+    <label class="f">Tu nombre · queda anotado en cada venta</label>
+    <input id="lUser" placeholder="Lucas" autocomplete="username">
     <label class="f">Contraseña</label>
     <div class="pw">
       <input id="lPass" type="password" placeholder="••••••••" autocomplete="current-password">
@@ -213,8 +187,6 @@ code{font-family:ui-monospace,monospace;font-size:12px;background:var(--tint);pa
     <nav class="nav" id="nav">
       <button class="on" data-sec="secResumen"><span class="ic">◧</span> Resumen</button>
       <button data-sec="secLic"><span class="ic">⚿</span> Licencias</button>
-      <button data-sec="secEquipo" id="navEquipo" class="hide"><span class="ic">☺</span> Equipo</button>
-      <button data-sec="secAjustes"><span class="ic">⚙</span> Ajustes</button>
     </nav>
     <div class="me">
       <div class="av" id="meAv">·</div>
@@ -289,73 +261,21 @@ code{font-family:ui-monospace,monospace;font-size:12px;background:var(--tint);pa
       </div>
     </section>
 
-    <!-- ===== EQUIPO (solo dueño) ===== -->
-    <section id="secEquipo" class="hide">
-      <h2>Equipo</h2>
-      <div class="crumb">Quién puede entrar a este panel.</div>
-
-      <div class="card">
-        <div class="lbl">Cuentas</div>
-        <div style="overflow-x:auto"><table>
-          <thead><tr><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Última entrada</th><th></th></tr></thead>
-          <tbody id="tbU"></tbody></table></div>
-      </div>
-
-      <div class="card">
-        <div class="lbl">Invitar a alguien</div>
-        <div class="hint">Le creás la cuenta vos y le pasás el usuario y la contraseña. Después ella puede cambiarla.</div>
-        <div class="grid2">
-          <div>
-            <label class="f">Nombre</label>
-            <input id="uNom" placeholder="Melu">
-          </div>
-          <div>
-            <label class="f">Usuario</label>
-            <input id="uUser" placeholder="melu">
-          </div>
-          <div class="full">
-            <label class="f">Contraseña · mínimo 8 caracteres</label>
-            <div class="pw">
-              <input id="uPass" type="password" placeholder="••••••••">
-              <button class="eye" data-eye="uPass" type="button" title="Ver contraseña">👁</button>
-            </div>
-          </div>
-        </div>
-        <button class="b" id="uGo">Crear cuenta</button>
-        <button class="g" id="uGen" style="margin-left:6px">Sugerir contraseña</button>
-        <div class="err" id="errUser"></div>
-      </div>
-    </section>
-
-    <!-- ===== AJUSTES ===== -->
-    <section id="secAjustes" class="hide">
-      <h2>Ajustes</h2>
-      <div class="crumb">Tu cuenta.</div>
-      <div class="card" style="max-width:440px">
-        <div class="lbl">Mi contraseña</div>
-        <label class="f">Contraseña nueva · mínimo 8 caracteres</label>
-        <div class="pw">
-          <input id="mPass" type="password" placeholder="••••••••">
-          <button class="eye" data-eye="mPass" type="button" title="Ver contraseña">👁</button>
-        </div>
-        <button class="b" id="mGo">Cambiar mi contraseña</button>
-        <div class="err" id="errMi"></div>
-      </div>
-    </section>
-
   </div>
 </div>
 
 <script>
 const $=s=>document.querySelector(s);
 const show=(el,on)=>$(el).classList.toggle('hide',!on);
-let API='', TOKEN='', YO=null;
+/* el panel vive en el mismo sitio que la API (Vercel): rutas relativas */
+const API='/api';
+let TOKEN='', YO=null;
 
 /* navegacion del sidebar */
 document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('#nav button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on');
-  ['secResumen','secLic','secEquipo','secAjustes'].forEach(id=>show('#'+id,id===b.dataset.sec));
+  ['secResumen','secLic'].forEach(id=>show('#'+id,id===b.dataset.sec));
 }));
 
 /* ojito de las contraseñas */
@@ -378,49 +298,21 @@ async function call(path,body){
   if(!r.ok) throw new Error(j.error||'Error '+r.status);
   return j;
 }
-const guardar=()=>localStorage.setItem('texma_panel',JSON.stringify({API,TOKEN:$('#rec')?.checked?TOKEN:''}));
+const guardar=()=>localStorage.setItem('texma_panel',JSON.stringify({TOKEN:$('#rec')?.checked?TOKEN:'',NOM:$('#lUser').value.trim()}));
 function salir(msg){
   TOKEN=''; YO=null;
-  localStorage.setItem('texma_panel',JSON.stringify({API}));
+  localStorage.setItem('texma_panel',JSON.stringify({NOM:$('#lUser').value.trim()}));
   show('#scPanel',false); show('#scLogin',true);
   $('#errLogin').textContent=msg||'';
 }
 
-/* ---------- conectar ---------- */
-$('#conectar').addEventListener('click',conectar);
-async function conectar(){
-  API=$('#api').value.trim().replace(/\/$/,'');
-  $('#errApi').textContent='';
-  if(!/^https?:\/\//.test(API)){ $('#errApi').textContent='Pegá la URL completa, empezando con https://'; return; }
-  try{
-    const d=await call('/admin/estado');
-    localStorage.setItem('texma_panel',JSON.stringify({API,TOKEN:TOKEN||''}));
-    show('#cardSetup',d.setup); show('#cardLogin',!d.setup);
-    $('#loginSub').textContent=d.setup?'Todavía no hay ninguna cuenta. Creá la tuya.':'Entrá con tu usuario y contraseña.';
-    ($(d.setup?'#sNom':'#lUser')).focus();
-  }catch(e){
-    $('#errApi').innerHTML='No hay ningún servidor en esa dirección.<br>'
-      +'Si todavía no publicaste el Worker en Cloudflare, este panel no tiene con qué hablar: '
-      +'seguí los pasos de <b>server/GUIA.md</b> y volvé.<br>'
-      +'Si ya lo publicaste, pegá la URL <b>tal cual</b> te la dio Cloudflare '
-      +'(termina en <code>.workers.dev</code> y no lleva nada después).';
-  }
-}
-
-/* ---------- crear cuenta / entrar ---------- */
-$('#crear').addEventListener('click',async()=>{
-  $('#errSetup').textContent='';
-  try{
-    const d=await call('/admin/setup',{user:$('#sUser').value,pass:$('#sPass').value,nombre:$('#sNom').value});
-    TOKEN=d.token; YO=d.yo; guardar(); await entrarAlPanel();
-  }catch(e){ $('#errSetup').textContent=e.message; }
-});
+/* ---------- entrar ---------- */
 $('#entrar').addEventListener('click',login);
 $('#lPass').addEventListener('keydown',e=>{ if(e.key==='Enter') login(); });
 async function login(){
   $('#errLogin').textContent='';
   try{
-    const d=await call('/admin/login',{user:$('#lUser').value,pass:$('#lPass').value});
+    const d=await call('/admin/login',{nombre:$('#lUser').value,pass:$('#lPass').value});
     TOKEN=d.token; YO=d.yo; guardar(); await entrarAlPanel();
   }catch(e){ $('#errLogin').textContent=e.message; }
 }
@@ -431,19 +323,19 @@ async function entrarAlPanel(){
   show('#scLogin',false); show('#scPanel',true);
   await lista();
 }
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function badgeEstado(l){
-  if(l.revoked) return '<span class="bdg bad">Revocada</span>';
+  if(l.status==='revoked') return '<span class="bdg bad">Revocada</span>';
   if(l.device)  return '<span class="bdg ok">Activada</span><br><span style="font-size:10px;color:#75695C">'
-                   +new Date(l.activatedAt).toLocaleDateString('es-AR')+'</span>';
+                   +new Date(l.activated_at).toLocaleDateString('es-AR')+'</span>';
   return '<span class="bdg warn">Pendiente</span>';
 }
 async function lista(){
   const d=await call('/admin/lista');
   YO=d.yo;
-  const rol=d.yo.role==='owner'?'dueña/o':'vendedora/or';
-  $('#quien').textContent=`Hola, ${d.yo.nombre} · ${rol}`;
+  $('#quien').textContent=`Hola, ${d.yo.nombre}`;
   $('#meNom').textContent=d.yo.nombre;
-  $('#meRol').textContent=rol;
+  $('#meRol').textContent='panel de ventas';
   $('#meAv').textContent=(d.yo.nombre||'?').trim().charAt(0).toUpperCase();
   $('#kT').textContent=d.total;
   $('#kA').textContent=d.activadas;
@@ -452,17 +344,17 @@ async function lista(){
   show('#cardPorV',pv.length>1);
   $('#porV').innerHTML=pv.length>1
     ?'<table><thead><tr><th>Vendedor</th><th>Vendidas</th><th>Activadas</th><th>Facturado</th></tr></thead><tbody>'
-      +pv.map(([n,x])=>`<tr><td>${n}</td><td>${x.vendidas}</td><td>${x.activadas}</td><td>$ ${Number(x.facturado).toLocaleString('es-AR')}</td></tr>`).join('')
+      +pv.map(([n,x])=>`<tr><td>${esc(n)}</td><td>${x.vendidas}</td><td>${x.activadas}</td><td>$ ${Number(x.facturado).toLocaleString('es-AR')}</td></tr>`).join('')
       +'</tbody></table>':'';
   $('#tb').innerHTML=d.licencias.length?d.licencias.map(l=>`<tr>
     <td><code>${l.code}</code></td>
-    <td>${l.nombre||'—'}<br><span style="color:#75695C;font-size:11px">${l.contacto||''}</span></td>
+    <td>${esc(l.nombre)||'—'}<br><span style="color:#75695C;font-size:11px">${esc(l.contacto)}</span></td>
     <td>${badgeEstado(l)}</td>
-    <td>${l.vendedor||'—'}</td>
+    <td>${esc(l.vendedor)||'—'}</td>
     <td>$ ${Number(l.precio||0).toLocaleString('es-AR')}</td>
     <td style="white-space:nowrap"><button class="g" data-m="${l.code}">Mensaje</button>
         <button class="g" data-r="${l.code}">Liberar celu</button>
-        <button class="g" data-x="${l.code}">${l.revoked?'Reactivar':'Dar de baja'}</button></td>
+        <button class="g" data-x="${l.code}">${l.status==='revoked'?'Reactivar':'Dar de baja'}</button></td>
   </tr>`).join(''):'<tr><td colspan="6" style="color:#75695C">Todavía no vendiste ninguna.</td></tr>';
   /* rearma el mensaje de entrega de una licencia ya vendida (para reenviarlo) */
   document.querySelectorAll('[data-m]').forEach(b=>b.onclick=async()=>{
@@ -482,14 +374,12 @@ async function lista(){
   document.querySelectorAll('[data-x]').forEach(b=>b.onclick=async()=>{
     await call('/admin/revocar',{code:b.dataset.x}); lista();
   });
-  show('#navEquipo',d.yo.role==='owner');
-  if(d.yo.role==='owner') usuarios();
 }
 
 /* ---------- el mensaje de entrega ----------
    Es lo único que la clienta recibe, así que tiene que traer las tres cosas:
    APK de Android, link de la PWA (iPhone/compu) y el código de licencia.
-   El texto lo arma el Worker (que es el que sabe qué APK está publicado). */
+   El texto lo arma /api/admin (que es el que sabe qué APK está publicado). */
 function pintarEntrega(r,contacto){
   $('#entTxt').value=r.mensaje||'';
   show('#nEnt',true);
@@ -541,55 +431,16 @@ $('#nGo').addEventListener('click',async()=>{
   }catch(e){ $('#errNueva').textContent=e.message; }
 });
 
-/* ---------- usuarios ---------- */
-async function usuarios(){
-  const d=await call('/admin/usuarios');
-  $('#tbU').innerHTML=d.usuarios.map(u=>`<tr>
-    <td><code>${u.user}</code></td>
-    <td>${u.nombre}</td>
-    <td><span class="pill">${u.role==='owner'?'dueña/o':'vendedora/or'}</span></td>
-    <td>${u.lastLogin?new Date(u.lastLogin).toLocaleDateString('es-AR'):'nunca'}</td>
-    <td>${u.role==='owner'?'':`<button class="g" data-du="${u.user}">Sacar acceso</button>`}</td>
-  </tr>`).join('');
-  document.querySelectorAll('[data-du]').forEach(b=>b.onclick=async()=>{
-    if(!confirm('¿Sacarle el acceso a '+b.dataset.du+'?')) return;
-    await call('/admin/usuarios/borrar',{user:b.dataset.du}); usuarios();
-  });
-}
-const sugerir=()=>{
-  const a='abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return [...crypto.getRandomValues(new Uint8Array(14))].map(b=>a[b%a.length]).join('');
-};
-$('#uGen').addEventListener('click',()=>{ $('#uPass').value=sugerir(); $('#uPass').type='text'; });
-$('#uGo').addEventListener('click',async()=>{
-  $('#errUser').textContent='';
-  try{
-    await call('/admin/usuarios/nuevo',{user:$('#uUser').value,pass:$('#uPass').value,nombre:$('#uNom').value});
-    alert(`Listo. Pasale estos datos:\n\nServidor: ${API}\nUsuario: ${$('#uUser').value.trim().toLowerCase()}\nContraseña: ${$('#uPass').value}`);
-    $('#uNom').value=''; $('#uUser').value=''; $('#uPass').value='';
-    usuarios();
-  }catch(e){ $('#errUser').textContent=e.message; }
-});
-$('#mGo').addEventListener('click',async()=>{
-  $('#errMi').textContent='';
-  try{
-    await call('/admin/usuarios/clave',{user:YO.user,pass:$('#mPass').value});
-    $('#mPass').value='';
-    $('#errMi').style.color='#2E7D5B';
-    $('#errMi').textContent='Contraseña cambiada ✓';
-  }catch(e){ $('#errMi').style.color='#9C3B2E'; $('#errMi').textContent=e.message; }
-});
-
 /* ---------- al abrir ---------- */
 (async()=>{
   let s={};
   try{ s=JSON.parse(localStorage.getItem('texma_panel')||'{}'); }catch(e){}
-  if(s.API){ $('#api').value=s.API; API=s.API; }
+  if(s.NOM) $('#lUser').value=s.NOM;
   if(s.TOKEN){
     TOKEN=s.TOKEN; $('#rec').checked=true;
-    try{ await entrarAlPanel(); return; }catch(e){ TOKEN=''; }
+    try{ await entrarAlPanel(); return; }catch(e){ TOKEN=''; show('#scPanel',false); show('#scLogin',true); }
   }
-  if(s.API) conectar();
+  $(s.NOM?'#lPass':'#lUser').focus();
 })();
 </script>
 </body>

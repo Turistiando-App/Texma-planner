@@ -1,8 +1,7 @@
 # TEXMA · sistema de licencias
 
-> **¿Primera vez? Andá a [GUIA.md](GUIA.md)** — está explicado paso a paso, sin
-> dar nada por sabido: qué es el Worker, de dónde sale la URL, y qué escribir en
-> la terminal. Este archivo es el resumen técnico.
+> Servidor: **Vercel** (funciones de `/api`) + **Supabase** (tabla `licenses`).
+> El Worker de Cloudflare y su KV quedaron dados de baja.
 
 **Desde la V1.3.0 esto está PRENDIDO**: `LIC_ON = true` en `TEXMA.html`. Para volver
 a dejar la app libre, poner `false` y subir el `CACHE` de `sw.js`.
@@ -32,60 +31,38 @@ tabla de abajo: quien sepa programar puede sacar el muro igual.
 Si más adelante querés blindaje fuerte: empaquetar con Capacitor en un APK y ofuscar el bundle.
 Sube mucho el costo de romperlo, pero tampoco es infinito.
 
-## Puesta en marcha (una sola vez, ~20 min)
+## Cómo está armado
 
-1. **Claves de firma**
-   ```
-   node server/keygen.mjs
-   ```
-   - Pegá la línea `const LIC_PUB=...` en `TEXMA.html` (reemplaza la que dice `PEGAR_X`).
-   - Guardá la privada aparte, no va al repo.
+| Qué | Dónde |
+|---|---|
+| PWA | raíz del repo (`index.html`, `sw.js`, …) servida por Vercel |
+| Panel de ventas | `admin.html` → `https://TU-SITIO.vercel.app/admin` |
+| Canje del código | `POST /api/activate` · `api/activate.mjs` |
+| Link de entrega | `/d/<token>` → `api/claim.mjs` (reescrito en `vercel.json`) |
+| Panel (login, lista, nueva, entrega, reset, revocar) | `/api/admin/*` · `api/admin/[accion].mjs` |
+| Datos | tabla `licenses` de Supabase · `supabase/licenses.sql` |
 
-2. **Cloudflare Workers** (gratis hasta 100 mil pedidos/día)
-   ```
-   cd server
-   npx wrangler kv namespace create LIC      # copiá el id en wrangler.toml
-   npx wrangler secret put LIC_PRIV          # pegá el JSON de la clave privada
-   npx wrangler deploy
-   ```
-   Anotá la URL que te devuelve (`https://texma-lic.TU-CUENTA.workers.dev`).
+## Puesta en marcha (una sola vez)
 
-   **No hay ninguna clave que configurar acá.** Tu usuario y contraseña los
-   creás vos desde el panel, la primera vez que lo abrís (paso 4).
+1. **La tabla**: Supabase → SQL Editor → pegar `supabase/licenses.sql` → Run.
+2. **Las variables** (`.env` en local, Vercel → Settings → Environment Variables en producción):
+   `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE`, `ADMIN_PASS`, `LIC_PRIV`. Ver `.env.example`.
+   - `LIC_PRIV` tiene que ser la pareja de `LIC_PUB` de `TEXMA.html`. Si la vieja
+     se perdió: `node server/keygen.mjs`, se **agrega** la pública nueva a `LIC_PUBS`
+     (sin borrar la vieja: las licencias ya activadas están firmadas con ella).
+3. **Local**: `npm i -g vercel` · `vercel login` · `npm run local` → http://localhost:3000
+   (panel en http://localhost:3000/admin).
+4. **Producción**: `npm run web:deploy` (o `vercel deploy --prod`). Anotá la URL y
+   ponela en `LIC_API_URL` de `TEXMA.html`: es la que usa el APK (en la web las
+   llamadas son relativas).
+5. **Migrar las ventas viejas del KV** (una vez, antes de borrar el Worker):
+   `npx wrangler login` · `npm run migrar:kv -- --dry` · `npm run migrar:kv`.
 
-3. **Prender la licencia en la app** — *ya está hecho desde la V1.3.0*
-   En `TEXMA.html`:
-   ```js
-   const LIC_ON = true;
-   const LIC_API = 'https://texma-lic.texma.workers.dev';
-   ```
-   Al tocar cualquiera de las dos cosas: correr `npm run build:web` (copia a
-   `index.html`) y **subir el número de `CACHE` en `sw.js`** (`texma-v13` → `texma-v14`),
-   si no el service worker sirve la versión vieja.
+## Panel
 
-4. **Panel — tu usuario y contraseña**
-   Abrí `server/panel.html` con doble clic (funciona desde el disco, no hace falta
-   subirlo a ningún lado — y mejor que no lo subas).
-
-   1. Pegá la URL del Worker → **Conectar**.
-   2. Como todavía no hay ninguna cuenta, te muestra **«Primera vez · creá tu
-      cuenta»**. Ponés tu nombre, el usuario y la contraseña que vos quieras
-      (mínimo 8 caracteres, con el ojito para verla mientras la escribís).
-   3. Esa primera cuenta queda como **dueño**. Listo, ya estás adentro.
-
-   La contraseña se guarda en el servidor hasheada con PBKDF2 (120 mil vueltas
-   + salt al azar). Ni nosotros podemos leerla, así que si la perdés hay que
-   borrar la cuenta a mano desde Cloudflare (`wrangler kv key delete`).
-
-   **Invitar a tu pareja**: dentro del panel, tarjeta *«Quién puede entrar»* →
-   ponés su nombre, un usuario y una contraseña (hay un botón que sugiere una).
-   Al crearla te muestra un cartel con los tres datos para pasarle: servidor,
-   usuario y contraseña. Ella entra desde su compu con `panel.html` y genera sus
-   propios links. Cada venta queda firmada con el nombre de quien la hizo, y el
-   panel muestra el total por vendedor.
-
-   Desde ahí mismo le podés **sacar el acceso** cuando quieras. Cada uno puede
-   cambiar su propia contraseña en la tarjeta *«Mi contraseña»*.
+Una sola contraseña, la de `ADMIN_PASS`. Al entrar ponés tu nombre: queda
+anotado como «vendedor» en cada venta y el resumen muestra el total por
+vendedor. Cambiar `ADMIN_PASS` (y redesplegar) cierra todas las sesiones.
 
 ## Vender
 
@@ -102,5 +79,5 @@ Sube mucho el costo de romperlo, pero tampoco es infinito.
 
 ## Datos
 
-Nada de lo que carga la usuaria sale del celular. El Worker solo guarda:
+Nada de lo que carga la usuaria sale del celular. El servidor solo guarda:
 código, nombre, contacto, precio, ID anónimo del dispositivo y fechas.

@@ -36,12 +36,21 @@
     <!-- Avisos de TEXMA (remedios, citas, pagos) -->
     <!-- Android 13+: hay que pedirle el permiso a la usuaria -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <!-- Alarmas a la hora EXACTA, aunque el celu esté en reposo -->
+    <!-- Alarmas a la hora EXACTA, aunque el celu esté en reposo (Doze).
+         SCHEDULE_EXACT_ALARM (Android 12) la usuaria la puede revocar a mano;
+         USE_EXACT_ALARM (Android 13+) se concede sola y es la que hace que la
+         alarma de la agenda suene con la pantalla apagada sin pedir nada. -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <!-- Que los avisos sobrevivan al reinicio del celular -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Despertar el celular cuando salta la alarma: sin esto el aviso
+         espera a que la pantalla se prenda sola y llega tarde. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- La alarma de la agenda (canal texma-alarma-1) puede aparecer encima
+         de la pantalla de bloqueo, como el despertador del sistema. -->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
     <!-- Actualizarse sola: TEXMA baja el APK nuevo adentro de la app y lanza
          el instalador de Android. Sin esto, Android bloquea el instalador. -->

@@ -182,26 +182,16 @@ Ajustes fuerza la consulta al toque.
 
 ## 4. Las licencias
 
-**Hoy funcionan con el Cloudflare Worker** (`server/worker.js`), publicado y
-probado. **No lo toques todavía**: anda, es gratis y es rápido.
+**Ya viven acá**: tabla `licenses` (SQL en `supabase/licenses.sql`), servidas
+por las funciones `/api` de Vercel con la service_role. El Worker de
+Cloudflare y su KV quedaron dados de baja. Detalle en `server/README.md`.
 
-Cuando quieras mudarlo a Supabase, la lógica es idéntica — cambia dónde vive:
-
-| | Worker (hoy) | Supabase (mañana) |
-|---|---|---|
-| Códigos | KV de Cloudflare | tabla `licencias` |
-| Firma | ECDSA P-256 en el Worker | igual, en la Edge Function |
-| Clave pública en la app | `LIC_PUB` | la misma, no cambia |
-| Panel | `server/panel.html` | mismo panel, otra URL |
-
-La clave privada se guarda con `supabase secrets set LIC_PRIVATE=...` y la app
-no se entera de nada: sigue verificando offline con la misma `LIC_PUB`. La
-ventaja de mudarlo es tener **todas las apps y todas las ventas en una tabla**
-que podés ordenar, filtrar y exportar.
+La firma sigue siendo ECDSA P-256: la privada es la variable `LIC_PRIV` de
+Vercel y la app verifica offline con `LIC_PUBS` de `TEXMA.html`.
 
 ## 5. El panel de dueño
 
-`server/panel.html` ya existe para TEXMA. La versión multi-app es la misma
+`admin.html` (en `/admin` del sitio de Vercel) ya existe para TEXMA. La versión multi-app es la misma
 pantalla con un selector arriba:
 
 - **Apps** → alta de app nueva, precio, versión publicada
@@ -218,7 +208,7 @@ puede leer y borrar toda la base.
 ## 6. Orden recomendado
 
 1. Crear la organización y el proyecto → correr el SQL del punto 2. *(10 min)*
-2. Seguir vendiendo con el Worker como está.
+2. Vender desde `/admin` (Vercel + tabla `licenses`).
 3. Cuando haya 2 apps, mudar licencias a la Edge Function y unificar el panel.
 4. Recién ahí, si hace falta, backup en la nube con Supabase Storage.
 

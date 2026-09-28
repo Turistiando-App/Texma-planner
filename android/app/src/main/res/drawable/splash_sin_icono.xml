@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ exige un ícono en su splash del sistema: va uno transparente
+     para que se vea solo el rosa (el logo aparece en el splash del HTML). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@android:color/transparent" />
+    <size android:width="108dp" android:height="108dp" />
+</shape>

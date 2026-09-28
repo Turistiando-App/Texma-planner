@@ -2,7 +2,7 @@
 
 El mismo `TEXMA.html` sirve para las dos cosas:
 
-- **Web / iPhone** → PWA en https://sommimarket.github.io/texma/
+- **Web / iPhone** → PWA en https://texma.vercel.app/ (Vercel)
 - **Android** → APK propio, con **alarmas exactas del sistema, sin internet y
   con el sonido de TEXMA**.
 
@@ -89,6 +89,56 @@ canal en `TEXMA.html`:
 ```js
 const CANAL='texma-avisos';   // → 'texma-avisos-2'
 ```
+
+## Alarmas de la agenda (desde v1.6.0)
+
+Un evento con hora puede avisar **varias veces** (a la hora, 10 min antes,
+1 hora antes, 1 día antes) y en dos modos:
+
+| | Aviso normal | Alarma ⏰ |
+|---|---|---|
+| Canal | `texma-avisos-2` | `texma-alarma-1` |
+| Sonido | `notif_texma.mp3` (1 s) | `alarma_texma.wav` (15 s) |
+| Importancia | 5 | 5 |
+| Repite | no | 5 veces, 1 por minuto |
+| Botones | — | **Apagar** · **Posponer 10 min** |
+
+Capacitor **no expone** el loop nativo del sonido: lo insistente se hace
+programando la misma alarma 5 veces seguidas y cancelando las que faltan
+cuando la usuaria toca *Apagar*, *Posponer* o el aviso.
+
+El sonido largo no se baja de ningún lado, se genera por código:
+
+```bash
+npm run sonido:alarma    # → alarma_texma.wav en la raíz y en res/raw/
+```
+
+⚠ Mismas reglas de `res/raw/` que el mp3: minúsculas, **guión bajo**, sin
+espacios. Y como Android congela el sonido del canal al crearlo, si cambiás
+el archivo hay que subir el id del canal en `TEXMA.html`:
+
+```js
+const CANAL_AL='texma-alarma-1';   // → 'texma-alarma-2'
+```
+
+### Permisos que esto pide en el manifest
+
+Ya están todos puestos en `android/app/src/main/AndroidManifest.xml`:
+
+| Permiso | Para qué |
+|---|---|
+| `POST_NOTIFICATIONS` | Android 13+: la usuaria tiene que aceptar los avisos |
+| `SCHEDULE_EXACT_ALARM` | Android 12: hora exacta (se puede revocar a mano) |
+| `USE_EXACT_ALARM` | Android 13+: hora exacta, se concede sola |
+| `RECEIVE_BOOT_COMPLETED` | que las alarmas sobrevivan al reinicio |
+| `WAKE_LOCK` | despertar el celu con la **pantalla apagada** |
+| `USE_FULL_SCREEN_INTENT` | que la alarma pise la pantalla de bloqueo |
+| `VIBRATE` | vibración del canal |
+
+Con eso alcanza para que suene con la pantalla apagada. Lo único que TEXMA
+no puede arreglar desde el código es el **ahorro de batería** de algunas
+marcas (Xiaomi, Huawei, Samsung agresivo): ahí hay que entrar una vez a
+*Ajustes → Batería → TEXMA → Sin restricciones*.
 
 ## Firmar el release (para vender)
 

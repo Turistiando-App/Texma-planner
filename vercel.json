@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "rewrites": [
+    { "source": "/d/:t", "destination": "/api/claim?t=:t" },
+    { "source": "/admin", "destination": "/admin.html" }
+  ],
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [{ "key": "cache-control", "value": "no-cache" }]
+    },
+    {
+      "source": "/admin.html",
+      "headers": [{ "key": "x-robots-tag", "value": "noindex, nofollow" }]
+    }
+  ]
+}
