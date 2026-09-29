@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { SITIO } from '@/lib/sitio';
+import { SITIO, WA_COMPRAR_APP } from '@/lib/sitio';
 
 const LINKS = [
   { href: '/merceria', txt: 'Mercería' },
@@ -36,8 +36,14 @@ export default function Header() {
             </li>
           ))}
           <li>
-            <a href={SITIO.pwa} className="rounded-full bg-tinta px-4 py-2 text-sm font-bold text-papel transition hover:bg-rosa">
+            <a href={SITIO.pwa} className="rounded-full border border-linea px-4 py-2 text-sm font-bold transition hover:border-rosa hover:text-rosa">
               Abrir la app
+            </a>
+          </li>
+          <li>
+            <a href={WA_COMPRAR_APP} target="_blank" rel="noopener"
+              className="rounded-full bg-rosa px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-rosa/30 transition hover:-translate-y-0.5 hover:bg-rosa-oscuro">
+              Comprar App
             </a>
           </li>
         </ul>
@@ -53,7 +59,8 @@ export default function Header() {
           {LINKS.map(l => (
             <li key={l.href}><Link href={l.href} className="block rounded-2xl px-4 py-3 font-semibold hover:bg-lino">{l.txt}</Link></li>
           ))}
-          <li><a href={SITIO.pwa} className="block rounded-2xl bg-rosa px-4 py-3 text-center font-bold text-white">Abrir la app</a></li>
+          <li><a href={WA_COMPRAR_APP} target="_blank" rel="noopener" className="block rounded-2xl bg-rosa px-4 py-3 text-center font-bold text-white shadow-lg shadow-rosa/30">Comprar App</a></li>
+          <li><a href={SITIO.pwa} className="block rounded-2xl border border-linea px-4 py-3 text-center font-bold">Abrir la app</a></li>
         </ul>
       )}
     </header>

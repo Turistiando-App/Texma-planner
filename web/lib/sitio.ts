@@ -16,6 +16,9 @@ export const SITIO = {
 export const waLink = (texto: string, numero = SITIO.whatsapp[0].numero) =>
   `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`;
 
+/* CTA de venta de la app: mismo mensaje en header, home y /app */
+export const WA_COMPRAR_APP = waLink('Hola, vengo de la web. Quiero comprar la aplicación de gestión Texma Planner para mi taller.');
+
 const NF = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 });
 export const pesos = (n: number) => NF.format(n);
 

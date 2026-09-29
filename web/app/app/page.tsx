@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import JsonLd from '@/components/JsonLd';
 import Revelar from '@/components/Revelar';
-import { SITIO, waLink } from '@/lib/sitio';
+import { SITIO, WA_COMPRAR_APP } from '@/lib/sitio';
 
 export const metadata: Metadata = {
   title: 'La app para modistas y costureras',
@@ -33,9 +33,12 @@ export default function PaginaApp() {
         <p className="mt-5 max-w-2xl text-lg text-tinta-suave">
           TEXMA junta en un solo lugar lo que hoy tenés repartido entre cuadernos, planillas y el WhatsApp: medidas, entregas, cobros, stock y plata.
         </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <a href={SITIO.pwa} className="rounded-full bg-rosa px-7 py-4 font-bold text-white">Abrir TEXMA</a>
-          <a href={waLink('¡Hola! Quiero comprar la app TEXMA.')} target="_blank" rel="noopener" className="rounded-full border border-linea bg-papel px-7 py-4 font-bold">Comprar por WhatsApp</a>
+        <div className="mt-8 flex flex-wrap items-center gap-3">
+          <a href={WA_COMPRAR_APP} target="_blank" rel="noopener"
+            className="rounded-full bg-rosa px-9 py-5 text-lg font-bold text-white shadow-xl shadow-rosa/30 transition hover:-translate-y-0.5 hover:bg-rosa-oscuro">
+            Comprar la app por WhatsApp
+          </a>
+          <a href={SITIO.pwa} className="rounded-full border border-linea bg-papel px-7 py-4 font-bold transition hover:border-rosa hover:text-rosa">Abrir TEXMA</a>
         </div>
       </Revelar>
 
@@ -63,6 +66,14 @@ export default function PaginaApp() {
             </Revelar>
           ))}
         </ol>
+        <Revelar>
+          <div className="mt-10 flex justify-center">
+            <a href={WA_COMPRAR_APP} target="_blank" rel="noopener"
+              className="rounded-full bg-rosa px-10 py-5 text-lg font-bold text-white shadow-xl shadow-rosa/30 transition hover:-translate-y-0.5 hover:bg-rosa-oscuro">
+              Quiero TEXMA para mi taller
+            </a>
+          </div>
+        </Revelar>
       </section>
 
       <JsonLd data={{

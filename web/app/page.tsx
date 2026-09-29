@@ -6,7 +6,7 @@ import ProductoCard from '@/components/ProductoCard';
 import Revelar from '@/components/Revelar';
 import { FAQ_HOME } from '@/content/faq';
 import { getDestacados } from '@/lib/productos';
-import { SITIO, waLink } from '@/lib/sitio';
+import { SITIO, waLink, WA_COMPRAR_APP } from '@/lib/sitio';
 
 export const revalidate = 60;
 
@@ -72,9 +72,13 @@ export default async function Home() {
               <p className="kicker opacity-80">La app</p>
               <h2 id="descarga" className="titulo mt-3 text-4xl md:text-5xl">Tu taller, ordenado en el celular.</h2>
               <p className="mt-4 max-w-md opacity-90">Medidas por clienta, entregas con aviso, lo que te deben, tu stock de mercería y tus números. Sin internet y sin suscripción.</p>
-              <div className="mt-7 flex flex-wrap gap-3">
-                <a href={SITIO.pwa} className="rounded-full bg-white px-6 py-3.5 font-bold text-rosa">Probala ahora</a>
-                <Link href="/app" className="rounded-full border border-white/50 px-6 py-3.5 font-bold">Ver funciones</Link>
+              <div className="mt-7 flex flex-wrap items-center gap-3">
+                <a href={WA_COMPRAR_APP} target="_blank" rel="noopener"
+                  className="rounded-full bg-white px-8 py-4 text-lg font-bold text-rosa shadow-xl shadow-rosa-oscuro/40 transition hover:-translate-y-0.5 hover:bg-rosa-claro">
+                  Comprar la app
+                </a>
+                <a href={SITIO.pwa} className="rounded-full border border-white/50 px-6 py-3.5 font-bold transition hover:bg-white/10">Probala ahora</a>
+                <Link href="/app" className="px-2 py-3.5 font-bold underline-offset-4 hover:underline">Ver funciones</Link>
               </div>
             </div>
             <ul className="grid grid-cols-2 gap-3 text-sm">
