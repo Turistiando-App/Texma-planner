@@ -115,6 +115,7 @@ export default function Header() {
   const [panel, setPanel] = useState<string | null>(null); // mega-menú desktop
   const [bajo, setBajo] = useState(false);
   const cierre = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const caja = useRef<HTMLElement>(null); // todo el header: barra + mega-menú + menú mobile
 
   useEffect(() => { setAbierto(false); setPanel(null); }, [ruta]);
   useEffect(() => {
@@ -122,6 +123,15 @@ export default function Header() {
     f(); window.addEventListener('scroll', f, { passive: true });
     return () => window.removeEventListener('scroll', f);
   }, []);
+  /* click afuera: cualquier mousedown fuera del header cierra el mega-menú y el menú mobile */
+  useEffect(() => {
+    if (!panel && !abierto) return;
+    const fuera = (e: MouseEvent) => {
+      if (caja.current && !caja.current.contains(e.target as Node)) { setPanel(null); setAbierto(false); }
+    };
+    document.addEventListener('mousedown', fuera);
+    return () => document.removeEventListener('mousedown', fuera);
+  }, [panel, abierto]);
   useEffect(() => {
     const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') { setPanel(null); setAbierto(false); } };
     window.addEventListener('keydown', esc);
@@ -143,6 +153,7 @@ export default function Header() {
 
   return (
     <header
+      ref={caja}
       onMouseLeave={cerrarLuego}
       className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${T.texto} ${transparente ? '' : T.fondo}`}>
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5" aria-label="Principal">

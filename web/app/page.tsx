@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Beneficios from '@/components/Beneficios';
 import FAQ from '@/components/FAQ';
 import HeroApp from '@/components/HeroApp';
 import JsonLd from '@/components/JsonLd';
@@ -10,37 +11,14 @@ import { SITIO, waLink, WA_COMPRAR_APP } from '@/lib/sitio';
 
 export const revalidate = 60;
 
-const VALOR = [
-  { t: 'Stock real, al día', d: 'Lo que ves en el catálogo es lo que hay en el taller. Se actualiza solo cuando algo se vende.', i: '◉' },
-  { t: 'Te asesora una modista', d: '¿No sabés qué cierre o qué elástico va? Preguntanos por WhatsApp: lo usamos todos los días.', i: '✂' },
-  { t: 'Envíos a todo el país', d: 'Armamos el pedido en el día y te lo mandamos por correo o moto en la ciudad.', i: '➶' },
-  { t: 'Todo tu taller en el celu', d: 'Con la app TEXMA tenés medidas, entregas, stock y plata ordenados, sin planillas.', i: '♥' },
-];
-
 export default async function Home() {
   const destacados = await getDestacados(11);
   return (
     <>
       <HeroApp />
 
-      {/* ---- valor ---- */}
-      <section className="mx-auto max-w-6xl px-5 py-20" aria-labelledby="valor">
-        <Revelar>
-          <p className="kicker text-rosa">Por qué TEXMA</p>
-          <h2 id="valor" className="titulo mt-3 max-w-2xl text-4xl md:text-5xl">Todo lo que tu costura necesita, sin vueltas.</h2>
-        </Revelar>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {VALOR.map((v, i) => (
-            <Revelar key={v.t} delay={i * 0.08}>
-              <div className="h-full rounded-3xl border border-linea bg-papel p-6">
-                <span className="grid h-11 w-11 place-items-center rounded-2xl bg-rosa-claro text-lg text-rosa-oscuro">{v.i}</span>
-                <h3 className="mt-4 text-lg font-bold">{v.t}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-tinta-suave">{v.d}</p>
-              </div>
-            </Revelar>
-          ))}
-        </div>
-      </section>
+      {/* ---- beneficios: foto + tarjetas que aparecen al scrollear ---- */}
+      <Beneficios />
 
       {/* ---- destacados: 11 productos + tarjeta «ver todo» = 12 (3 filas de 4) ---- */}
       <section className="mx-auto max-w-6xl px-5 py-10" aria-labelledby="destacados">

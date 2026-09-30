@@ -17,17 +17,16 @@ const uno = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) 
 
 export default async function Merceria({ searchParams }: { searchParams: SP }) {
   const [productos, sp] = await Promise.all([getProductos(), searchParams]);
-  const num = (k: string) => { const n = Number(uno(sp[k])); return Number.isFinite(n) && uno(sp[k]) !== '' ? n : undefined; };
   return (
-    <div className="mx-auto max-w-6xl px-5 pt-28">
+    <div className="mx-auto max-w-6xl px-5 pb-10 pt-28">
       <p className="kicker text-rosa">Mercería</p>
       <h1 className="titulo mt-3 text-5xl md:text-6xl">Todo para coser</h1>
       <p className="mt-4 max-w-2xl text-tinta-suave">
-        {productos.length} productos con stock real. Filtrá por categoría, medida o precio y pedí por WhatsApp.
+        {productos.length} productos con stock real. Buscá, elegí tu rubro y pedí por WhatsApp.
       </p>
-      <div className="mt-10">
+      <div className="mt-8">
         <Catalogo productos={productos} inicial={{
-          cat: uno(sp.cat), sub: uno(sp.sub), q: uno(sp.q), orden: uno(sp.orden) || undefined, min: num('min'), max: num('max'),
+          cat: uno(sp.cat), sub: uno(sp.sub), q: uno(sp.q), orden: uno(sp.orden) || undefined,
         }} />
       </div>
       <JsonLd data={{
