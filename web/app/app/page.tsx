@@ -42,7 +42,7 @@ export default function PaginaApp() {
         </div>
       </Revelar>
 
-      <section className="mt-20 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label="Funciones">
+      <section id="funciones" className="mt-20 grid scroll-mt-24 gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label="Funciones">
         {FUNCIONES.map((f, i) => (
           <Revelar key={f.t} delay={(i % 3) * 0.07}>
             <article className="h-full rounded-3xl border border-linea bg-papel p-7">
@@ -55,7 +55,7 @@ export default function PaginaApp() {
       </section>
 
       <section className="mt-24" aria-labelledby="como">
-        <Revelar><h2 id="como" className="titulo text-4xl md:text-5xl">Cómo la conseguís</h2></Revelar>
+        <Revelar><h2 id="como" className="scroll-mt-24 titulo text-4xl md:text-5xl">Cómo la conseguís</h2></Revelar>
         <ol className="mt-8 grid gap-4 md:grid-cols-3">
           {PASOS.map((p, i) => (
             <Revelar key={i} delay={i * 0.08}>

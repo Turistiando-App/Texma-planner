@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import FAQ from '@/components/FAQ';
-import HeroHilo from '@/components/HeroHilo';
+import HeroApp from '@/components/HeroApp';
 import JsonLd from '@/components/JsonLd';
 import ProductoCard from '@/components/ProductoCard';
 import Revelar from '@/components/Revelar';
@@ -21,7 +21,7 @@ export default async function Home() {
   const destacados = await getDestacados(11);
   return (
     <>
-      <HeroHilo />
+      <HeroApp />
 
       {/* ---- valor ---- */}
       <section className="mx-auto max-w-6xl px-5 py-20" aria-labelledby="valor">
