@@ -3,15 +3,15 @@
    HERO · portada estilo SaaS
    ------------------------------------------------------------
    Fondo casi negro con un resplandor radial rosa/coral muy suave.
-   Izquierda: texto + CTA. Derecha: la foto de la modista al centro y
+   Izquierda: texto + CTA. Derecha: la foto de la modista adelante y
    dos réplicas de pantallas de la app (Finanzas y ficha de un pedido)
-   montadas sobre sus esquinas, todo flotando en bucle con desfase.
+   asomando por detrás en abanico, todo flotando en bucle con desfase.
    Las réplicas copian el CSS de la PWA con la paleta «rosa»
    (.card, .balance, .carry, .fin2, .catbar, .pdk, .pdt, .pdtag, .pdmed).
    Con «reducir movimiento» nada flota y todo muestra su estado final.
 ============================================================ */
 import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion';
-import { ArrowRight, Check, ChevronLeft, ChevronRight, MoveHorizontal, Ruler, Scissors, Shirt } from 'lucide-react';
+import { ArrowRight, Check, ChevronLeft, ChevronRight, MoveHorizontal, Ruler, Shirt } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -179,10 +179,7 @@ export default function HeroApp() {
       <div className="mx-auto grid min-h-[100svh] max-w-6xl items-center gap-12 px-5 pb-16 pt-28 md:grid-cols-2 md:pt-24">
         {/* ---- texto + CTA ---- */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: EASE }}>
-          <p className="kicker inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-rosa-claro">
-            <Scissors className="h-3.5 w-3.5" aria-hidden="true" /> Mercería · App para modistas
-          </p>
-          <h1 className="titulo mt-5 text-5xl leading-[1.02] md:text-7xl">
+          <h1 className="titulo text-5xl leading-[1.02] md:text-7xl">
             Coser es un arte.<br /><span className="text-rosa">Organizarlo, también.</span>
           </h1>
           <p className="mt-6 max-w-lg text-base text-white/70 md:text-lg">
@@ -206,29 +203,31 @@ export default function HeroApp() {
           </ul>
         </motion.div>
 
-        {/* ---- composición: foto al centro, pantallas de la app en sus esquinas ----
-             capas: foto z-10 · finanzas z-20 (arriba a la izquierda) · pedido z-30 (abajo a la derecha) */}
+        {/* ---- composición en abanico: las pantallas de la app asoman por detrás de la foto ----
+             capas: finanzas z-10 · pedido z-20 · foto z-30 (adelante de todo).
+             La foto va corrida a la derecha y las tarjetas salen por la izquierda,
+             que es donde tienen su contenido (balance, estado, medidas). */}
         <div className="relative mx-auto h-[540px] w-full max-w-[540px] md:h-[620px]" aria-hidden="true">
-          {/* halo detrás de la foto, da la sensación de profundidad */}
+          {/* halo detrás de todo, da la sensación de profundidad */}
           <div className="absolute left-1/2 top-1/2 z-0 h-[70%] w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-rosa/25 blur-[90px]" />
 
-          {/* la foto */}
-          <Flotante delay={0.5} className="left-[18%] top-[7%] z-10 w-[64%]">
-            <div className="relative aspect-[2/3] overflow-hidden rounded-[2rem] ring-1 ring-white/15 shadow-[0_40px_90px_-25px_rgba(0,0,0,.85)]">
+          {/* finanzas: atrás de todo, arriba a la izquierda */}
+          <Flotante delay={0} className="left-0 top-0 z-10 w-[64%] sm:w-[56%] max-w-[300px]">
+            <div className="-rotate-6"><TarjetaFinanzas /></div>
+          </Flotante>
+
+          {/* ficha del pedido: segunda capa, abajo a la izquierda */}
+          <Flotante delay={1.2} className="bottom-0 left-[2%] z-20 w-[66%] sm:w-[56%] max-w-[300px]">
+            <div className="rotate-[5deg]"><TarjetaPedido /></div>
+          </Flotante>
+
+          {/* la foto: adelante de todo */}
+          <Flotante delay={0.5} className="right-[4%] top-[12%] z-30 w-[54%]">
+            <div className="relative aspect-[2/3] overflow-hidden rounded-[2rem] ring-1 ring-white/15 shadow-[-30px_40px_90px_-20px_rgba(0,0,0,.9)]">
               <Image src="/modista.jpg" alt="" fill priority
-                sizes="(min-width: 768px) 346px, 64vw" className="object-cover" />
+                sizes="(min-width: 768px) 292px, 54vw" className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
             </div>
-          </Flotante>
-
-          {/* finanzas: pisa la esquina superior izquierda de la foto */}
-          <Flotante delay={0} className="left-0 top-0 z-20 w-[64%] sm:w-[58%] max-w-[300px]">
-            <TarjetaFinanzas />
-          </Flotante>
-
-          {/* ficha del pedido: pisa la esquina inferior derecha de la foto */}
-          <Flotante delay={1.2} className="bottom-0 right-0 z-30 w-[68%] sm:w-[60%] max-w-[300px]">
-            <TarjetaPedido />
           </Flotante>
         </div>
       </div>

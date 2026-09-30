@@ -5,14 +5,19 @@
    «Mercería» y «La app» abren un panel ancho al pasar el mouse
    (o con foco / click en pantallas táctiles). El panel entra y sale
    con framer-motion (opacidad + un poco de desplazamiento vertical).
-   Arriba de la portada (hero oscuro) el header va en texto claro;
-   al scrollear o con un panel abierto pasa a fondo papel.
+   Dos temas según la ruta (usePathname):
+     · oscuro (/ y /app): texto claro, logo en blanco y vidrio casi negro.
+       En la portada, arriba de todo, va transparente sobre el hero; en
+       /app el fondo de la página es claro, así que el vidrio va siempre.
+     · claro (el resto): texto oscuro, logo original y, al scrollear,
+       vidrio papel. Arriba de todo va transparente sobre el lino.
 ============================================================ */
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight, BookOpen, CalendarClock, ChevronDown, CircleDot, LineChart, ListChecks, Menu,
   MessageCircle, Package, Ruler, Scissors, Smartphone, Store, Truck, Wallet, Waves, X, type LucideIcon,
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -78,6 +83,25 @@ const SIMPLES = [
 
 const esExterno = (href: string) => href.startsWith('http');
 
+/* rutas con navbar oscuro */
+const RUTAS_OSCURAS = ['/', '/app'];
+const esOscura = (ruta: string) => RUTAS_OSCURAS.some(r => ruta === r || (r !== '/' && ruta.startsWith(`${r}/`)));
+
+const TEMA = {
+  oscuro: {
+    texto: 'text-gray-200', activo: 'text-white', hover: 'hover:text-white',
+    fondo: 'bg-[#0E0A0B]/85 shadow-[0_1px_0_rgba(255,255,255,.08)] backdrop-blur-lg',
+    logo: 'brightness-0 invert', // el PNG es gris oscuro: así queda blanco puro
+    borde: 'border-white/25 text-white hover:border-white/60 hover:bg-white/5',
+  },
+  claro: {
+    texto: 'text-gray-900', activo: 'text-rosa', hover: 'hover:text-rosa',
+    fondo: 'bg-papel/90 shadow-[0_1px_0_#E4DCCD] backdrop-blur-lg',
+    logo: '',
+    borde: 'border-linea bg-papel/60 text-gray-900 hover:border-rosa hover:text-rosa',
+  },
+};
+
 function Enlace({ href, className, children, onClick }: { href: string; className?: string; children: React.ReactNode; onClick?: () => void }) {
   return esExterno(href)
     ? <a href={href} target="_blank" rel="noopener" className={className} onClick={onClick}>{children}</a>
@@ -109,7 +133,10 @@ export default function Header() {
   const cerrarLuego = () => { clearTimeout(cierre.current); cierre.current = setTimeout(() => setPanel(null), 120); };
 
   const activo = MEGA.find(m => m.id === panel);
-  const oscuro = ruta === '/' && !bajo && !panel && !abierto; // sobre el hero oscuro de la portada
+  const oscura = esOscura(ruta);
+  const T = oscura ? TEMA.oscuro : TEMA.claro;
+  /* transparente solo arriba de todo; /app (oscuro sobre página clara) nunca */
+  const transparente = !bajo && !panel && !abierto && ruta !== '/app';
   const anim = quieto
     ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
     : { initial: { opacity: 0, y: -10 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -6 } };
@@ -117,12 +144,11 @@ export default function Header() {
   return (
     <header
       onMouseLeave={cerrarLuego}
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        oscuro ? 'text-white' : 'text-tinta'
-      } ${bajo || panel || abierto ? 'bg-papel/90 shadow-[0_1px_0_#E4DCCD] backdrop-blur-lg' : ''}`}>
+      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${T.texto} ${transparente ? '' : T.fondo}`}>
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5" aria-label="Principal">
-        <Link href="/" className="titulo text-2xl tracking-[.08em]" aria-label="TEXMA, inicio">
-          <span className="text-rosa">T</span>EXMA
+        <Link href="/" className="shrink-0" aria-label="TEXMA, inicio">
+          <Image src="/logo-texma.png" alt="TEXMA" width={800} height={144} priority
+            sizes="160px" className={`h-6 w-auto transition md:h-7 ${T.logo}`} />
         </Link>
 
         <ul className="hidden items-center gap-1 md:flex">
@@ -131,7 +157,7 @@ export default function Header() {
             return (
               <li key={m.id} onMouseEnter={() => abrir(m.id)}>
                 <button
-                  className={`flex items-center gap-1 rounded-full px-3.5 py-2 text-sm font-semibold transition hover:text-rosa ${on ? 'text-rosa' : ''}`}
+                  className={`flex items-center gap-1 rounded-full px-3.5 py-2 text-sm font-semibold transition ${T.hover} ${on ? T.activo : T.texto}`}
                   aria-expanded={panel === m.id} aria-controls={`mega-${m.id}`}
                   onFocus={() => abrir(m.id)}
                   onClick={() => setPanel(p => (p === m.id ? null : m.id))}>
@@ -143,7 +169,7 @@ export default function Header() {
           })}
           {SIMPLES.map(l => (
             <li key={l.href} onMouseEnter={cerrarLuego}>
-              <Link href={l.href} className={`rounded-full px-3.5 py-2 text-sm font-semibold transition hover:text-rosa ${ruta.startsWith(l.href) ? 'text-rosa' : ''}`}>
+              <Link href={l.href} className={`rounded-full px-3.5 py-2 text-sm font-semibold transition ${T.hover} ${ruta.startsWith(l.href) ? T.activo : T.texto}`}>
                 {l.txt}
               </Link>
             </li>
@@ -152,7 +178,7 @@ export default function Header() {
 
         <div className="hidden items-center gap-2 md:flex" onMouseEnter={cerrarLuego}>
           <a href={SITIO.pwa}
-            className={`rounded-full border px-4 py-2 text-sm font-bold transition hover:border-rosa hover:text-rosa ${oscuro ? 'border-white/25' : 'border-linea'}`}>
+            className={`rounded-full border px-4 py-2 text-sm font-bold transition ${T.borde}`}>
             Abrir la app
           </a>
           <a href={WA_COMPRAR_APP} target="_blank" rel="noopener"
@@ -162,7 +188,7 @@ export default function Header() {
         </div>
 
         <button
-          className={`grid h-11 w-11 place-items-center rounded-2xl border md:hidden ${oscuro ? 'border-white/25' : 'border-linea bg-papel'}`}
+          className={`grid h-11 w-11 place-items-center rounded-2xl border md:hidden ${T.borde}`}
           aria-label="Menú" aria-expanded={abierto} onClick={() => setAbierto(v => !v)}>
           {abierto ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
