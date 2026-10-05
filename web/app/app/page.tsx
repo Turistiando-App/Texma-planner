@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import JsonLd from '@/components/JsonLd';
 import Revelar from '@/components/Revelar';
 import { SITIO, WA_COMPRAR_APP } from '@/lib/sitio';
@@ -38,7 +39,7 @@ export default function PaginaApp() {
             className="rounded-full bg-rosa px-9 py-5 text-lg font-bold text-white shadow-xl shadow-rosa/30 transition hover:-translate-y-0.5 hover:bg-rosa-oscuro">
             Comprar la app por WhatsApp
           </a>
-          <a href={SITIO.pwa} className="rounded-full border border-linea bg-papel px-7 py-4 font-bold transition hover:border-rosa hover:text-rosa">Abrir TEXMA</a>
+          <Link href="/login" className="rounded-full border border-linea bg-papel px-7 py-4 font-bold transition hover:border-rosa hover:text-rosa">Abrir la app</Link>
         </div>
       </Revelar>
 

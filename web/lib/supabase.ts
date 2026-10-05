@@ -12,3 +12,17 @@ export function supabase(): SupabaseClient | null {
   cliente = url && key ? createClient(url, key, { auth: { persistSession: false } }) : null;
   return cliente;
 }
+
+/* Cliente para el login (/login): este SÍ guarda la sesión en el navegador
+   y lee la vuelta de Google desde la URL. Solo en el cliente. */
+let clienteAuth: SupabaseClient | null | undefined;
+
+export function supabaseAuth(): SupabaseClient | null {
+  if (clienteAuth !== undefined) return clienteAuth;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  clienteAuth = url && key
+    ? createClient(url, key, { auth: { persistSession: true, detectSessionInUrl: true, flowType: 'pkce' } })
+    : null;
+  return clienteAuth;
+}

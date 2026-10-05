@@ -143,7 +143,7 @@ programa avisos y **no registra el service worker** (o sea, tampoco sigue
 recibiendo actualizaciones sola).
 
 En la pantalla de bloqueo están los contactos para pedir el código
-(+54 387 576-0091, +54 387 614-5611, texma.ok@gmail.com) y el campo para
+(+54 9 387 614-5611, texma.ok@gmail.com) y el campo para
 pegarlo si ya lo compraron.
 
 ### Código maestro (nuestro)

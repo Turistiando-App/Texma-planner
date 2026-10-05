@@ -5,12 +5,14 @@
    «Mercería» y «La app» abren un panel ancho al pasar el mouse
    (o con foco / click en pantallas táctiles). El panel entra y sale
    con framer-motion (opacidad + un poco de desplazamiento vertical).
-   Dos temas según la ruta (usePathname):
-     · oscuro (/ y /app): texto claro, logo en blanco y vidrio casi negro.
-       En la portada, arriba de todo, va transparente sobre el hero; en
-       /app el fondo de la página es claro, así que el vidrio va siempre.
-     · claro (el resto): texto oscuro, logo original y, al scrollear,
-       vidrio papel. Arriba de todo va transparente sobre el lino.
+   El tema sigue a lo que hay DEBAJO de la barra, no a la ruta:
+     · oscuro: mientras la barra está sobre una sección marcada con
+       data-nav="oscuro" (el hero de la portada) va transparente, con
+       texto claro y logo en blanco.
+     · claro (todo lo demás): texto oscuro, logo original y, al scrollear
+       o con un menú abierto, vidrio papel. Así el contraste no depende
+       del scroll: fondo claro ⇄ texto oscuro, fondo oscuro ⇄ texto claro.
+   El mega-menú se cierra solo al sacar el mouse del panel o del header.
 ============================================================ */
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
@@ -21,7 +23,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { SITIO, WA_COMPRAR_APP, waLink } from '@/lib/sitio';
+import { WA_COMPRAR_APP, waLink } from '@/lib/sitio';
 
 type Item = { href: string; t: string; d: string; i: LucideIcon; externo?: boolean };
 type Columna = { titulo: string; items: Item[] };
@@ -67,7 +69,7 @@ const MEGA: Mega[] = [
         titulo: 'Empezar',
         items: [
           { href: '/app#como', t: 'Cómo la conseguís', d: 'Pago único, sin suscripción', i: Package },
-          { href: SITIO.pwa, t: 'Abrir la app', d: 'Android, iPhone o compu', i: Smartphone, externo: true },
+          { href: '/login', t: 'Abrir la app', d: 'Android, iPhone o compu', i: Smartphone },
           { href: '/blog', t: 'Guías y consejos', d: 'Para ordenar tu taller', i: BookOpen },
         ],
       },
@@ -83,14 +85,18 @@ const SIMPLES = [
 
 const esExterno = (href: string) => href.startsWith('http');
 
-/* rutas con navbar oscuro */
-const RUTAS_OSCURAS = ['/', '/app'];
-const esOscura = (ruta: string) => RUTAS_OSCURAS.some(r => ruta === r || (r !== '/' && ruta.startsWith(`${r}/`)));
+const ALTO_BARRA = 64; // h-16
+
+/* ¿la barra está encima de una sección oscura (data-nav="oscuro")? */
+const sobreSeccionOscura = () =>
+  Array.from(document.querySelectorAll<HTMLElement>('[data-nav="oscuro"]')).some(el => {
+    const r = el.getBoundingClientRect();
+    return r.top < ALTO_BARRA && r.bottom > ALTO_BARRA / 2;
+  });
 
 const TEMA = {
   oscuro: {
     texto: 'text-gray-200', activo: 'text-white', hover: 'hover:text-white',
-    fondo: 'bg-[#0E0A0B]/85 shadow-[0_1px_0_rgba(255,255,255,.08)] backdrop-blur-lg',
     logo: 'brightness-0 invert', // el PNG es gris oscuro: así queda blanco puro
     borde: 'border-white/25 text-white hover:border-white/60 hover:bg-white/5',
   },
@@ -114,15 +120,18 @@ export default function Header() {
   const [abierto, setAbierto] = useState(false);       // menú mobile
   const [panel, setPanel] = useState<string | null>(null); // mega-menú desktop
   const [bajo, setBajo] = useState(false);
+  const [sobreOscuro, setSobreOscuro] = useState(false);
   const cierre = useRef<ReturnType<typeof setTimeout>>(undefined);
   const caja = useRef<HTMLElement>(null); // todo el header: barra + mega-menú + menú mobile
 
   useEffect(() => { setAbierto(false); setPanel(null); }, [ruta]);
   useEffect(() => {
-    const f = () => setBajo(window.scrollY > 12);
-    f(); window.addEventListener('scroll', f, { passive: true });
-    return () => window.removeEventListener('scroll', f);
-  }, []);
+    const f = () => { setBajo(window.scrollY > 12); setSobreOscuro(sobreSeccionOscura()); };
+    f();
+    window.addEventListener('scroll', f, { passive: true });
+    window.addEventListener('resize', f);
+    return () => { window.removeEventListener('scroll', f); window.removeEventListener('resize', f); };
+  }, [ruta]);
   /* click afuera: cualquier mousedown fuera del header cierra el mega-menú y el menú mobile */
   useEffect(() => {
     if (!panel && !abierto) return;
@@ -143,10 +152,10 @@ export default function Header() {
   const cerrarLuego = () => { clearTimeout(cierre.current); cierre.current = setTimeout(() => setPanel(null), 120); };
 
   const activo = MEGA.find(m => m.id === panel);
-  const oscura = esOscura(ruta);
-  const T = oscura ? TEMA.oscuro : TEMA.claro;
-  /* transparente solo arriba de todo; /app (oscuro sobre página clara) nunca */
-  const transparente = !bajo && !panel && !abierto && ruta !== '/app';
+  const menu = !!panel || abierto;
+  /* texto claro solo sobre el hero oscuro y sin menú abierto (el menú lleva vidrio papel) */
+  const T = sobreOscuro && !menu ? TEMA.oscuro : TEMA.claro;
+  const transparente = !menu && (sobreOscuro || !bajo);
   const anim = quieto
     ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
     : { initial: { opacity: 0, y: -10 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -6 } };
@@ -155,7 +164,7 @@ export default function Header() {
     <header
       ref={caja}
       onMouseLeave={cerrarLuego}
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${T.texto} ${transparente ? '' : T.fondo}`}>
+      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${T.texto} ${transparente ? '' : TEMA.claro.fondo}`}>
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5" aria-label="Principal">
         <Link href="/" className="shrink-0" aria-label="TEXMA, inicio">
           <Image src="/logo-texma.png" alt="TEXMA" width={800} height={144} priority
@@ -188,10 +197,10 @@ export default function Header() {
         </ul>
 
         <div className="hidden items-center gap-2 md:flex" onMouseEnter={cerrarLuego}>
-          <a href={SITIO.pwa}
+          <Link href="/login"
             className={`rounded-full border px-4 py-2 text-sm font-bold transition ${T.borde}`}>
             Abrir la app
-          </a>
+          </Link>
           <a href={WA_COMPRAR_APP} target="_blank" rel="noopener"
             className="rounded-full bg-rosa px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-rosa/30 transition hover:-translate-y-0.5 hover:bg-rosa-oscuro">
             Comprar App
@@ -211,9 +220,12 @@ export default function Header() {
           <motion.div
             key={activo.id} id={`mega-${activo.id}`}
             {...anim} transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            onMouseEnter={() => abrir(activo.id)}
-            className="absolute inset-x-0 top-full hidden px-5 md:block">
-            <div className="mx-auto grid max-w-6xl grid-cols-[1fr_1fr_1.1fr] gap-8 rounded-3xl border border-linea bg-white p-8 text-tinta shadow-[0_30px_80px_-20px_rgba(43,38,34,.28)]">
+            className="pointer-events-none absolute inset-x-0 top-full hidden px-5 md:block">
+            {/* solo el panel recibe el mouse: al salir de él se contrae (el margen lateral no cuenta) */}
+            <div
+              onMouseEnter={() => abrir(activo.id)}
+              onMouseLeave={cerrarLuego}
+              className="pointer-events-auto mx-auto grid max-w-6xl grid-cols-[1fr_1fr_1.1fr] gap-8 rounded-3xl border border-linea bg-white p-8 text-tinta shadow-[0_30px_80px_-20px_rgba(43,38,34,.28)]">
               {activo.columnas.map(c => (
                 <div key={c.titulo}>
                   <p className="kicker text-tinta-suave">{c.titulo}</p>
@@ -272,7 +284,7 @@ export default function Header() {
             ))}
             <div className="mt-2 grid gap-2">
               <a href={WA_COMPRAR_APP} target="_blank" rel="noopener" className="block rounded-2xl bg-rosa px-4 py-3 text-center font-bold text-white shadow-lg shadow-rosa/30">Comprar App</a>
-              <a href={SITIO.pwa} className="block rounded-2xl border border-linea px-4 py-3 text-center font-bold">Abrir la app</a>
+              <Link href="/login" className="block rounded-2xl border border-linea px-4 py-3 text-center font-bold">Abrir la app</Link>
             </div>
           </motion.div>
         )}

@@ -168,7 +168,7 @@ function TarjetaPedido() {
 
 export default function HeroApp() {
   return (
-    <section className="relative isolate overflow-hidden bg-[#0E0A0B] text-white" aria-label="TEXMA, app para modistas y mercería">
+    <section data-nav="oscuro" className="relative isolate overflow-hidden bg-[#0E0A0B] text-white" aria-label="TEXMA, app para modistas y mercería">
       {/* resplandor de marca: muy sutil, dos focos radiales */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10
         bg-[radial-gradient(60%_55%_at_78%_45%,rgba(236,25,104,.22),transparent_70%),radial-gradient(40%_40%_at_10%_100%,rgba(166,16,72,.18),transparent_70%)]" />
