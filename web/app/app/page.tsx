@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import CineApp from '@/components/app/CineApp';
 import FraseRotativa from '@/components/app/FraseRotativa';
-import ScrollIphone from '@/components/app/ScrollIphone';
 import JsonLd from '@/components/JsonLd';
 import Revelar from '@/components/Revelar';
+import { PhoneMockupBasic } from '@/components/ui/phone-mockups-1';
 import { SITIO, WA_COMPRAR_APP } from '@/lib/sitio';
 
 export const metadata: Metadata = {
@@ -67,10 +67,8 @@ export default function PaginaApp() {
        </div>
       </section>
 
-      {/* ---- scroll-telling con iPhone pegajoso ---- */}
-      <div className="mt-16 md:mt-24">
-        <ScrollIphone />
-      </div>
+      {/* ---- carrusel de pantallas de la app ---- */}
+      <PhoneMockupBasic />
 
       {/* ---- y además ---- */}
       <section className="mx-auto mt-24 max-w-6xl px-5" aria-labelledby="extras">

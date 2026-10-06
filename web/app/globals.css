@@ -16,6 +16,20 @@
   --color-linea: #E4DCCD;
   --color-naranja: #F2803C;
 
+  /* tokens semánticos de shadcn/ui (components/ui/*), mapeados a la marca */
+  --color-background: var(--color-papel);
+  --color-foreground: var(--color-tinta);
+  --color-primary: var(--color-rosa);
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: var(--color-rosa-claro);
+  --color-secondary-foreground: var(--color-rosa-oscuro);
+  --color-accent: var(--color-lino);
+  --color-accent-foreground: var(--color-tinta);
+  --color-destructive: #B3261E;
+  --color-border: var(--color-linea);
+  --color-input: var(--color-linea);
+  --color-ring: var(--color-rosa);
+
   --font-serif: var(--font-cormorant), Georgia, serif;
   --font-sans: var(--font-manrope), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
