@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import CineApp from '@/components/app/CineApp';
@@ -32,8 +33,15 @@ export default function PaginaApp() {
   return (
     <div className="overflow-x-clip bg-lino text-gray-900">
       {/* ---- hero «cine» ---- */}
-      <section className="bg-gradient-to-b from-pink-200 via-pink-100 via-55% to-lino" aria-labelledby="hero-app">
-       <div className="mx-auto max-w-7xl px-5 pb-16 pt-32 md:pb-20 md:pt-40">
+      <section className="relative isolate bg-gradient-to-b from-pink-200 via-pink-100 via-55% to-lino" aria-labelledby="hero-app">
+       {/* figurines decorativos a los costados: detrás del texto y del video, sin clics */}
+       <div aria-hidden="true" className="pointer-events-none absolute left-0 top-36 z-0 hidden w-[170px] opacity-80 lg:block xl:w-[240px] 2xl:w-[300px]">
+         <Image src="/figurin-1.png" alt="" width={1340} height={2400} sizes="300px" className="h-auto w-full object-contain" />
+       </div>
+       <div aria-hidden="true" className="pointer-events-none absolute right-0 top-44 z-0 hidden w-[150px] opacity-80 lg:block xl:w-[210px] 2xl:w-[260px]">
+         <Image src="/figurin-2.png" alt="" width={349} height={683} sizes="260px" className="h-auto w-full object-contain" />
+       </div>
+       <div className="relative z-10 mx-auto max-w-7xl px-5 pb-16 pt-32 md:pb-20 md:pt-40">
         <Revelar className="text-center">
           <p className="font-mono text-xs uppercase tracking-[.25em] text-rosa-oscuro">TEXMA Planner</p>
           <h1 id="hero-app" className="mx-auto mt-5 max-w-4xl text-5xl font-semibold leading-[1.02] tracking-tight text-gray-900 md:text-7xl">
@@ -54,7 +62,7 @@ export default function PaginaApp() {
         </Revelar>
        </div>
        {/* el video sale del max-w del texto: casi todo el ancho en desktop */}
-       <div className="px-3 pb-16 sm:px-5">
+       <div className="relative z-10 px-3 pb-16 sm:px-5">
          <CineApp />
        </div>
       </section>

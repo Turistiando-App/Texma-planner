@@ -2,24 +2,58 @@
 /* ============================================================
    SCROLL-TELLING · iPhone pegajoso que cambia de pantalla
    ------------------------------------------------------------
-   Izquierda: un bloque de texto por función, cada uno de alto de
+   Izquierda: un bloque de texto por función (9), cada uno de alto de
    pantalla. Derecha (lg+): un iPhone sticky. useScroll mide el avance
    por toda la sección y cada pantalla tiene su tramo de opacidad, con
-   un crossfade corto entre tramos.
+   un crossfade corto entre tramos. Los tramos se calculan a partir de
+   N, así que sumar o sacar pasos no requiere tocar nada más.
    En mobile no hay sticky: cada bloque lleva su iPhone debajo.
    Si un PNG todavía no está, se ve el degradado con el nombre.
 ============================================================ */
 import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } from 'framer-motion';
-import { CalendarClock, LineChart, Ruler, type LucideIcon } from 'lucide-react';
+import {
+  CalendarClock, Dumbbell, LineChart, Package, Pill, Scissors, ShoppingCart, Sparkles, TrendingUp, type LucideIcon,
+} from 'lucide-react';
+import Image from 'next/image';
 import { useRef, useState } from 'react';
 
 type Paso = { id: string; kicker: string; t: string; d: string; img: string; i: LucideIcon; tono: string };
 
 const PASOS: Paso[] = [
   {
-    id: 'medidas', kicker: 'Medidas', i: Ruler, img: '/mockup-medidas.png', tono: 'from-[#3A0F20] to-[#0A0A0A]',
+    id: 'costura', kicker: 'Costura', i: Scissors, img: '/mockup-costura.png', tono: 'from-[#3A0F20] to-[#0A0A0A]',
     t: 'Cada clienta, con sus medidas a mano.',
     d: 'Guardá las medidas en cm con la calculadora de patrón al lado (÷2, ÷4), el maniquí de referencia y hasta 4 fotos por trabajo.',
+  },
+  {
+    id: 'inversiones', kicker: 'Inversiones', i: TrendingUp, img: '/mockup-inversiones.png', tono: 'from-[#0F2233] to-[#0A0A0A]',
+    t: 'Lo que ahorrás, creciendo.',
+    d: 'Anotá tus ahorros e inversiones y mirá cuánto rinden mes a mes, sin planillas.',
+  },
+  {
+    id: 'compras', kicker: 'Lista de compras', i: ShoppingCart, img: '/mockup-compras.png', tono: 'from-[#2A2410] to-[#0A0A0A]',
+    t: 'Nada se te olvida en la tienda.',
+    d: 'Armá la lista mientras trabajás y tachá lo que ya compraste. Siempre en el bolsillo.',
+  },
+  {
+    id: 'entrenamiento', kicker: 'Entrenamiento', i: Dumbbell, img: '/mockup-entrenamiento.png', tono: 'from-[#102A2A] to-[#0A0A0A]',
+    t: 'Un rato para vos.',
+    d: 'Rutinas simples y un registro de tus días de ejercicio, para cuidar la espalda después de tantas horas en la máquina.',
+  },
+  {
+    id: 'merceria', kicker: 'Mercería y stock', i: Package, img: '/mockup-merceria.png', tono: 'from-[#2A1030] to-[#0A0A0A]',
+    t: 'Tu mercería, siempre contada.',
+    d: 'Cintas, cierres y botones con precio por metro o unidad y alertas cuando algo se está por terminar.',
+  },
+  {
+    id: 'tratamientos', kicker: 'Tratamientos', i: Sparkles, img: '/mockup-tratamientos.png', tono: 'from-[#33101F] to-[#0A0A0A]',
+    t: 'Tus cuidados, al día.',
+    d: 'Seguí tratamientos de belleza o salud con sus sesiones y fechas, todo en el mismo lugar.',
+  },
+  {
+    id: 'remedios', kicker: 'Remedios', i: Pill, img: '/mockup-remedios.png', tono: 'from-[#0F2A1A] to-[#0A0A0A]',
+    t: 'Cada toma, a su hora.',
+    d: 'Cargá tus remedios con dosis y horario, y la app te avisa cuando toca.',
   },
   {
     id: 'agenda', kicker: 'Agenda', i: CalendarClock, img: '/mockup-agenda.png', tono: 'from-[#0F2A22] to-[#0A0A0A]',
@@ -34,11 +68,15 @@ const PASOS: Paso[] = [
 ];
 
 const N = PASOS.length;
-const FUNDIDO = 0.05; // ancho del crossfade, en fracción del scroll total
+/* cada bloque de texto queda centrado en pantalla cuando el avance vale i/(N-1);
+   el cambio de pantalla cae a mitad de camino entre dos bloques */
+const borde = (k: number) => (k - 0.5) / (N - 1);
+const FUNDIDO = Math.min(0.05, 0.3 / (N - 1)); // medio ancho del crossfade, en fracción del scroll total
 
 /* tramo de opacidad de la pantalla i: entra, queda, sale */
 function rango(i: number): [number[], number[]] {
-  const a = i / N, b = (i + 1) / N;
+  if (N === 1) return [[0, 1], [1, 1]];
+  const a = borde(i), b = borde(i + 1);
   if (i === 0) return [[0, b - FUNDIDO, b + FUNDIDO], [1, 1, 0]];
   if (i === N - 1) return [[a - FUNDIDO, a + FUNDIDO, 1], [0, 1, 1]];
   return [[a - FUNDIDO, a + FUNDIDO, b - FUNDIDO, b + FUNDIDO], [0, 1, 1, 0]];
@@ -56,8 +94,8 @@ function Pantalla({ paso, opacidad, escala }: { paso: Paso; opacidad?: MotionVal
           </div>
         </div>
       ) : (
-        <img src={paso.img} alt={`Pantalla de ${paso.kicker} en TEXMA`} onError={() => setSinImg(true)}
-          className="h-full w-full object-cover" loading="lazy" decoding="async" />
+        <Image src={paso.img} alt={`Pantalla de ${paso.kicker} en TEXMA`} onError={() => setSinImg(true)}
+          fill sizes="310px" className="object-cover" />
       )}
     </motion.div>
   );
