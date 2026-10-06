@@ -7,7 +7,7 @@ import FraseRotativa from '@/components/app/FraseRotativa';
 import JsonLd from '@/components/JsonLd';
 import Revelar from '@/components/Revelar';
 import { PhoneMockupBasic } from '@/components/ui/phone-mockups-1';
-import { SITIO, WA_COMPRAR_APP } from '@/lib/sitio';
+import { SITIO, COMPRAR_APP } from '@/lib/sitio';
 
 export const metadata: Metadata = {
   title: 'La app para modistas y costureras',
@@ -51,7 +51,7 @@ export default function PaginaApp() {
             El planner que entiende a las modistas: medidas, entregas, cobros, stock y plata en un solo lugar.
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <a href={WA_COMPRAR_APP} target="_blank" rel="noopener"
+            <a href={COMPRAR_APP}
               className="rounded-full bg-gray-900 px-8 py-4 font-semibold text-white transition hover:bg-black">
               Comprar la app
             </a>
@@ -105,7 +105,7 @@ export default function PaginaApp() {
         </ol>
         <Revelar>
           <div className="mt-14 flex justify-center">
-            <a href={WA_COMPRAR_APP} target="_blank" rel="noopener"
+            <a href={COMPRAR_APP}
               className="rounded-full bg-rosa px-10 py-5 text-lg font-semibold text-white shadow-[0_20px_60px_-15px_rgba(236,25,104,.7)] transition hover:-translate-y-0.5 hover:bg-rosa-oscuro">
               Quiero TEXMA para mi taller
             </a>

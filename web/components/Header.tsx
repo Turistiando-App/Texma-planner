@@ -23,7 +23,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { WA_COMPRAR_APP, waLink } from '@/lib/sitio';
+import { COMPRAR_APP, waLink } from '@/lib/sitio';
 
 type Item = { href: string; t: string; d: string; i: LucideIcon; externo?: boolean };
 type Columna = { titulo: string; items: Item[] };
@@ -78,7 +78,7 @@ const MEGA: Mega[] = [
         ],
       },
     ],
-    destacado: { kicker: 'Texma Planner', t: 'Tu taller, ordenado en el celular.', d: 'Pago único. Funciona sin internet.', cta: 'Comprar la app', href: WA_COMPRAR_APP },
+    destacado: { kicker: 'Texma Planner', t: 'Tu taller, ordenado en el celular.', d: 'Pago único. Funciona sin internet.', cta: 'Comprar la app', href: COMPRAR_APP },
     verTodo: { t: 'Ver todo sobre la App', href: '/app' },
   },
 ];
@@ -209,7 +209,7 @@ export default function Header() {
             className={`rounded-full border px-4 py-2 text-sm font-bold transition ${T.borde}`}>
             Abrir la app
           </Link>
-          <a href={WA_COMPRAR_APP} target="_blank" rel="noopener"
+          <a href={COMPRAR_APP}
             className="rounded-full bg-rosa px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-rosa/30 transition hover:-translate-y-0.5 hover:bg-rosa-oscuro">
             Comprar App
           </a>
@@ -303,7 +303,7 @@ export default function Header() {
               <Link key={l.href} href={l.href} className="block rounded-2xl px-3 py-2.5 font-semibold hover:bg-lino">{l.txt}</Link>
             ))}
             <div className="mt-2 grid gap-2">
-              <a href={WA_COMPRAR_APP} target="_blank" rel="noopener" className="block rounded-2xl bg-rosa px-4 py-3 text-center font-bold text-white shadow-lg shadow-rosa/30">Comprar App</a>
+              <a href={COMPRAR_APP} className="block rounded-2xl bg-rosa px-4 py-3 text-center font-bold text-white shadow-lg shadow-rosa/30">Comprar App</a>
               <Link href="/login" className="block rounded-2xl border border-linea px-4 py-3 text-center font-bold">Abrir la app</Link>
             </div>
           </motion.div>

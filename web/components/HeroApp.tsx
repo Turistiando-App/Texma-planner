@@ -15,7 +15,7 @@ import { ArrowRight, Check, ChevronLeft, ChevronRight, MoveHorizontal, Ruler, Sh
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { WA_COMPRAR_APP } from '@/lib/sitio';
+import { COMPRAR_APP } from '@/lib/sitio';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 /* mismo formato que fMoney() de la app: «$ 1.284.600» */
@@ -187,7 +187,7 @@ export default function HeroApp() {
             tenés hilos, botones, cierres y elásticos con stock real.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <a href={WA_COMPRAR_APP} target="_blank" rel="noopener"
+            <a href={COMPRAR_APP}
               className="inline-flex items-center gap-2 rounded-full bg-rosa px-7 py-4 font-bold text-white shadow-[0_14px_40px_-8px_rgba(236,25,104,.65)] transition hover:-translate-y-0.5 hover:bg-rosa-oscuro">
               Comprar la app <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </a>

@@ -8,12 +8,15 @@
        Requiere el proveedor Google activo en Supabase y /login en
        Authentication → URL Configuration → Redirect URLs.
      · Código de activación: el que se entrega al comprar (XXXX-XXXX-XXXX).
-   Regla: para entrar a la app hacen falta LAS DOS cosas, sesión de
-   Google y un código creado desde el panel de admin. El formulario del
-   código se habilita recién con la sesión; /api/licencia/verificar
-   comprueba que el código exista (sin canjearlo) y se pasa a la PWA con
-   ?k=, que es lo que lee su muro. El canje lo hace la PWA porque la
-   licencia queda atada a ESE celular.
+   Regla híbrida:
+     · PC (navegador de escritorio): sesión de Google OBLIGATORIA (queda
+       el mail) y después el código creado desde el panel de admin.
+     · Celular: el código directo, sin Google.
+   /api/licencia/verificar comprueba que el código exista (sin canjearlo;
+   si hay sesión, guarda el mail en la licencia) y se pasa a la PWA con
+   ?k=. La PWA lo canjea (queda atado a ESE dispositivo) y muestra el
+   onboarding que explica la app antes de entrar. OJO: «celular o PC» se
+   decide en el navegador; es una regla de experiencia, no de seguridad.
 ============================================================ */
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, KeyRound, Loader2, LogOut, MessageCircle, ShieldCheck, Smartphone, WifiOff } from 'lucide-react';
@@ -22,7 +25,7 @@ import type { User } from '@supabase/supabase-js';
 import { esAdmin } from '@/lib/admin';
 import { supabaseAuth } from '@/lib/supabase';
 import Link from 'next/link';
-import { SITIO, WA_COMPRAR_APP } from '@/lib/sitio';
+import { SITIO, COMPRAR_APP } from '@/lib/sitio';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -30,6 +33,11 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 const formatear = (v: string) =>
   v.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12).match(/.{1,4}/g)?.join('-') ?? '';
 const completo = (c: string) => /^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(c);
+
+/* celular o tablet (incluye iPad, que se anuncia como Mac con pantalla táctil) */
+const esMovil = () =>
+  /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
 function LogoGoogle() {
   return (
@@ -55,6 +63,10 @@ export default function Acceso() {
   const [codigo, setCodigo] = useState('');
   const [error, setError] = useState('');
   const [verificando, setVerificando] = useState(false);
+  const [movil, setMovil] = useState(false);
+  useEffect(() => { setMovil(esMovil()); }, []);
+  /* en el celular el código va directo; en la PC, recién con Google */
+  const puedeCodigo = movil || !!usuario;
 
   /* sesión actual + la que vuelve de Google */
   useEffect(() => {
@@ -82,20 +94,20 @@ export default function Acceso() {
 
   const activar = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!usuario) { setError('Primero iniciá sesión con Google.'); return; }
+    if (!puedeCodigo) { setError('Primero iniciá sesión con Google.'); return; }
     if (!completo(codigo)) { setError('El código tiene 12 caracteres: XXXX-XXXX-XXXX.'); return; }
     setError('');
     setVerificando(true);
     try {
-      const { data } = await supabaseAuth()!.auth.getSession();
+      const token = usuario ? (await supabaseAuth()?.auth.getSession())?.data.session?.access_token : undefined;
       const r = await fetch('/api/licencia/verificar', {
         method: 'POST',
-        headers: { 'content-type': 'application/json', authorization: `Bearer ${data.session?.access_token ?? ''}` },
+        headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({ code: codigo }),
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) { setError(j.error || 'No pudimos verificar el código. Probá de nuevo.'); setVerificando(false); return; }
-      /* la PWA canjea ?k= apenas abre y lo saca de la URL */
+      /* la PWA canjea ?k= apenas abre, lo saca de la URL y muestra el onboarding */
       window.location.href = `${SITIO.pwa}/?k=${encodeURIComponent(codigo)}`;
     } catch {
       setError('Sin conexión. Revisá internet y probá de nuevo.');
@@ -114,7 +126,9 @@ export default function Acceso() {
         <p className="kicker text-rosa">Acceso</p>
         <h1 className="titulo mt-3 text-4xl leading-[1.05] sm:text-5xl lg:text-6xl">Entrá a TEXMA Planner.</h1>
         <p className="mt-5 max-w-lg text-base text-tinta-suave sm:text-lg">
-          Iniciá sesión con tu cuenta de Google y activá la app con el código único que te mandamos al comprarla.
+          {movil
+            ? 'Poné el código único que te mandamos al comprarla y listo.'
+            : 'Desde la compu: iniciá sesión con tu cuenta de Google y activá la app con el código único que te mandamos al comprarla.'}
         </p>
         <ul className="mt-8 grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
           {PUNTOS.map(p => (
@@ -155,7 +169,7 @@ export default function Acceso() {
               <LogOut className="h-4 w-4" aria-hidden="true" /> Cerrar sesión
             </button>
           </div>
-        ) : (
+        ) : movil ? null : (
           <button type="button" onClick={entrarConGoogle} disabled={cargandoGoogle}
             className="mt-6 flex w-full items-center justify-center gap-3 rounded-full border border-linea bg-white px-6 py-4 font-bold text-tinta shadow-sm transition hover:border-tinta/40 hover:shadow-md disabled:cursor-wait disabled:opacity-70">
             {cargandoGoogle ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" /> : <LogoGoogle />}
@@ -163,23 +177,23 @@ export default function Acceso() {
           </button>
         )}
 
-        <div className="my-7 flex items-center gap-4 text-tinta-suave" aria-hidden="true">
+        <div className={`my-7 flex items-center gap-4 text-tinta-suave ${movil && !usuario ? 'hidden' : ''}`} aria-hidden="true">
           <span className="h-px flex-1 bg-linea" /><span className="kicker">o</span><span className="h-px flex-1 bg-linea" />
         </div>
 
-        <form onSubmit={activar} noValidate aria-disabled={!usuario}>
+        <form onSubmit={activar} noValidate aria-disabled={!puedeCodigo} className={movil && !usuario ? 'mt-6' : ''}>
           <label htmlFor="codigo" className="block text-sm font-semibold">Código de activación único</label>
           <div className="relative mt-2">
             <KeyRound className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-tinta-suave" aria-hidden="true" />
-            <input id="codigo" value={codigo} disabled={!usuario} onChange={e => { setCodigo(formatear(e.target.value)); setError(''); }}
+            <input id="codigo" value={codigo} disabled={!puedeCodigo} onChange={e => { setCodigo(formatear(e.target.value)); setError(''); }}
               placeholder="XXXX-XXXX-XXXX" inputMode="text" autoComplete="one-time-code" autoCapitalize="characters" spellCheck={false}
               maxLength={14} aria-invalid={!!error} aria-describedby="codigo-ayuda"
               className="w-full rounded-2xl border border-linea bg-lino py-4 pl-12 pr-4 font-mono text-lg tracking-[.2em] outline-none transition placeholder:text-tinta-suave/50 focus:border-rosa focus:bg-white focus:ring-4 focus:ring-rosa/10 disabled:cursor-not-allowed disabled:opacity-50" />
           </div>
           <p id="codigo-ayuda" className="mt-2 text-xs text-tinta-suave">
-            {usuario ? 'Te lo mandamos por WhatsApp cuando compraste la app.' : 'Primero iniciá sesión con Google para poner tu código.'}
+            {puedeCodigo ? 'Te lo mandamos por WhatsApp cuando compraste la app.' : 'Primero iniciá sesión con Google para poner tu código.'}
           </p>
-          <button type="submit" disabled={!usuario || !completo(codigo) || verificando}
+          <button type="submit" disabled={!puedeCodigo || !completo(codigo) || verificando}
             className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-tinta px-6 py-4 font-bold text-papel transition hover:bg-rosa disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-tinta">
             {verificando
               ? <><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Verificando…</>
@@ -191,8 +205,8 @@ export default function Acceso() {
 
         <p className="mt-7 border-t border-linea pt-5 text-center text-sm text-tinta-suave">
           ¿Todavía no la tenés?{' '}
-          <a href={WA_COMPRAR_APP} target="_blank" rel="noopener" className="inline-flex items-center gap-1 font-bold text-rosa hover:underline">
-            <MessageCircle className="h-4 w-4" aria-hidden="true" /> Comprala por WhatsApp
+          <a href={COMPRAR_APP} className="inline-flex items-center gap-1 font-bold text-rosa hover:underline">
+            <MessageCircle className="h-4 w-4" aria-hidden="true" /> Comprala acá
           </a>
         </p>
       </motion.section>

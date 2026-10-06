@@ -1395,6 +1395,8 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
    ≥768px: sidebar fijo de íconos (84px) y el contenido ocupa el resto.
    ≥1100px: sidebar con nombres (232px) y #view en grilla de 2 columnas
    (los bloques .vc se acomodan solos; encabezados y héroes a lo ancho).
+   El contenido NO tiene ancho máximo: llena toda la pantalla a la
+   derecha del sidebar (pedido explícito, nada de «celular al medio»).
    En el celu no cambia nada: todo esto vive dentro de los @media.
 ============================================================ */
 @media (min-width:768px){
@@ -1415,9 +1417,15 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
   #nav button.on{background:var(--tint)}
   #nav button::after{left:0;top:50%;bottom:auto;width:4px;height:22px;margin:-11px 0 0;border-radius:0 4px 4px 0}
 
-  #app{max-width:none;margin:0 0 0 var(--side-w);padding:0 clamp(20px,4vw,48px) 64px}
-  #top,#view{max-width:1180px;margin-left:auto;margin-right:auto}
+  :root{--app-px:clamp(20px,4vw,48px)}
+  #app{max-width:none;width:auto;margin:0 0 0 var(--side-w);padding:0 var(--app-px) 64px}
+  #top,#view{max-width:none;width:100%;margin-left:0;margin-right:0}
   #top{margin-bottom:22px}
+  /* Home: la cabecera de color y el bloque .hcolor llegan a los dos bordes del
+     área de contenido (en el celu lo hacen con -16px; acá con el padding real) */
+  body.en-home #top{margin:0 calc(var(--app-px) * -1);width:auto;padding-left:var(--app-px);padding-right:var(--app-px)}
+  .hcolor{margin-left:calc(var(--app-px) * -1);margin-right:calc(var(--app-px) * -1);padding-left:var(--app-px);padding-right:var(--app-px)}
+  .hhero .hr{max-width:240px}
 
   #addfab{right:32px;bottom:calc(32px + env(safe-area-inset-bottom))}
   #calcfab{right:36px;bottom:calc(98px + env(safe-area-inset-bottom))}
@@ -1426,6 +1434,21 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
   .rdock{left:var(--side-w);bottom:calc(22px + env(safe-area-inset-bottom))}
   body.en-racha #app{padding-bottom:calc(var(--rdock-h) + 80px)}
   body.en-racha #addfab{bottom:calc(var(--rdock-h) + 40px)}
+}
+/* Onboarding en pantallas apaisadas (PC/tablet acostada): las fotos son
+   verticales (720×1080). Estiradas a todo el ancho quedaban ampliadas al
+   doble y se veían deformadas/borrosas. Acá la foto ocupa la mitad
+   izquierda con su proporción (object-fit:cover centrado) y el texto va
+   a la derecha sobre el fondo oscuro. */
+@media (min-width:768px) and (min-aspect-ratio:1/1){
+  #onb .obg{right:auto;width:50%;max-width:720px;object-fit:cover;object-position:center 30%}
+  #onb .oshade{right:auto;width:50%;max-width:720px;
+    background:linear-gradient(90deg,rgba(20,16,13,0) 70%,#14100D 100%)}
+  #onb .obox{left:min(50%,720px);right:0;top:0;bottom:0;max-width:none;margin:0;
+    justify-content:center;padding:48px clamp(32px,6vw,96px)}
+  #onb .ot{font-size:clamp(32px,3.4vw,46px)}
+  #onb .os{font-size:16px;max-width:440px}
+  #onb .feats{max-width:440px}
 }
 @media (min-width:1100px){
   :root{--side-w:232px}
@@ -1437,6 +1460,8 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
     position:static;width:auto;height:auto;overflow:visible;clip-path:none;
     font-family:var(--sans);font-size:14.5px;font-weight:700;
   }
+  /* el área de contenido se estira hasta el borde derecho */
+  #app{flex:1;width:auto}
   /* contenido en 2 columnas */
   #view{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px;align-items:start}
   #view > *{grid-column:1/-1}
@@ -8002,9 +8027,18 @@ function licScreen(msg){
   inp.addEventListener('keydown',e=>{ if(e.key==='Enter') entrar(); });
   return w;
 }
+/* Tras validar un código (en el muro o llegando con ?k= desde /login), la
+   clienta pasa SIEMPRE por el onboarding que explica la app antes de
+   entrar, salvo que ya lo haya visto en esta misma apertura. */
+let onbEnSesion=false, licRecienActivada=false;
+function trasActivar(){
+  if(onbEnSesion){ abrirApp(); return; }
+  onbEnSesion=true;
+  showOnb(abrirApp);
+}
 function cerrarLic(w,msg){
   const g=G();
-  const seguir=()=>{ w.remove(); toast(msg); abrirApp(); };
+  const seguir=()=>{ w.remove(); toast(msg); trasActivar(); };
   if(g) g.to(w,{opacity:0,scale:1.03,duration:.4,ease:'power2.in',onComplete:seguir});
   else seguir();
 }
@@ -8018,6 +8052,7 @@ async function licGate(){
   if(pre){
     try{
       await licActivate(pre);
+      licRecienActivada=true;
       history.replaceState({},'',url.pathname); return true;
     }catch(e){ licScreen(e.message); return false; }
   }
@@ -8066,9 +8101,9 @@ async function arrancar(){
      guardada, y el cartel sale apenas la pantalla queda libre. */
   updFetch();
   programarChequeoUpdate();
-  if(!S.settings.onboarded) await new Promise(seguir=>showOnb(seguir));
+  if(!S.settings.onboarded){ await new Promise(seguir=>showOnb(seguir)); onbEnSesion=true; }
   const ok=await licGate();
-  if(ok) abrirApp();
+  if(ok){ if(licRecienActivada) trasActivar(); else abrirApp(); }
 }
 function abrirApp(){
   if(appAbierta) return;          /* con o sin licencia, se abre una sola vez */

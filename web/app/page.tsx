@@ -7,7 +7,7 @@ import ProductoCard from '@/components/ProductoCard';
 import Revelar from '@/components/Revelar';
 import { FAQ_HOME } from '@/content/faq';
 import { getDestacados } from '@/lib/productos';
-import { waLink, WA_COMPRAR_APP } from '@/lib/sitio';
+import { waLink, COMPRAR_APP } from '@/lib/sitio';
 
 export const revalidate = 60;
 
@@ -51,7 +51,7 @@ export default async function Home() {
               <h2 id="descarga" className="titulo mt-3 text-4xl md:text-5xl">Tu taller, ordenado en el celular.</h2>
               <p className="mt-4 max-w-md opacity-90">Medidas por clienta, entregas con aviso, lo que te deben, tu stock de mercería y tus números. Sin internet y sin suscripción.</p>
               <div className="mt-7 flex flex-wrap items-center gap-3">
-                <a href={WA_COMPRAR_APP} target="_blank" rel="noopener"
+                <a href={COMPRAR_APP}
                   className="rounded-full bg-white px-8 py-4 text-lg font-bold text-rosa shadow-xl shadow-rosa-oscuro/40 transition hover:-translate-y-0.5 hover:bg-rosa-claro">
                   Comprar la app
                 </a>

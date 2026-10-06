@@ -7,20 +7,23 @@
    valida el token contra Supabase y el mail en el servidor.
    Ocupa toda la pantalla (fixed) y tapa el header/footer del sitio.
 ============================================================ */
-import { ChartColumn, KeyRound, LifeBuoy, LoaderCircle, LogOut, type LucideIcon } from 'lucide-react';
+import { ChartColumn, KeyRound, LifeBuoy, LoaderCircle, LogOut, UserPlus, type LucideIcon } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { esAdmin } from '@/lib/admin';
+import { esAdmin, type Prefill } from '@/lib/admin';
 import { supabaseAuth } from '@/lib/supabase';
 import Generador from './Generador';
 import MetricasAdmin from './MetricasAdmin';
+import PreVentas from './PreVentas';
 import Tickets from './Tickets';
 import type { Api } from './ui';
 
-type Pestana = 'metricas' | 'codigos' | 'soporte';
+type Pestana = 'metricas' | 'preventas' | 'codigos' | 'soporte';
 const PESTANAS: { id: Pestana; t: string; i: LucideIcon }[] = [
   { id: 'metricas', t: 'Métricas', i: ChartColumn },
+  { id: 'preventas', t: 'Pre-ventas', i: UserPlus },
   { id: 'codigos', t: 'Códigos', i: KeyRound },
   { id: 'soporte', t: 'Soporte', i: LifeBuoy },
 ];
@@ -29,6 +32,10 @@ export default function PanelAdmin() {
   const router = useRouter();
   const [email, setEmail] = useState<string | null>(null);
   const [pestana, setPestana] = useState<Pestana>('metricas');
+  /* «Generar licencia» en Pre-ventas: datos para precargar el generador */
+  const [prefill, setPrefill] = useState<Prefill | null>(null);
+  const [genKey, setGenKey] = useState(0);
+  const generarDesde = (p: Prefill) => { setPrefill(p); setGenKey(k => k + 1); setPestana('codigos'); };
 
   useEffect(() => {
     const sb = supabaseAuth();
@@ -75,7 +82,11 @@ export default function PanelAdmin() {
       {/* ---- sidebar (desktop) / barra de arriba (mobile) ---- */}
       <aside className="flex shrink-0 flex-col border-b border-white/10 bg-[#0E0E0F] md:w-64 md:border-b-0 md:border-r">
         <div className="flex items-center justify-between px-5 py-4 md:py-7">
-          <Link href="/" className="font-serif text-2xl font-bold italic text-white"><span className="text-rosa">T</span>EXMA <span className="ml-1 align-middle font-mono text-[10px] not-italic tracking-[.2em] text-neutral-500">ADMIN</span></Link>
+          {/* el PNG es tinta oscura: brightness-0 + invert lo pasa a blanco sobre el sidebar negro */}
+          <Link href="/" aria-label="TEXMA, ir al sitio" className="flex items-center gap-2">
+            <Image src="/logo-texma.png" alt="TEXMA" width={800} height={144} priority className="h-7 w-auto brightness-0 invert" />
+            <span className="font-mono text-[10px] tracking-[.2em] text-neutral-500">ADMIN</span>
+          </Link>
           <button onClick={salir} className="grid h-9 w-9 place-items-center rounded-xl text-neutral-500 hover:bg-white/5 hover:text-white md:hidden" aria-label="Cerrar sesión">
             <LogOut className="h-4 w-4" />
           </button>
@@ -100,7 +111,10 @@ export default function PanelAdmin() {
       <main className="min-w-0 flex-1 overflow-y-auto">
         <div className="mx-auto max-w-6xl px-5 py-8 md:px-10 md:py-12">
           {pestana === 'metricas' && <MetricasAdmin api={api} />}
-          {pestana === 'codigos' && <Generador api={api} />}
+          {pestana === 'preventas' && <PreVentas api={api} onGenerar={generarDesde} />}
+          {/* genKey: cada «Generar licencia» remonta el generador con los datos del lead;
+              limpiar el prefill después de crear NO lo remonta (no se pierde el código nuevo) */}
+          {pestana === 'codigos' && <Generador key={genKey} api={api} inicial={prefill} onUsado={() => setPrefill(null)} />}
           {pestana === 'soporte' && <Tickets api={api} />}
         </div>
       </main>

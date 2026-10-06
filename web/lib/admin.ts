@@ -20,3 +20,13 @@ export type Metricas = {
   ventas: number; facturado: number; facturadoMes: number;
   activas: number; activas30: number; pendientes: number; ticketsPendientes: number;
 };
+
+/* lead de /checkout (tabla pre_ventas). En el panel:
+   pendiente = «Nueva», vendida = «Código enviado», descartada = «Descartada» */
+export type PreVenta = {
+  id: string; nombre: string; apellido: string; email: string; celular: string;
+  estado: 'pendiente' | 'vendida' | 'descartada'; license_code: string | null; created_at: string;
+};
+
+/* lo que la pestaña Pre-ventas le pasa al generador al tocar «Generar licencia» */
+export type Prefill = { leadId: string; nombre: string; contacto: string; email: string };

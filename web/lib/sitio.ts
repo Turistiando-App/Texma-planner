@@ -22,8 +22,14 @@ export const SITIO = {
 export const waLink = (texto: string, numero = SITIO.whatsapp[0].numero) =>
   `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`;
 
-/* CTA de venta de la app: mismo mensaje en header, home y /app */
-export const WA_COMPRAR_APP = waLink('Hola, vengo de la web. Quiero comprar la aplicación de gestión Texma Planner para mi taller.');
+/* CTA de venta de la app (header, home, /app, /login): ya no va directo a
+   WhatsApp. Pasa por /checkout, que guarda nombre, apellido, email y celular
+   en `pre_ventas` y recién ahí abre el WhatsApp de María con los datos. */
+export const COMPRAR_APP = '/checkout';
+
+/* mensaje prearmado para María al terminar /checkout */
+export const waPreventa = (d: { nombre: string; apellido: string; email: string }) =>
+  waLink(`Hola María, quiero comprar Texma Planner. Mis datos son: ${d.nombre} ${d.apellido}, Email: ${d.email}.`);
 
 const NF = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 });
 export const pesos = (n: number) => NF.format(n);

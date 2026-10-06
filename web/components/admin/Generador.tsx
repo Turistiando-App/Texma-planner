@@ -1,9 +1,12 @@
 'use client';
 /* Generador de códigos: crea una licencia nueva en `licenses` para una
-   clienta y la deja lista para mandar por WhatsApp. Abajo, las últimas. */
+   clienta y la deja lista para mandar por WhatsApp. Abajo, las últimas.
+   Si viene de Pre-ventas («Generar licencia»), llega `inicial` con la
+   clienta y el contacto ya cargados; al crear el código, el lead pasa a
+   «Código enviado» con el código vinculado. */
 import { Check, Copy, KeyRound, LoaderCircle, MessageCircle } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import type { Licencia } from '@/lib/admin';
+import type { Licencia, Prefill } from '@/lib/admin';
 import { pesos, SITIO } from '@/lib/sitio';
 import { Aviso, fecha, Titulo, type Api } from './ui';
 
@@ -30,8 +33,9 @@ function waDe(contacto: string) {
 
 const campo = 'w-full rounded-xl border border-white/10 bg-white/[.04] px-4 py-3 text-white outline-none transition placeholder:text-neutral-600 focus:border-rosa focus:bg-white/[.06]';
 
-export default function Generador({ api }: { api: Api }) {
-  const [d, setD] = useState({ nombre: '', contacto: '', precio: '30000' });
+export default function Generador({ api, inicial, onUsado }: { api: Api; inicial?: Prefill | null; onUsado?: () => void }) {
+  const [d, setD] = useState({ nombre: inicial?.nombre ?? '', contacto: inicial?.contacto ?? '', precio: '30000' });
+  const [lead, setLead] = useState<Prefill | null>(inicial ?? null);
   const [nueva, setNueva] = useState<Licencia | null>(null);
   const [lista, setLista] = useState<Licencia[] | null>(null);
   const [creando, setCreando] = useState(false);
@@ -49,10 +53,16 @@ export default function Generador({ api }: { api: Api }) {
     if (!d.nombre.trim()) { setError('Poné el nombre de la clienta.'); return; }
     setCreando(true); setError(''); setCopiado(false);
     try {
-      const l = await api<Licencia>('licencias', { method: 'POST', body: JSON.stringify({ ...d, precio: +d.precio }) });
+      const l = await api<Licencia>('licencias', { method: 'POST', body: JSON.stringify({ ...d, precio: +d.precio, email: lead?.email }) });
       setNueva(l);
       setLista(v => [l, ...(v ?? [])]);
       setD({ nombre: '', contacto: '', precio: d.precio });
+      if (lead) {
+        /* el código ya existe: si esto falla, se avisa pero no se pierde nada */
+        try { await api('pre-ventas', { method: 'PATCH', body: JSON.stringify({ id: lead.leadId, estado: 'vendida', license_code: l.code }) }); }
+        catch { setError('El código se creó, pero no pude marcar la pre-venta. Marcala a mano en Pre-ventas.'); }
+        setLead(null); onUsado?.();
+      }
     } catch (e) { setError(e instanceof Error ? e.message : 'No se pudo crear'); }
     finally { setCreando(false); }
   };
@@ -68,6 +78,13 @@ export default function Generador({ api }: { api: Api }) {
       <Titulo kicker="Licencias" t="Generador de códigos" />
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1.1fr]">
         <form onSubmit={crear} className="space-y-4 rounded-3xl border border-white/10 bg-white/[.03] p-6">
+          {lead && (
+            <p className="flex items-center justify-between gap-3 rounded-xl border border-rosa/30 bg-rosa/10 px-4 py-2.5 text-xs text-rosa-claro">
+              <span>Datos cargados desde la pre-venta de <b className="text-white">{lead.nombre}</b>.</span>
+              <button type="button" onClick={() => { setLead(null); onUsado?.(); setD(v => ({ ...v, nombre: '', contacto: '' })); }}
+                className="shrink-0 font-semibold text-neutral-400 hover:text-white">Quitar</button>
+            </p>
+          )}
           <label className="block text-sm font-semibold text-neutral-300">Clienta
             <input className={`${campo} mt-2`} value={d.nombre} onChange={e => setD(v => ({ ...v, nombre: e.target.value }))} placeholder="Nombre y apellido" required />
           </label>

@@ -1,7 +1,8 @@
 /* ============================================================
    /api/admin/licencias (solo admin)
      GET                               → últimas 100 licencias
-     POST {nombre, contacto, precio}   → crea un código nuevo
+     POST {nombre, contacto, precio, email?}   → crea un código nuevo
+                                       (email: el del lead de /checkout, si vino de Pre-ventas)
    Escribe en la MISMA tabla `licenses` que usa la PWA (/api/activate),
    con los mismos campos que el panel viejo, así el código funciona
    en la app y el link de entrega /d/<claim_token> también.
@@ -35,6 +36,7 @@ export const POST = seguro(async req => {
     nombre,
     contacto: String(b.contacto || '').trim().slice(0, 80),
     precio: Math.max(0, Math.round(+b.precio)) || 30000,
+    ...(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(b.email || '')) ? { email: String(b.email).trim().toLowerCase().slice(0, 120) } : {}),
     vendedor: ADMIN_EMAIL,
     status: 'pending',
     claim_token: nuevoClaimToken(),
