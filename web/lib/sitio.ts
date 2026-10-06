@@ -3,7 +3,9 @@ export const SITIO = {
   nombre: 'TEXMA',
   lema: 'Tu planner de costura y tu mercería, en un solo lugar',
   url: (process.env.NEXT_PUBLIC_SITE_URL || 'https://texma.com.ar').replace(/\/+$/, ''),
-  pwa: process.env.NEXT_PUBLIC_PWA_URL || 'https://texma.vercel.app',
+  /* la PWA es OTRO proyecto de Vercel. Ojo: texma.vercel.app hoy sirve
+     ESTA web, no la PWA — mandar ahí el código terminaba en el home. */
+  pwa: (process.env.NEXT_PUBLIC_PWA_URL || 'https://texma-planner.vercel.app').replace(/\/+$/, ''),
   mail: 'texma.ok@gmail.com',
   /* único número de ventas y soporte (María); el mismo que muestra la app en el muro de licencia */
   whatsapp: [

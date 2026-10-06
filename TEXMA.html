@@ -1367,6 +1367,28 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
 #lic .lerr{color:#9C3B2E;font-size:12px;font-family:var(--mono);min-height:17px;margin-top:8px}
 #lic .lpie{font-size:11px;color:var(--ink2);margin-top:16px;max-width:320px;line-height:1.5}
 
+/* ---------- invitación a instalar la app (PWA) ---------- */
+#inst{position:fixed;inset:0;z-index:80;display:flex;align-items:flex-end;justify-content:center;
+  background:rgba(43,38,34,.32);padding:16px 16px calc(16px + env(safe-area-inset-bottom));
+  opacity:0;transition:opacity .25s}
+#inst.on{opacity:1}
+#inst .ibox{position:relative;width:100%;max-width:420px;background:var(--paper);border-radius:26px;
+  padding:26px 22px 20px;text-align:center;box-shadow:0 24px 60px rgba(28,22,18,.28);
+  transform:translateY(24px);transition:transform .32s cubic-bezier(.22,1,.36,1)}
+#inst.on .ibox{transform:none}
+#inst .iico{width:64px;height:64px;border-radius:18px;margin:0 auto 12px;display:block;box-shadow:0 8px 20px rgba(43,38,34,.18)}
+#inst h3{font-family:var(--serif);font-style:italic;font-weight:700;font-size:26px;margin:0;color:var(--ink)}
+#inst p{font-size:14px;line-height:1.5;color:var(--ink2);margin:8px 0 0}
+#inst ol{text-align:left;font-size:14px;line-height:1.55;color:var(--ink);margin:14px 0 0;padding:14px 16px 14px 34px;
+  background:var(--linen);border-radius:16px}
+#inst ol b{color:var(--deep)}
+#inst .ibtns{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+#inst .ix{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;border:0;
+  background:var(--linen);color:var(--ink2);font-size:18px;line-height:1;cursor:pointer}
+@media (min-width:768px){
+  #inst{align-items:center;padding-left:calc(var(--side-w) + 16px)}
+}
+
 /* ============================================================
    TABLET / DESKTOP · la píldora de abajo pasa a sidebar izquierdo
    ------------------------------------------------------------
@@ -7949,7 +7971,7 @@ function licScreen(msg){
   }
 
   const inp=w.querySelector('#licIn'), er=w.querySelector('#licEr'), bt=w.querySelector('#licGo');
-  const url=new URL(location.href), pre=url.searchParams.get('k');
+  const url=new URL(location.href), pre=url.searchParams.get('k')||url.searchParams.get('codigo');
   if(pre) inp.value=pre.toUpperCase();
   const fallar=t=>{
     er.textContent=t;
@@ -7991,7 +8013,8 @@ async function licGate(){
   if(maestroPuesto()) return true;              /* puerta de atrás ya usada acá */
   const t=localStorage.getItem(LICK);
   if(t&&await licVerify(t)) return true;
-  const url=new URL(location.href), pre=url.searchParams.get('k');
+  /* ?k= (o ?codigo=, el nombre que usaba la web): llega desde /login de texma */
+  const url=new URL(location.href), pre=url.searchParams.get('k')||url.searchParams.get('codigo');
   if(pre){
     try{
       await licActivate(pre);
@@ -8063,6 +8086,7 @@ function abrirApp(){
     if(!document.hidden) programarChequeoUpdate();
   });
   arrancarAvisos();
+  setTimeout(()=>instalarInvitar(),8000);   /* pop-up «Instalá la App», si corresponde */
 }
 /* la entrada solo se anima si la app está a la vista: si el celu la tiene
    en segundo plano, el navegador frena los frames y los botones quedarían
@@ -8103,6 +8127,77 @@ function arrancarAvisos(){
       .then(r=>{ swReg=r||swReg; startNotifLoop(); })
       .catch(()=>startNotifLoop());
   } else startNotifLoop();
+}
+
+/* ============================================================
+   INVITACIÓN A INSTALAR · pop-up para tenerla como app
+   ------------------------------------------------------------
+   Chrome/Edge/Android disparan beforeinstallprompt: lo guardamos y
+   el botón abre el instalador del sistema. iPhone/iPad (Safari) no
+   tiene ese evento: ahí mostramos los pasos de «Compartir → Agregar
+   a inicio». Otros navegadores: los pasos desde el menú.
+   No sale si ya está instalada, en el APK, ni si la cerraron hace
+   menos de 7 días. Espera a que no haya otro cartel encima.
+============================================================ */
+const INSTK='texma_inst_no';
+let instEvt=null;
+window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); instEvt=e; });
+window.addEventListener('appinstalled',()=>{
+  instEvt=null; localStorage.setItem(INSTK,String(Date.now()+3650*864e5));
+  const w=$('#inst'); if(w) w.remove();
+});
+const instalada=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const esIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+function instalarInvitar(intento=0){
+  if(NATIVO||instalada()||!location.protocol.startsWith('http')) return;
+  if(Date.now()<Number(localStorage.getItem(INSTK)||0)) return;
+  /* que no se pise con onboarding, bienvenida, tutorial, licencia, novedades o una hoja abierta */
+  if(document.querySelector('#onb,#wel,#tut,#prof,#lic,#updv,#dlg,#calcov,#pv,#pdet,#inst')||sheetOpen){
+    if(intento<12) setTimeout(()=>instalarInvitar(intento+1),5000);
+    return;
+  }
+  const ios=esIOS();
+  const pasos=instEvt?''
+    :ios?`<ol>
+        <li>Tocá <b>Compartir</b> (el cuadrado con la flecha ↑) abajo en Safari.</li>
+        <li>Elegí <b>«Agregar a inicio»</b>.</li>
+        <li>Tocá <b>Agregar</b> y abrí TEXMA desde el ícono.</li></ol>`
+    :`<ol>
+        <li>Abrí el <b>menú del navegador</b> (⋮ o ⋯ arriba a la derecha).</li>
+        <li>Elegí <b>«Instalar app»</b> o <b>«Agregar a pantalla de inicio»</b>.</li>
+        <li>Confirmá y abrí TEXMA desde el ícono.</li></ol>`;
+  const w=document.createElement('div'); w.id='inst';
+  w.setAttribute('role','dialog'); w.setAttribute('aria-modal','true'); w.setAttribute('aria-labelledby','instT');
+  w.innerHTML=`
+    <div class="ibox">
+      <button class="ix" type="button" aria-label="Cerrar">×</button>
+      <img class="iico" src="icon-192.png" alt="">
+      <h3 id="instT">Instalá la App en tu dispositivo</h3>
+      <p>Tenela a un toque desde tu pantalla de inicio, a pantalla completa y funcionando sin internet, como una app de verdad.</p>
+      ${pasos}
+      <div class="ibtns">
+        ${instEvt?'<button class="btn primary" type="button" id="instGo">Tocá acá para instalar</button>':''}
+        <button class="btn ghost" type="button" id="instNo">${instEvt?'Ahora no':'Entendido'}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(w);
+  requestAnimationFrame(()=>w.classList.add('on'));
+  const cerrar=(dias=7)=>{
+    localStorage.setItem(INSTK,String(Date.now()+dias*864e5));
+    w.classList.remove('on'); setTimeout(()=>w.remove(),280);
+  };
+  w.querySelector('.ix').addEventListener('click',()=>cerrar());
+  w.querySelector('#instNo').addEventListener('click',()=>cerrar());
+  w.addEventListener('click',e=>{ if(e.target===w) cerrar(); });
+  const go=w.querySelector('#instGo');
+  if(go) go.addEventListener('click',async ()=>{
+    const ev=instEvt; instEvt=null;
+    if(!ev){ cerrar(); return; }
+    ev.prompt();
+    const r=await ev.userChoice.catch(()=>null);
+    if(r&&r.outcome==='accepted'){ cerrar(3650); toast('¡Instalando TEXMA! ♥'); }
+    else cerrar();
+  });
 }
 arrancar();
 </script>

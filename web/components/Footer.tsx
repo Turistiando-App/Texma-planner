@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { SITIO } from '@/lib/sitio';
 
@@ -24,7 +25,9 @@ export default function Footer() {
     <footer className="mt-24 border-t border-linea bg-papel">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-4">
         <div className="md:col-span-1">
-          <p className="titulo text-3xl"><span className="text-rosa">T</span>EXMA</p>
+          <Link href="/" aria-label="TEXMA, ir al inicio" className="inline-block">
+            <Image src="/logo-texma.png" alt="TEXMA" width={800} height={144} className="h-9 w-auto" />
+          </Link>
           <p className="mt-3 text-sm text-tinta-suave">{SITIO.lema}.</p>
           <p className="mt-3 text-sm text-tinta-suave">{SITIO.ciudad}</p>
           <ul className="mt-5 flex gap-2">

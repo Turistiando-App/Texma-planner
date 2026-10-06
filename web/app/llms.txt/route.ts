@@ -1,6 +1,6 @@
 /* /llms.txt · resumen del sitio en texto plano para asistentes de IA
    (convención llmstxt.org): quiénes somos y los links que importan. */
-import { ARTICULOS } from '@/content/blog';
+import { ARTICULOS, CATEGORIAS } from '@/content/blog';
 import { getProductos } from '@/lib/productos';
 import { SITIO } from '@/lib/sitio';
 
@@ -20,8 +20,9 @@ ${cats.map(c => `- [${c}](${SITIO.url}/merceria?cat=${encodeURIComponent(c)})`).
 ## App
 - [TEXMA para modistas](${SITIO.url}/app): funciones, precio (pago único) y cómo conseguirla.
 
-## Guías de costura
-${ARTICULOS.map(a => `- [${a.titulo}](${SITIO.url}/blog/${a.slug}): ${a.resumen}`).join('\n')}
+## Blog: costura, patronaje, moldería digital, diseño de indumentaria, upcycling, asesoría de imagen y tendencias textiles
+${CATEGORIAS.map(c => `### ${c}\n` + ARTICULOS.filter(a => a.categoria === c)
+  .map(a => `- [${a.titulo}](${SITIO.url}/blog/${a.slug}): ${a.resumen}`).join('\n')).join('\n\n')}
 
 ## Contacto
 - WhatsApp: ${SITIO.whatsapp.map(w => w.lindo).join(' · ')}

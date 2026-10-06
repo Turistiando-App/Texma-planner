@@ -12,11 +12,14 @@
    link filtrado y volver atrás sin perderlos.
    Banners: cada uno espera su foto en /public (banner-hilos.jpg, …).
    Mientras no esté, se ve el degradado de color de la categoría.
+   A la derecha de cada banner va su animación Remotion en bucle
+   (components/MerceriaAnim + components/remotion/MerceriaLoops).
 ============================================================ */
 import { AnimatePresence, motion, useReducedMotion, type Variants } from 'framer-motion';
 import { ArrowRight, CircleDot, LayoutGrid, ListChecks, Scissors, Search, Waves, X, type LucideIcon } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Producto } from '@/lib/tipos';
+import MerceriaAnim from './MerceriaAnim';
 import ProductoCard from './ProductoCard';
 
 type Filtros = { cat: string; sub: string; q: string; orden: string };
@@ -183,6 +186,9 @@ export default function Catalogo({ productos, inicial }: { productos: Producto[]
                         className="absolute inset-0 -z-10 bg-cover bg-center transition duration-700 group-hover:scale-105" />
                     )}
                     <span aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
+                    {/* animación Remotion en bucle, al costado derecho del texto */}
+                    <MerceriaAnim rubro={c}
+                      className="absolute right-4 top-4 h-24 w-24 drop-shadow-[0_6px_14px_rgba(0,0,0,.25)] md:right-8 md:top-1/2 md:h-40 md:w-40 md:-translate-y-1/2" />
                     <span className="font-mono text-[11px] uppercase tracking-[.18em] text-white/75">{cant} productos</span>
                     <span className="titulo mt-1 text-4xl md:text-5xl">{c}</span>
                     <span className="mt-1 max-w-sm text-sm text-white/85">{r?.bajada}</span>

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import JsonLd from '@/components/JsonLd';
@@ -17,8 +18,13 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   return {
     title: a.titulo,
     description: a.descripcion,
+    keywords: [...a.etiquetas, a.categoria],
     alternates: { canonical: `/blog/${a.slug}` },
-    openGraph: { type: 'article', publishedTime: a.fecha, title: a.titulo, description: a.descripcion },
+    openGraph: {
+      type: 'article', publishedTime: a.fecha, title: a.titulo, description: a.descripcion, section: a.categoria,
+      tags: a.etiquetas, images: [{ url: a.imagen.src, alt: a.imagen.alt }],
+    },
+    twitter: { card: 'summary_large_image', title: a.titulo, description: a.descripcion, images: [a.imagen.src] },
   };
 }
 
@@ -29,10 +35,15 @@ export default async function ArticuloPage({ params }: { params: Params }) {
   return (
     <article className="mx-auto max-w-3xl px-5 pt-28">
       <Link href="/blog" className="kicker text-tinta-suave hover:text-rosa">← Blog</Link>
+      <p className="mt-6"><span className="rounded-full bg-rosa-claro px-3 py-1 text-xs font-bold text-rosa-oscuro">{a.categoria}</span></p>
       <h1 className="titulo mt-4 text-5xl leading-[1.05] md:text-6xl">{a.titulo}</h1>
       <p className="kicker mt-4 text-tinta-suave">
         <time dateTime={a.fecha}>{new Date(a.fecha + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })}</time> · {a.lectura} min de lectura
       </p>
+
+      <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-[2rem]">
+        <Image src={a.imagen.src} alt={a.imagen.alt} fill priority sizes="(min-width:768px) 768px, 100vw" className="object-cover" />
+      </div>
 
       {/* respuesta directa arriba: es lo que citan Google y los asistentes de IA */}
       <p className="mt-8 rounded-3xl border-l-4 border-rosa bg-papel p-6 text-lg leading-relaxed">
@@ -73,7 +84,7 @@ export default async function ArticuloPage({ params }: { params: Params }) {
         '@context': 'https://schema.org', '@type': 'Article', headline: a.titulo, description: a.descripcion,
         datePublished: a.fecha, dateModified: a.fecha, inLanguage: 'es-AR', mainEntityOfPage: url,
         author: { '@type': 'Organization', name: 'TEXMA' }, publisher: { '@type': 'Organization', name: 'TEXMA' },
-        keywords: a.etiquetas.join(', '), abstract: a.resumen,
+        keywords: a.etiquetas.join(', '), abstract: a.resumen, image: a.imagen.src, articleSection: a.categoria,
       }} />
       <JsonLd data={{
         '@context': 'https://schema.org', '@type': 'FAQPage',
