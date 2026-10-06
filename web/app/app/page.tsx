@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import CineApp from '@/components/app/CineApp';
+import FraseRotativa from '@/components/app/FraseRotativa';
 import ScrollIphone from '@/components/app/ScrollIphone';
 import JsonLd from '@/components/JsonLd';
 import Revelar from '@/components/Revelar';
@@ -32,11 +33,11 @@ export default function PaginaApp() {
     <div className="overflow-x-clip bg-lino text-gray-900">
       {/* ---- hero «cine» ---- */}
       <section className="bg-gradient-to-b from-pink-200 via-pink-100 via-55% to-lino" aria-labelledby="hero-app">
-       <div className="mx-auto max-w-7xl px-5 pb-16 pt-32 md:pt-40">
+       <div className="mx-auto max-w-7xl px-5 pb-16 pt-32 md:pb-20 md:pt-40">
         <Revelar className="text-center">
           <p className="font-mono text-xs uppercase tracking-[.25em] text-rosa-oscuro">TEXMA Planner</p>
           <h1 id="hero-app" className="mx-auto mt-5 max-w-4xl text-5xl font-semibold leading-[1.02] tracking-tight text-gray-900 md:text-7xl">
-            Medí, agendá y cobrá.<br /><span className="text-gray-900/45">Desde el celular.</span>
+            Medí, agendá y cobrá.<br /><FraseRotativa />
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-lg text-gray-700">
             El planner que entiende a las modistas: medidas, entregas, cobros, stock y plata en un solo lugar.
@@ -51,9 +52,10 @@ export default function PaginaApp() {
             </Link>
           </div>
         </Revelar>
-        <div className="mt-16 md:mt-20">
-          <CineApp />
-        </div>
+       </div>
+       {/* el video sale del max-w del texto: casi todo el ancho en desktop */}
+       <div className="px-3 pb-16 sm:px-5">
+         <CineApp />
        </div>
       </section>
 

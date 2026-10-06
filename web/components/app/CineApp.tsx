@@ -29,7 +29,7 @@ export default function CineApp() {
       initial={quieto ? false : { opacity: 0, y: 40, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-      className="relative mx-auto w-full max-w-6xl">
+      className="relative mx-auto w-full max-w-[95vw] 2xl:max-w-[1400px]">
       {/* resplandor */}
       <div aria-hidden="true" className="pointer-events-none absolute -inset-8 -z-10 rounded-[3rem] opacity-70 blur-3xl
         bg-[radial-gradient(50%_60%_at_25%_40%,rgba(236,25,104,.35),transparent_70%),radial-gradient(45%_55%_at_80%_65%,rgba(52,211,153,.22),transparent_70%)]" />
