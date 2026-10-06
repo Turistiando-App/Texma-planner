@@ -19,6 +19,11 @@ export default function ContactoForm() {
     setError('');
     const texto = `¡Hola TEXMA! Soy ${d.nombre.trim()}.\nMotivo: ${d.motivo}\n\n${d.mensaje.trim()}`;
     window.open(waLink(texto, d.a), '_blank', 'noopener');
+    /* queda registrada en el panel (/admin → Soporte); si falla, no importa: ya salió por WhatsApp */
+    fetch('/api/tickets', {
+      method: 'POST', keepalive: true, headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ nombre: d.nombre, motivo: d.motivo, mensaje: d.mensaje }),
+    }).catch(() => {});
   };
 
   const campo = 'mt-2 w-full rounded-2xl border border-linea bg-lino px-4 py-3 outline-none focus:border-rosa';

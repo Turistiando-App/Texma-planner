@@ -1367,6 +1367,61 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
 #lic .lerr{color:#9C3B2E;font-size:12px;font-family:var(--mono);min-height:17px;margin-top:8px}
 #lic .lpie{font-size:11px;color:var(--ink2);margin-top:16px;max-width:320px;line-height:1.5}
 
+/* ============================================================
+   TABLET / DESKTOP · la píldora de abajo pasa a sidebar izquierdo
+   ------------------------------------------------------------
+   ≥768px: sidebar fijo de íconos (84px) y el contenido ocupa el resto.
+   ≥1100px: sidebar con nombres (232px) y #view en grilla de 2 columnas
+   (los bloques .vc se acomodan solos; encabezados y héroes a lo ancho).
+   En el celu no cambia nada: todo esto vive dentro de los @media.
+============================================================ */
+@media (min-width:768px){
+  :root{--side-w:84px}
+  #nav{top:0;bottom:0;right:auto;width:var(--side-w);padding:16px 0 16px 14px}
+  #nav .in{
+    flex-direction:column;align-items:stretch;justify-content:flex-start;gap:6px;
+    height:100%;max-width:none;border-radius:26px;padding:76px 8px 16px;
+  }
+  /* marca arriba del sidebar */
+  #nav .in::before{
+    content:'TEXMA';position:absolute;top:24px;left:0;right:0;text-align:center;
+    font-family:var(--serif);font-style:italic;font-weight:700;font-size:17px;color:var(--deep);
+  }
+  #nav .gl{display:none}
+  #nav button{flex:none;height:52px;border-radius:16px;transition:color .22s,background .22s}
+  #nav button:hover{background:color-mix(in srgb,var(--tint) 55%,transparent)}
+  #nav button.on{background:var(--tint)}
+  #nav button::after{left:0;top:50%;bottom:auto;width:4px;height:22px;margin:-11px 0 0;border-radius:0 4px 4px 0}
+
+  #app{max-width:none;margin:0 0 0 var(--side-w);padding:0 clamp(20px,4vw,48px) 64px}
+  #top,#view{max-width:1180px;margin-left:auto;margin-right:auto}
+  #top{margin-bottom:22px}
+
+  #addfab{right:32px;bottom:calc(32px + env(safe-area-inset-bottom))}
+  #calcfab{right:36px;bottom:calc(98px + env(safe-area-inset-bottom))}
+  #toast{left:calc(50% + var(--side-w)/2);bottom:32px}
+  #sheet{left:var(--side-w)}
+  .rdock{left:var(--side-w);bottom:calc(22px + env(safe-area-inset-bottom))}
+  body.en-racha #app{padding-bottom:calc(var(--rdock-h) + 80px)}
+  body.en-racha #addfab{bottom:calc(var(--rdock-h) + 40px)}
+}
+@media (min-width:1100px){
+  :root{--side-w:232px}
+  #nav{padding:20px 0 20px 18px}
+  #nav .in{padding:84px 12px 18px}
+  #nav .in::before{text-align:left;left:28px;font-size:24px;top:26px}
+  #nav button{justify-content:flex-start;gap:14px;padding:0 16px}
+  #nav button .nlb{
+    position:static;width:auto;height:auto;overflow:visible;clip-path:none;
+    font-family:var(--sans);font-size:14.5px;font-weight:700;
+  }
+  /* contenido en 2 columnas */
+  #view{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px;align-items:start}
+  #view > *{grid-column:1/-1}
+  #view > .vc{grid-column:auto}
+  #view > .vc:first-child,#view > .aghead,#view > .hero,#view > .hhero{grid-column:1/-1}
+}
+
 @media (prefers-reduced-motion: reduce){
   *{transition:none!important;animation:none!important}
   /* hero del Home sin animación: queda fija la primera frase */
@@ -2070,6 +2125,8 @@ window.addEventListener('popstate',e=>{
   go((e.state&&e.state.v)||'hoy',true);
 });
 $$('#nav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.v)));
+/* al pasar de sidebar (desktop) a píldora (celu) se recalcula dónde va la marca */
+addEventListener('resize',()=>{ const gl=$('#navgl'); if(gl) delete gl.dataset.set; navMark(); });
 $('#avatar').addEventListener('click',()=>go('ajustes'));
 /* + del centro = todas las secciones · + de la derecha = agregar en esta sección */
 $('#fab').addEventListener('click',()=>{ if(sheetOpen) attemptCloseSheet(()=>masSheet()); else masSheet(); });

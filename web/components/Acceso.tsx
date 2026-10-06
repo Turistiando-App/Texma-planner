@@ -15,7 +15,9 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, KeyRound, Loader2, LogOut, MessageCircle, ShieldCheck, Smartphone, WifiOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
+import { esAdmin } from '@/lib/admin';
 import { supabaseAuth } from '@/lib/supabase';
+import Link from 'next/link';
 import { SITIO, WA_COMPRAR_APP } from '@/lib/sitio';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -122,6 +124,11 @@ export default function Acceso() {
               className="flex w-full items-center justify-center gap-2 rounded-full bg-rosa px-6 py-4 font-bold text-white shadow-[0_10px_24px_rgba(236,25,104,.3)] transition hover:bg-rosa-oscuro">
               Abrir TEXMA Planner <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </a>
+            {esAdmin(usuario.email) && (
+              <Link href="/admin" className="flex w-full items-center justify-center rounded-full bg-tinta px-6 py-3.5 font-bold text-papel transition hover:bg-rosa">
+                Ir al panel de administración
+              </Link>
+            )}
             <button type="button" onClick={salir}
               className="flex w-full items-center justify-center gap-2 rounded-full border border-linea px-6 py-3 text-sm font-semibold text-tinta-suave transition hover:border-tinta hover:text-tinta">
               <LogOut className="h-4 w-4" aria-hidden="true" /> Cerrar sesión

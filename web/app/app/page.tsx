@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import CineApp from '@/components/app/CineApp';
+import ScrollIphone from '@/components/app/ScrollIphone';
 import JsonLd from '@/components/JsonLd';
 import Revelar from '@/components/Revelar';
 import { SITIO, WA_COMPRAR_APP } from '@/lib/sitio';
@@ -10,13 +13,10 @@ export const metadata: Metadata = {
   alternates: { canonical: '/app' },
 };
 
-const FUNCIONES = [
-  { t: 'Medidas por clienta', d: 'Cada proyecto guarda sus medidas en cm con la calculadora de patrón al lado (÷2, ÷4), el maniquí de referencia y hasta 4 fotos.', e: '📏' },
-  { t: 'Entregas que no se olvidan', d: 'Agenda por semana o mes con alarmas en el celular, aunque la app esté cerrada. Sabés qué entregás hoy y qué quedó sin retirar.', e: '📅' },
-  { t: 'Cobros y señas', d: 'Precio, seña, saldo y materiales de cada trabajo. Al marcarlo cobrado entra solo como ingreso en tus finanzas.', e: '💳' },
-  { t: 'Tu mercería con stock', d: 'Cintas, cierres y botones con precio por metro o unidad, alertas de reposición y balance de ventas por mes.', e: '🧵' },
-  { t: 'Finanzas reales', d: 'Balance acumulado mes a mes, gastos fijos con aviso y metas de ahorro con foto.', e: '💰' },
-  { t: 'Tus datos, tuyos', d: 'Todo queda en tu celular: funciona sin internet y exportás una copia de seguridad cuando quieras.', e: '🔒' },
+const EXTRAS = [
+  { t: 'Tu mercería con stock', d: 'Cintas, cierres y botones con precio por metro o unidad y alertas de reposición.', e: '🧵' },
+  { t: 'Sin internet', d: 'Funciona en el taller aunque no haya señal. Tus datos quedan en tu celular.', e: '📶' },
+  { t: 'Copia de seguridad', d: 'Exportás todo cuando quieras y lo pasás a otro celular.', e: '🔒' },
 ];
 
 const PASOS = [
@@ -25,39 +25,68 @@ const PASOS = [
   'Abrís TEXMA, pegás el código y listo: queda activada en tu celular.',
 ];
 
+/* /app es clara (lino) con contrastes fuertes. Solo el hero es «cine»: degradado
+   casi negro con tono rosa que se funde en el lino. data-nav="oscuro" va SOLO en
+   el hero, así el header usa texto claro encima y vuelve al tema claro al salir. */
 export default function PaginaApp() {
   return (
-    <div className="mx-auto max-w-6xl px-5 pt-28">
-      <Revelar>
-        <p className="kicker text-rosa">La app</p>
-        <h1 className="titulo mt-3 max-w-3xl text-5xl md:text-7xl">El planner que entiende a las modistas.</h1>
-        <p className="mt-5 max-w-2xl text-lg text-tinta-suave">
-          TEXMA junta en un solo lugar lo que hoy tenés repartido entre cuadernos, planillas y el WhatsApp: medidas, entregas, cobros, stock y plata.
-        </p>
-        <div className="mt-8 flex flex-wrap items-center gap-3">
-          <a href={WA_COMPRAR_APP} target="_blank" rel="noopener"
-            className="rounded-full bg-rosa px-9 py-5 text-lg font-bold text-white shadow-xl shadow-rosa/30 transition hover:-translate-y-0.5 hover:bg-rosa-oscuro">
-            Comprar la app por WhatsApp
-          </a>
-          <Link href="/login" className="rounded-full border border-linea bg-papel px-7 py-4 font-bold transition hover:border-rosa hover:text-rosa">Abrir la app</Link>
+    <div className="overflow-x-clip bg-lino text-gray-900">
+      {/* ---- hero «cine» ---- */}
+      <section data-nav="oscuro" className="bg-gradient-to-b from-[#1a1114] via-[#1a1114] via-55% to-lino" aria-labelledby="hero-app">
+       <div className="mx-auto max-w-6xl px-5 pb-16 pt-32 md:pt-40">
+        <Revelar className="text-center">
+          <p className="font-mono text-xs uppercase tracking-[.25em] text-rosa-claro/70">TEXMA Planner</p>
+          <h1 id="hero-app" className="mx-auto mt-5 max-w-4xl text-5xl font-semibold leading-[1.02] tracking-tight text-white md:text-7xl">
+            Medí, agendá y cobrá.<br /><span className="text-white/45">Desde el celular.</span>
+          </h1>
+          <p className="mx-auto mt-6 max-w-xl text-lg text-white/65">
+            El planner que entiende a las modistas: medidas, entregas, cobros, stock y plata en un solo lugar.
+          </p>
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+            <a href={WA_COMPRAR_APP} target="_blank" rel="noopener"
+              className="rounded-full bg-white px-8 py-4 font-semibold text-black transition hover:bg-neutral-200">
+              Comprar la app
+            </a>
+            <Link href="/login" className="inline-flex items-center gap-1.5 rounded-full px-5 py-4 font-semibold text-white transition hover:text-rosa">
+              Abrir la app <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
+        </Revelar>
+        <div className="mt-16 md:mt-20">
+          <CineApp />
         </div>
-      </Revelar>
-
-      <section id="funciones" className="mt-20 grid scroll-mt-24 gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label="Funciones">
-        {FUNCIONES.map((f, i) => (
-          <Revelar key={f.t} delay={(i % 3) * 0.07}>
-            <article className="h-full rounded-3xl border border-linea bg-papel p-7">
-              <span className="text-3xl" aria-hidden="true">{f.e}</span>
-              <h2 className="mt-4 text-xl font-bold">{f.t}</h2>
-              <p className="mt-2 leading-relaxed text-tinta-suave">{f.d}</p>
-            </article>
-          </Revelar>
-        ))}
+       </div>
       </section>
 
-      <section className="mt-24" aria-labelledby="como">
-        <Revelar><h2 id="como" className="scroll-mt-24 titulo text-4xl md:text-5xl">Cómo la conseguís</h2></Revelar>
-        <ol className="mt-8 grid gap-4 md:grid-cols-3">
+      {/* ---- scroll-telling con iPhone pegajoso ---- */}
+      <div className="mt-16 md:mt-24">
+        <ScrollIphone />
+      </div>
+
+      {/* ---- y además ---- */}
+      <section className="mx-auto mt-24 max-w-6xl px-5" aria-labelledby="extras">
+        <Revelar>
+          <h2 id="extras" className="text-4xl font-semibold tracking-tight text-gray-900 md:text-5xl">Y además.</h2>
+        </Revelar>
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          {EXTRAS.map((f, i) => (
+            <Revelar key={f.t} delay={i * 0.07}>
+              <article className="h-full rounded-3xl border border-linea bg-white p-7 shadow-[0_1px_2px_rgba(43,38,34,.04)] transition hover:border-rosa/40 hover:shadow-[0_18px_40px_-12px_rgba(43,38,34,.18)]">
+                <span className="text-3xl" aria-hidden="true">{f.e}</span>
+                <h3 className="mt-4 text-xl font-semibold text-gray-900">{f.t}</h3>
+                <p className="mt-2 leading-relaxed text-tinta-suave">{f.d}</p>
+              </article>
+            </Revelar>
+          ))}
+        </div>
+      </section>
+
+      {/* ---- cómo la conseguís ---- */}
+      <section className="mx-auto mt-32 max-w-6xl px-5" aria-labelledby="como">
+        <Revelar>
+          <h2 id="como" className="scroll-mt-24 text-4xl font-semibold tracking-tight text-gray-900 md:text-5xl">Cómo la conseguís.</h2>
+        </Revelar>
+        <ol className="mt-10 grid gap-4 md:grid-cols-3">
           {PASOS.map((p, i) => (
             <Revelar key={i} delay={i * 0.08}>
               <li className="h-full rounded-3xl bg-tinta p-7 text-papel">
@@ -68,9 +97,9 @@ export default function PaginaApp() {
           ))}
         </ol>
         <Revelar>
-          <div className="mt-10 flex justify-center">
+          <div className="mt-14 flex justify-center">
             <a href={WA_COMPRAR_APP} target="_blank" rel="noopener"
-              className="rounded-full bg-rosa px-10 py-5 text-lg font-bold text-white shadow-xl shadow-rosa/30 transition hover:-translate-y-0.5 hover:bg-rosa-oscuro">
+              className="rounded-full bg-rosa px-10 py-5 text-lg font-semibold text-white shadow-[0_20px_60px_-15px_rgba(236,25,104,.7)] transition hover:-translate-y-0.5 hover:bg-rosa-oscuro">
               Quiero TEXMA para mi taller
             </a>
           </div>

@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+/* misma paleta que la PWA y el sitio */
+@theme {
+  --color-rosa: #EC1968;
+  --color-rosa-claro: #FBD9E6;
+  --color-rosa-oscuro: #A61048;
+  --color-lino: #F3EEE5;
+  --color-papel: #FAF7F1;
+  --color-tinta: #2B2622;
+  --color-tinta-suave: #75695C;
+  --color-linea: #E4DCCD;
+
+  --font-sans: "Manrope", system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+.titulo { font-family: var(--font-serif); font-style: italic; font-weight: 700; }
+.kicker { font-family: var(--font-mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; }

@@ -2,9 +2,8 @@
 /* ============================================================
    BENEFICIOS · video grande + tarjetas que aparecen al scrollear
    ------------------------------------------------------------
-   Izquierda: /costura.mp4 en bucle, mudo, con bordes muy redondeados
-   (el póster /costura-poster.jpg se ve mientras carga). Si el video
-   no está, queda a la vista un degradado de marca.
+   Izquierda: /costura.mp4 en bucle, mudo, con bordes muy redondeados.
+   Mientras carga (o si no está) queda a la vista un degradado de marca.
    Derecha: las tarjetas entran escalonadas (fade + suben) con
    whileInView cuando el 30 % de la columna está en pantalla.
 ============================================================ */
@@ -39,7 +38,7 @@ export default function Beneficios() {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="relative aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-[radial-gradient(120%_90%_at_30%_20%,#FBD9E6,#F3EEE5_55%,#E4DCCD)] shadow-[0_40px_80px_-30px_rgba(43,38,34,.35)]">
-          <video autoPlay loop muted playsInline preload="metadata" poster="/costura-poster.jpg" src="/costura.mp4"
+          <video autoPlay loop muted playsInline preload="metadata" src="/costura.mp4"
             aria-label="Cinta métrica sobre un molde de costura"
             className="absolute inset-0 h-full w-full rounded-[2.5rem] object-cover" />
           <div className="absolute bottom-5 left-5 flex items-center gap-3 rounded-2xl bg-white/85 px-4 py-3 shadow-lg backdrop-blur">

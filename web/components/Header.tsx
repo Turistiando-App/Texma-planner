@@ -7,8 +7,8 @@
    con framer-motion (opacidad + un poco de desplazamiento vertical).
    El tema sigue a lo que hay DEBAJO de la barra, no a la ruta:
      · oscuro: mientras la barra está sobre una sección marcada con
-       data-nav="oscuro" (el hero de la portada) va transparente, con
-       texto claro y logo en blanco.
+       data-nav="oscuro" (el hero de la portada, /app entera): texto claro,
+       logo en blanco; arriba de todo transparente y al scrollear vidrio negro.
      · claro (todo lo demás): texto oscuro, logo original y, al scrollear
        o con un menú abierto, vidrio papel. Así el contraste no depende
        del scroll: fondo claro ⇄ texto oscuro, fondo oscuro ⇄ texto claro.
@@ -27,7 +27,11 @@ import { WA_COMPRAR_APP, waLink } from '@/lib/sitio';
 
 type Item = { href: string; t: string; d: string; i: LucideIcon; externo?: boolean };
 type Columna = { titulo: string; items: Item[] };
-type Mega = { id: string; txt: string; href: string; columnas: Columna[]; destacado: { kicker: string; t: string; d: string; cta: string; href: string } };
+type Mega = {
+  id: string; txt: string; href: string; columnas: Columna[];
+  destacado: { kicker: string; t: string; d: string; cta: string; href: string };
+  verTodo?: { t: string; href: string }; // enlace destacado al pie del panel
+};
 
 const MEGA: Mega[] = [
   {
@@ -75,6 +79,7 @@ const MEGA: Mega[] = [
       },
     ],
     destacado: { kicker: 'Texma Planner', t: 'Tu taller, ordenado en el celular.', d: 'Pago único. Funciona sin internet.', cta: 'Comprar la app', href: WA_COMPRAR_APP },
+    verTodo: { t: 'Ver todo sobre la App', href: '/app' },
   },
 ];
 
@@ -97,6 +102,7 @@ const sobreSeccionOscura = () =>
 const TEMA = {
   oscuro: {
     texto: 'text-gray-200', activo: 'text-white', hover: 'hover:text-white',
+    fondo: 'bg-black/60 shadow-[0_1px_0_rgba(255,255,255,.08)] backdrop-blur-lg',
     logo: 'brightness-0 invert', // el PNG es gris oscuro: así queda blanco puro
     borde: 'border-white/25 text-white hover:border-white/60 hover:bg-white/5',
   },
@@ -155,7 +161,9 @@ export default function Header() {
   const menu = !!panel || abierto;
   /* texto claro solo sobre el hero oscuro y sin menú abierto (el menú lleva vidrio papel) */
   const T = sobreOscuro && !menu ? TEMA.oscuro : TEMA.claro;
-  const transparente = !menu && (sobreOscuro || !bajo);
+  const transparente = !menu && !bajo;
+  /* scrolleando sobre algo oscuro (resto del hero, /app entera): vidrio negro con texto claro */
+  const fondo = transparente ? '' : T.fondo;
   const anim = quieto
     ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
     : { initial: { opacity: 0, y: -10 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -6 } };
@@ -164,7 +172,7 @@ export default function Header() {
     <header
       ref={caja}
       onMouseLeave={cerrarLuego}
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${T.texto} ${transparente ? '' : TEMA.claro.fondo}`}>
+      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${T.texto} ${fondo}`}>
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5" aria-label="Principal">
         <Link href="/" className="shrink-0" aria-label="TEXMA, inicio">
           <Image src="/logo-texma.png" alt="TEXMA" width={800} height={144} priority
@@ -259,6 +267,13 @@ export default function Header() {
                   {activo.destacado.cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Enlace>
               </div>
+              {activo.verTodo && (
+                <Enlace href={activo.verTodo.href} onClick={() => setPanel(null)}
+                  className="group col-span-2 -mt-3 flex items-center justify-between rounded-2xl border border-linea bg-lino/60 px-5 py-3.5 text-sm font-bold transition hover:border-rosa hover:bg-rosa-claro/40 hover:text-rosa-oscuro">
+                  {activo.verTodo.t}
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                </Enlace>
+              )}
             </div>
           </motion.div>
         )}
@@ -277,6 +292,11 @@ export default function Header() {
                     <it.i className="h-5 w-5 text-rosa" strokeWidth={1.8} aria-hidden="true" /> {it.t}
                   </Enlace>
                 ))}
+                {m.verTodo && (
+                  <Link href={m.verTodo.href} className="flex items-center justify-between rounded-2xl px-3 py-2.5 font-bold text-rosa hover:bg-lino">
+                    {m.verTodo.t} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </Link>
+                )}
               </div>
             ))}
             {SIMPLES.map(l => (
