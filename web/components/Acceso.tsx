@@ -63,7 +63,7 @@ export default function Acceso() {
   const entrarConGoogle = async () => {
     setError('');
     const sb = supabaseAuth();
-    if (!sb) { setError('El acceso con Google todavía no está disponible. Usá tu código de activación.'); return; }
+    if (!sb) { console.error('[Acceso] Faltan NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY'); setError('No pudimos conectar con Google. Probá de nuevo.'); return; }
     setCargandoGoogle(true);
     const { error: e } = await sb.auth.signInWithOAuth({
       provider: 'google',
