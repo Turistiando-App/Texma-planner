@@ -70,8 +70,12 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-linea">
-        <p className="kicker mx-auto max-w-6xl px-5 py-5 text-tinta-suave">
+        <p className="kicker mx-auto max-w-6xl px-5 pt-5 text-tinta-suave">
           © {new Date().getFullYear()} TEXMA · Hecho con amor ♥
+        </p>
+        {/* firma, centrada abajo de todo */}
+        <p className="px-5 pb-6 pt-4 text-center font-mono text-[11px] tracking-[.12em] text-tinta-suave">
+          Copyright © 2026 — Maxing Agent
         </p>
       </div>
     </footer>

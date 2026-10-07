@@ -388,6 +388,8 @@ body.fitfull #top,body.fitfull #addfab{display:none}
   background:var(--deep);opacity:0;transform:scale(0);transition:opacity .22s,transform .22s;
 }
 #nav button.on{color:var(--deep)}
+/* perfil del sidebar: solo en tablet/compu (en el celu manda la píldora de abajo) */
+#nav .nprof{display:none}
 #nav button.on::after{opacity:1;transform:scale(1)}
 
 /* el viejo ＋ central queda en el DOM (lo tocan masSheet y la entrada
@@ -531,7 +533,7 @@ body.fitfull #top,body.fitfull #addfab{display:none}
 .catbar .cv{font-family:var(--mono);font-size:11px;min-width:64px;text-align:right}
 
 /* ---------- costura ---------- */
-.mqi{display:block;margin:0 auto;width:200px;max-width:62%;height:auto}
+.mqi{display:block;margin:0 auto;width:auto;max-width:62%;height:auto;max-height:280px;object-fit:contain}
 .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
 .mfld label{display:block;font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--ink2);margin-bottom:4px}
 .mfld input{width:100%;padding:9px 11px;border-radius:11px;border:1px solid var(--line);background:var(--linen);font-family:var(--mono);font-size:14px;color:var(--ink);outline:none}
@@ -1029,6 +1031,8 @@ body.pdet-on{overflow:hidden}
 /* ---------- tira de días de la semana ---------- */
 .wkstrip{display:flex;gap:8px;overflow-x:auto;margin:0 -16px;padding:2px 16px 6px;scrollbar-width:none}
 .wkstrip::-webkit-scrollbar{display:none}
+/* Mercería: título + buscador (en el celu, uno abajo del otro) */
+.stkhead .hsearch{margin-bottom:14px}
 .wday{
   flex:0 0 46px;height:66px;border-radius:22px;background:var(--paper);border:1px solid var(--line);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;
@@ -1411,11 +1415,13 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
     flex-direction:column;align-items:stretch;justify-content:flex-start;gap:6px;
     height:100%;max-width:none;border-radius:26px;padding:76px 8px 16px;
   }
-  /* marca arriba del sidebar */
+  /* marca arriba del sidebar: el ícono (sidebar angosto) */
   #nav .in::before{
-    content:'TEXMA';position:absolute;top:24px;left:0;right:0;text-align:center;
-    font-family:var(--serif);font-style:italic;font-weight:700;font-size:17px;color:var(--deep);
+    content:'';position:absolute;top:20px;left:0;right:0;height:38px;
+    background:url(icon.svg) center/contain no-repeat;
   }
+  /* sidebar SÓLIDO: nada de vidrio. Antes en Entreno se veía la foto a través */
+  #nav .in{background:var(--paper);-webkit-backdrop-filter:none;backdrop-filter:none}
   #nav .gl{display:none}
   #nav button{flex:none;height:52px;border-radius:16px;transition:color .22s,background .22s}
   #nav button:hover{background:color-mix(in srgb,var(--tint) 55%,transparent)}
@@ -1439,6 +1445,58 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
   .rdock{left:var(--side-w);bottom:calc(22px + env(safe-area-inset-bottom))}
   body.en-racha #app{padding-bottom:calc(var(--rdock-h) + 80px)}
   body.en-racha #addfab{bottom:calc(var(--rdock-h) + 40px)}
+
+  /* perfil + cerrar sesión, abajo del sidebar */
+  #nav .nprof{
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+    margin-top:auto;padding-top:14px;border-top:1px solid var(--line);
+  }
+  #nav .npav{
+    width:40px;height:40px;border-radius:50%;overflow:hidden;flex:none;display:grid;place-items:center;
+    background:var(--tint);color:var(--deep);font-family:var(--serif);font-style:italic;font-weight:700;font-size:18px;
+  }
+  #nav .npav img{width:100%;height:100%;object-fit:cover;display:block}
+  #nav .nptx{display:none}
+  #nav .nplog{
+    flex:none;width:44px;height:40px;border-radius:12px;display:grid;place-items:center;
+    color:var(--ink2);background:transparent;border:1px solid var(--line);cursor:pointer;
+  }
+  #nav .nplog:hover{color:#9C3B2E;border-color:#E3C9C2;background:#FBF1EE}
+  #nav .nplog::after{display:none}
+  #nav .nplog[hidden]{display:none}
+  #nav .nplog svg{width:18px;height:18px}
+  #nav .nplog span{display:none}
+
+  /* formularios: drawer desde el borde derecho, alto completo (en el celu
+     sigue siendo la hoja que sube desde abajo). La animación en x la
+     hace sheet()/closeSheet() según el ancho. */
+  #veil{background:rgba(28,22,18,.5)}
+  #sheet{
+    left:auto;right:0;top:0;bottom:0;width:min(480px,100vw - var(--side-w));max-width:none;
+    max-height:none;height:100dvh;margin:0;border-radius:26px 0 0 26px;border:1px solid var(--line);border-right:none;
+    padding:22px 26px calc(26px + env(safe-area-inset-bottom));transform:translateX(105%);
+    box-shadow:-24px 0 60px rgba(28,22,18,.18);
+  }
+  #sheet .grab{display:none}
+
+  /* bienvenida de Entreno a pantalla completa: arranca DESPUÉS del sidebar */
+  .fitsplash.full{left:var(--side-w);padding:48px clamp(28px,6vw,96px) 56px}
+  .fitsplash.full h2{font-size:clamp(44px,4.6vw,64px)}
+  .fitsplash.full p{font-size:15px;max-width:520px}
+  .fitsplash.full .btn{max-width:340px}
+
+  /* la semana de días: integrada a lo ancho, no flotando */
+  #view > .wkstrip.vc{grid-column:1/-1}
+  .wkstrip{margin:0 0 18px;padding:2px 0 6px;overflow:visible}
+  .wkstrip .wday{flex:1 1 0;min-width:46px}
+
+  /* Mercería: título y buscador en la misma fila, el buscador a la derecha */
+  .stkhead{display:flex;align-items:center;justify-content:space-between;gap:20px}
+  .stkhead .vt{margin-bottom:10px}
+  .stkhead .hsearch{flex:0 1 380px;margin:0}
+
+  /* Ajustes: créditos centrados a lo ancho, abajo de todo */
+  #view > .about.vc{grid-column:1/-1;padding-top:44px}
 }
 /* Onboarding en pantallas apaisadas (PC/tablet acostada): las fotos son
    verticales (720×1080). Estiradas a todo el ancho quedaban ampliadas al
@@ -1459,12 +1517,18 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
   :root{--side-w:232px}
   #nav{padding:20px 0 20px 18px}
   #nav .in{padding:84px 12px 18px}
-  #nav .in::before{text-align:left;left:28px;font-size:24px;top:26px}
+  #nav .in::before{left:28px;right:28px;top:28px;height:28px;background:url(logo-texma.png) left center/contain no-repeat}
   #nav button{justify-content:flex-start;gap:14px;padding:0 16px}
   #nav button .nlb{
     position:static;width:auto;height:auto;overflow:visible;clip-path:none;
     font-family:var(--sans);font-size:14.5px;font-weight:700;
   }
+  #nav .nprof{flex-direction:row;flex-wrap:wrap;align-items:center;padding:14px 4px 0}
+  #nav .nptx{display:flex;flex-direction:column;min-width:0;flex:1}
+  #nav .nptx b{font-size:13.5px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #nav .nptx i{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #nav .nplog{width:100%;height:40px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--sans);font-size:13px;font-weight:700}
+  #nav .nplog span{display:inline}
   /* el área de contenido se estira hasta el borde derecho */
   #app{flex:1;width:auto}
   /* contenido en 2 columnas */
@@ -1585,6 +1649,13 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
   <button data-v="cal"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg><span class="nlb">Agenda</span></button>
   <button data-v="fin"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.2"/><path d="M12 7.6v8.8M14.6 9.6c-.5-.9-1.5-1.4-2.6-1.4-1.6 0-2.9.9-2.9 2.1 0 2.7 5.6 1.3 5.6 4 0 1.2-1.3 2.1-2.9 2.1-1.2 0-2.2-.6-2.7-1.5"/></svg><span class="nlb">Finanzas</span></button>
   <button data-v="costura"><svg viewBox="0 0 24 24"><circle cx="6" cy="6.5" r="2.6"/><circle cx="6" cy="17.5" r="2.6"/><path d="M8.3 8.1 20 19.5M8.3 15.9 20 4.5"/></svg><span class="nlb">Costura</span></button>
+  <div class="nprof" id="navProf">
+    <span class="npav" id="npAv">♥</span>
+    <span class="nptx"><b id="npNom">Bienvenida</b><i id="npMail"></i></span>
+    <button type="button" class="nplog" id="npLog" title="Cerrar sesión" aria-label="Cerrar sesión" hidden>
+      <svg viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11"/></svg><span>Cerrar sesión</span>
+    </button>
+  </div>
 </div></nav>
 
 <button id="fab" aria-label="Todas las secciones">+</button>
@@ -1983,13 +2054,20 @@ function dlg(o,cb){
 /* ---------- sheet ---------- */
 const sheetEl=$('#sheet'), veil=$('#veil');
 let sheetOpen=false, sheetDirty=false, histSuppress=0;
+/* ≥768px el sheet es un drawer desde la derecha (ver CSS); en el celu sube desde abajo */
+const esDrawer=()=>matchMedia('(min-width:768px)').matches;
 function sheet(title,html){
   $('#shTitle').textContent=title; $('#shBody').innerHTML=html;
   veil.classList.add('on'); sheetOpen=true; sheetDirty=false;
   $('#addfab').classList.add('hide');
   const g=G();
-  if(g) g.fromTo(sheetEl,{y:'105%'},{y:'0%',duration:.42,ease:'power3.out',overwrite:'auto'});
-  else sheetEl.style.transform='translateY(0)';
+  if(esDrawer()){
+    if(g) g.fromTo(sheetEl,{x:'105%',y:0},{x:'0%',duration:.42,ease:'power3.out',overwrite:'auto'});
+    else sheetEl.style.transform='translateX(0)';
+  }else{
+    if(g) g.fromTo(sheetEl,{y:'105%',x:0},{y:'0%',duration:.42,ease:'power3.out',overwrite:'auto'});
+    else sheetEl.style.transform='translateY(0)';
+  }
   /* entrada en el historial: el botón atrás del celu cierra el sheet */
   if(!(history.state&&history.state.sh)){ try{ history.pushState({sh:1,v:cur},''); }catch(e){} }
   return $('#shBody');
@@ -2002,8 +2080,13 @@ function closeSheet(skipHist){
   const fb=document.getElementById('fab'); if(fb) fb.classList.remove('open');
   $('#addfab').classList.toggle('hide',!(VIEWS[cur]&&VIEWS[cur].fab));
   const g=G();
-  if(g) g.to(sheetEl,{y:'105%',duration:.32,ease:'power2.in',overwrite:'auto'});
-  else sheetEl.style.transform='translateY(105%)';
+  if(esDrawer()){
+    if(g) g.to(sheetEl,{x:'105%',duration:.32,ease:'power2.in',overwrite:'auto'});
+    else sheetEl.style.transform='translateX(105%)';
+  }else{
+    if(g) g.to(sheetEl,{y:'105%',duration:.32,ease:'power2.in',overwrite:'auto'});
+    else sheetEl.style.transform='translateY(105%)';
+  }
   if(!skipHist&&history.state&&history.state.sh){ histSuppress++; try{ history.back(); }catch(e){} }
 }
 function attemptCloseSheet(then){
@@ -2097,7 +2180,7 @@ let cur='hoy';
 let appAbierta=false;
 function navMark(){
   let act=null;
-  $$('#nav button').forEach(b=>{
+  $$('#nav button[data-v]').forEach(b=>{
     const on = b.dataset.v===cur;
     b.classList.toggle('on',on);
     if(on) act=b;
@@ -2176,7 +2259,10 @@ window.addEventListener('popstate',e=>{
   if(document.getElementById('pdet')){ cerrarDetalle(true); return; }
   go((e.state&&e.state.v)||'hoy',true);
 });
-$$('#nav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.v)));
+$$('#nav button[data-v]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.v)));
+$('#npLog').addEventListener('click',()=>dlg({title:'¿Cerrar sesión?',
+  msg:'Se cierra tu cuenta de Google en este navegador. Tus datos y tu licencia quedan guardados acá.',
+  okTxt:'Cerrar sesión',danger:true},ok=>{ if(ok) cerrarSesionGoogle(); }));
 /* al pasar de sidebar (desktop) a píldora (celu) se recalcula dónde va la marca */
 addEventListener('resize',()=>{ const gl=$('#navgl'); if(gl) delete gl.dataset.set; navMark(); });
 $('#avatar').addEventListener('click',()=>go('ajustes'));
@@ -2671,7 +2757,7 @@ const MEDIDAS=[
 ];
 const CALC={busto:4,cintura:4,cadera:4,cuello:6,espalda:2,sepbusto:2,anchomanga:2,puno:2};
 function maniqui(){
-  return `<img class="mqi" src="maniqui.png" alt="Maniquí de modista" width="200" height="199">`;
+  return `<img class="mqi" src="figurin.png" alt="Figurín de modista" width="420" height="752">`;
 }
 /* ============================================================
    IMÁGENES · leer, achicar y dejar SIEMPRE un JPEG
@@ -6371,18 +6457,20 @@ VIEWS.stock={
     const vVta=S.stock.reduce((t,i)=>t+(+i.cantidad||0)*(+i.precio_venta||0),0);
     const bajos=S.stock.filter(stkBajo);
     V.innerHTML=`
-      <h1 class="vt vc">Mercería</h1>
+      <div class="stkhead">
+        <h1 class="vt">Mercería</h1>
+        <div class="hsearch">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+          <input type="search" id="sq" value="${esc(stkQ)}" placeholder="Buscá cierre, 17 mm, rojo…"
+                 autocomplete="off" enterkeyhint="search" aria-label="Buscar en mercería">
+        </div>
+      </div>
       <div class="card vc sbal" id="sBal"></div>
       <div class="lbl" style="margin:2px 2px 8px">Tu stock</div>
       <div class="stkres vc">
         <div><em>Inventario</em><b>${fMoney(vCost)}</b></div>
         <div><em>Si vendés todo</em><b>${fMoney(vVta)}</b></div>
         <div class="${bajos.length?'al':''}" ${bajos.length?'data-verbajos':''}><em>A reponer</em><b>${bajos.length}</b></div>
-      </div>
-      <div class="hsearch vc">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
-        <input type="search" id="sq" value="${esc(stkQ)}" placeholder="Buscá cierre, 17 mm, rojo…"
-               autocomplete="off" enterkeyhint="search" aria-label="Buscar en mercería">
       </div>
       <div class="schips vc" id="sChips"></div>
       <div class="sgrid vc" id="sGrid"></div>
@@ -8122,7 +8210,32 @@ function saludo(){
   const h=new Date().getHours();
   return h<12?'Buen día':h<19?'Buenas tardes':'Buenas noches';
 }
+/* perfil abajo del sidebar (tablet/compu): foto o inicial, nombre y el
+   mail de la sesión de Google. «Cerrar sesión» solo si hay sesión. */
+function pintarPerfilNav(){
+  const n=(S.settings.name||'').trim();
+  const av=$('#npAv'); if(!av) return;
+  if(S.settings.photo) av.innerHTML=`<img src="${S.settings.photo}" alt="">`;
+  else av.textContent=n?n[0].toUpperCase():'♥';
+  $('#npNom').textContent=n||'Bienvenida';
+  const ses=WEB_CON_LOGIN?sesionGoogle():null;
+  $('#npMail').textContent=ses&&ses.email?ses.email:'';
+  $('#npLog').hidden=!ses;
+}
+/* cerrar sesión de Google: se avisa a Supabase (si responde) y se borra la
+   sesión local; la licencia de este dispositivo NO se toca. */
+async function cerrarSesionGoogle(){
+  const ses=sesionGoogle();
+  if(ses&&!ses.vencida&&SUPA_URL&&SUPA_ANON){
+    try{ await fetch(SUPA_URL+'/auth/v1/logout',{method:'POST',headers:{apikey:SUPA_ANON,authorization:'Bearer '+ses.token}}); }catch(e){}
+  }
+  try{
+    Object.keys(localStorage).filter(k=>/^sb-.+-auth-token/.test(k)).forEach(k=>localStorage.removeItem(k));
+  }catch(e){}
+  location.href='/login';
+}
 function paintTop(){
+  pintarPerfilNav();
   const d=new Date();
   $('#topdate').textContent=`${DIA[d.getDay()].slice(0,3)} ${d.getDate()} ${MES[d.getMonth()].slice(0,3)}`.toUpperCase();
   const n=(S.settings.name||'').trim();

@@ -37,7 +37,7 @@ if (!existsSync(fuente)) {
 
 const ARCHIVOS = [
   'favicon.png', 'icon-192.png', 'icon-512.png', 'icon-mask.png', 'icon.svg',
-  'maniqui.png', 'onb1.jpg', 'onb2.jpg', 'onb3.jpg', 'splash-gym.jpg', 'img_welcome.jpg',
+  'maniqui.png', 'figurin.png', 'logo-texma.png', 'onb1.jpg', 'onb2.jpg', 'onb3.jpg', 'splash-gym.jpg', 'img_welcome.jpg',
   'notif_texma.mp3', 'alarma_texma.wav', 'gsap.min.js', 'fonts',
 ];
 

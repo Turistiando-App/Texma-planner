@@ -22,6 +22,8 @@ const ARCHIVOS = [
   'icon-mask.png',
   'icon.svg',
   'maniqui.png',
+  'figurin.png',      // figurín de Costura (versión liviana de web/public/figurin-1.png)
+  'logo-texma.png',   // logo del sidebar en compu
   'onb1.jpg',
   'onb2.jpg',
   'onb3.jpg',

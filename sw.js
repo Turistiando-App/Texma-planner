@@ -1,7 +1,7 @@
 /* TEXMA · service worker · cache-first para funcionar 100% offline */
 /* subir este nombre en cada versión: si no, el cache-first sigue sirviendo
    la TEXMA vieja y los cambios nuevos no se ven en la web/PWA */
-const CACHE = 'texma-v1.7.8';
+const CACHE = 'texma-v1.7.9';
 const PRECACHE = [
   './',
   './index.html',
@@ -11,6 +11,9 @@ const PRECACHE = [
   './icon-512.png',
   './icon-mask.png',
   './maniqui.png',
+  './figurin.png',
+  './logo-texma.png',
+  './icon.svg',
   './onb1.jpg',
   './onb2.jpg',
   './onb3.jpg',
