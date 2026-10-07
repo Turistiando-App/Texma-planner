@@ -1357,6 +1357,11 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
   font-family:var(--mono);font-size:9.5px;letter-spacing:1.4px;text-transform:uppercase;
 }
 #lic .lsep:before,#lic .lsep:after{content:'';flex:1;height:1px;background:var(--line)}
+#lic .lses{font-size:12.5px;color:var(--ink2);margin:0 0 10px;max-width:340px;line-height:1.5}
+#lic .lses b{color:var(--ink)}
+#lic .lses a{color:var(--deep);font-weight:700}
+#lic .lses .lgoo{width:min(340px,92vw);margin:0 0 6px;background:#FFF;border-color:var(--line);color:var(--ink)}
+#lic .lses span{display:block}
 #lic input{
   width:min(340px,92vw);padding:13px 15px;border-radius:13px;border:1px solid var(--line);
   background:var(--paper);color:var(--ink);font-family:var(--mono);font-size:15px;text-align:center;
@@ -1364,7 +1369,7 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
 }
 #lic input:focus{border-color:var(--mid)}
 #lic .btn{width:min(340px,92vw);margin-top:10px}
-#lic .lerr{color:#9C3B2E;font-size:12px;font-family:var(--mono);min-height:17px;margin-top:8px}
+#lic .lerr{color:#9C3B2E;font-size:12px;font-family:var(--mono);min-height:17px;margin-top:8px;max-width:340px;line-height:1.45}
 #lic .lpie{font-size:11px;color:var(--ink2);margin-top:16px;max-width:320px;line-height:1.5}
 
 /* ---------- invitación a instalar la app (PWA) ---------- */
@@ -7775,12 +7780,12 @@ function abrirAfuera(url){
    todo: sin código válido no arranca ninguna otra parte de la app.
 ============================================================ */
 const LIC_ON=true;                        /* ← false vuelve a dejar la app libre */
-/* El servidor de licencias son las funciones /api del mismo proyecto de
-   Vercel que publica la PWA. En la web se llama con rutas relativas
-   (/api/activate), así sirve igual en localhost, en la URL de Vercel o en
-   un dominio propio. Adentro del APK la página se sirve desde el celular
-   (https://localhost), así que ahí hace falta la URL completa. */
-const LIC_API_URL='https://texma.vercel.app';   /* ← la URL de producción de Vercel, sin barra al final */
+/* El servidor de licencias es la API de Next del proyecto `web`: la PWA
+   se publica en /app de ese MISMO dominio (web/scripts/copiar-pwa.mjs).
+   En la web se llama con rutas relativas (/api/activate). Adentro del APK
+   la página se sirve desde el celular (https://localhost), así que ahí
+   hace falta la URL completa. */
+const LIC_API_URL='https://texmaplanner.vercel.app';   /* ← dominio único de producción, sin barra al final */
 const LIC_API=(NATIVO||!/^https?:$/.test(location.protocol))?LIC_API_URL:'';
 /* claves PÚBLICAS de verificación · la privada vive solo como LIC_PRIV en Vercel.
    Si algún día se rota la clave, se AGREGA la nueva a la lista y la vieja se deja:
@@ -7901,6 +7906,29 @@ function normCodigo(code){
   const c=String(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
   return c.length===12?c.match(/.{4}/g).join('-'):String(code||'').trim().toUpperCase();
 }
+/* ---------- sesión de Google (Supabase) del mismo dominio ----------
+   La PWA vive en /app del sitio: el login de /login deja la sesión en
+   localStorage con la clave sb-<proyecto>-auth-token y acá se lee tal
+   cual (sin cargar supabase-js). En el APK no hay sesión: la licencia
+   queda atada solo al dispositivo. */
+const WEB_CON_LOGIN=!NATIVO&&/^https?:$/.test(location.protocol);
+function sesionGoogle(){
+  try{
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(!/^sb-.+-auth-token$/.test(k)) continue;
+      const v=JSON.parse(localStorage.getItem(k)||'null');
+      const s=v&&(v.access_token?v:v.currentSession);
+      if(!s||!s.access_token) continue;
+      const vencida=s.expires_at&&s.expires_at*1000<Date.now()+30000;
+      return {token:s.access_token,email:(s.user&&s.user.email)||'',vencida:!!vencida};
+    }
+  }catch(e){}
+  return null;
+}
+/* el login de la web vuelve solo a /app con la sesión fresca */
+const irALogin=()=>{ location.href='/login?next=/app'; };
+
 async function licActivate(code){
   code=normCodigo(code);
   const url=LIC_API+'/api/activate';
@@ -7908,9 +7936,12 @@ async function licActivate(code){
     console.error('[TEXMA licencia] '+detalle,{url,origen:location.origin,nativo:NATIVO});
     return new Error(msg);
   };
+  const ses=WEB_CON_LOGIN?sesionGoogle():null;
+  const hdr={'content-type':'application/json'};
+  if(ses&&!ses.vencida) hdr.authorization='Bearer '+ses.token;
   let r;
   try{
-    r=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},
+    r=await fetch(url,{method:'POST',headers:hdr,
       body:JSON.stringify({code:String(code).trim().toUpperCase(),device:deviceId()})});
   }catch(e){
     throw falla('Sin conexión con el servidor. Revisá internet y probá de nuevo.',
@@ -7923,8 +7954,10 @@ async function licActivate(code){
       `status ${r.status} ${r.statusText} con respuesta NO JSON (¿ruta /api inexistente o la función no compiló?): ${txt.slice(0,300)}`);
   }
   if(!r.ok){
-    throw falla(j.error||'No pude activar',
+    const err=falla(j.error||'No pude activar',
       `status ${r.status} · error: ${j.error||'—'} · detalle del servidor: ${j.detalle||'—'}`);
+    if(r.status===401) err.sesion=true;          /* la sesión de Google venció: volver a /login */
+    throw err;
   }
   if(!j.token) throw falla('No pude activar', `status ${r.status} pero sin token en la respuesta: ${txt.slice(0,300)}`);
   const diag={};
@@ -7957,6 +7990,7 @@ function licScreen(msg){
       <a href="mailto:${LIC_MAIL}" target="_blank" rel="noopener">${mailIco}<b>${LIC_MAIL}</b></a>
     </div>
     <div class="lsep">¿Ya lo tenés?</div>
+    <div class="lses" id="licSes"></div>
     <input id="licIn" placeholder="XXXX-XXXX-XXXX" maxlength="24" autocomplete="off"
            autocapitalize="characters" spellcheck="false">
     <div class="lerr" id="licEr">${esc(msg||'')}</div>
@@ -8003,6 +8037,18 @@ function licScreen(msg){
     const g2=G();
     if(g2) g2.fromTo(inp,{x:-9},{x:0,duration:.5,ease:'elastic.out(1.6,.32)'});
   };
+  /* en la web, el código se ata a la cuenta de Google: primero la sesión */
+  const ses=w.querySelector('#licSes');
+  const pintarSes=()=>{
+    if(!WEB_CON_LOGIN){ ses.hidden=true; return; }
+    const s=sesionGoogle();
+    ses.innerHTML=s&&!s.vencida
+      ?`Cuenta: <b>${esc(s.email||'Google')}</b> · <a href="/login?next=/app" id="licOtra">cambiar</a>`
+      :`<button class="btn lgoo" type="button" id="licGoo">Iniciar sesión con Google</button>
+        <span>Necesario para activar tu código en esta compu o celular.</span>`;
+    ses.querySelector('#licGoo')?.addEventListener('click',irALogin);
+  };
+  pintarSes();
   const entrar=async ()=>{
     const code=inp.value.trim();
     if(code.length<4){ fallar('Poné el código completo'); return; }
@@ -8014,12 +8060,17 @@ function licScreen(msg){
       cerrarLic(w,'Modo pruebas ✓');
       return;
     }
+    if(WEB_CON_LOGIN){
+      const s=sesionGoogle();
+      if(!s||s.vencida){ fallar('Primero iniciá sesión con Google.'); pintarSes(); return; }
+    }
     bt.disabled=true; bt.textContent='Activando…';
     try{
       await licActivate(code);                   /* ya verifica la firma adentro */
       cerrarLic(w,'¡Activada! Bienvenida ♥');
     }catch(e){
       fallar(e.message||'No pude activar');
+      if(e.sesion) pintarSes();
       bt.disabled=false; bt.textContent='Activar mi TEXMA';
     }
   };
@@ -8049,7 +8100,9 @@ async function licGate(){
   if(t&&await licVerify(t)) return true;
   /* ?k= (o ?codigo=, el nombre que usaba la web): llega desde /login de texma */
   const url=new URL(location.href), pre=url.searchParams.get('k')||url.searchParams.get('codigo');
-  if(pre){
+  /* en la web sin sesión de Google no se canjea solo: el muro pide el login */
+  const sinSesion=WEB_CON_LOGIN&&!(sesionGoogle()&&!sesionGoogle().vencida);
+  if(pre&&!sinSesion){
     try{
       await licActivate(pre);
       licRecienActivada=true;

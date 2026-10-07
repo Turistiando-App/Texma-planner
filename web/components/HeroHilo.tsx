@@ -120,7 +120,7 @@ export default function HeroHilo() {
               <Link href="/merceria" className="rounded-full bg-rosa px-6 py-3.5 font-bold text-white shadow-[0_10px_24px_rgba(236,25,104,.32)] transition hover:-translate-y-0.5">
                 Ver la mercería
               </Link>
-              <Link href="/app" className="rounded-full border border-linea bg-papel px-6 py-3.5 font-bold transition hover:-translate-y-0.5">
+              <Link href="/planner" className="rounded-full border border-linea bg-papel px-6 py-3.5 font-bold transition hover:-translate-y-0.5">
                 Conocé la app
               </Link>
             </div>

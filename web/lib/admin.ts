@@ -6,7 +6,7 @@ export const esAdmin = (email?: string | null) => (email || '').trim().toLowerCa
 
 export type Licencia = {
   code: string; status: 'pending' | 'active' | 'revoked';
-  nombre: string; contacto: string; precio: number; vendedor: string;
+  nombre: string; contacto: string; email?: string | null; precio: number; vendedor: string;
   device: string | null; activated_at: string | null; last_seen_at: string | null;
   claim_token: string | null; created_at: string;
 };

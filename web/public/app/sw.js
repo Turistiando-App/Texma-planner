@@ -3,7 +3,6 @@
    la TEXMA vieja y los cambios nuevos no se ven en la web/PWA */
 const CACHE = 'texma-v1.7.8';
 const PRECACHE = [
-  './',
   './index.html',
   './manifest.json',
   './favicon.png',

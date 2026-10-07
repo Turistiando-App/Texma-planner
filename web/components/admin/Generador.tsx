@@ -4,10 +4,10 @@
    Si viene de Pre-ventas («Generar licencia»), llega `inicial` con la
    clienta y el contacto ya cargados; al crear el código, el lead pasa a
    «Código enviado» con el código vinculado. */
-import { Check, Copy, KeyRound, LoaderCircle, MessageCircle } from 'lucide-react';
+import { Check, Copy, KeyRound, LoaderCircle, MessageCircle, Unlink } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import type { Licencia, Prefill } from '@/lib/admin';
-import { pesos, SITIO } from '@/lib/sitio';
+import { pesos, PWA_URL, SITIO } from '@/lib/sitio';
 import { Aviso, fecha, Titulo, type Api } from './ui';
 
 const ESTADO: Record<Licencia['status'], { t: string; c: string }> = {
@@ -16,11 +16,11 @@ const ESTADO: Record<Licencia['status'], { t: string; c: string }> = {
   revoked: { t: 'Dada de baja', c: 'border-red-400/30 bg-red-400/10 text-red-300' },
 };
 
-const linkEntrega = (l: Licencia) => (l.claim_token ? `${SITIO.pwa}/d/${l.claim_token}` : '');
+const linkEntrega = (l: Licencia) => (l.claim_token ? `${SITIO.url}/d/${l.claim_token}` : '');
 
 function mensaje(l: Licencia) {
   const hola = l.nombre ? `¡Hola ${l.nombre.split(/\s+/)[0]}!` : '¡Hola!';
-  return `${hola} 💗 Acá va tu TEXMA.\n\nTu código de activación: ${l.code}\n\nEntrá por acá para instalarla y activarla:\n${linkEntrega(l) || SITIO.pwa}\n\nEl código queda atado a tu celular. ¡Que la disfrutes! ♥`;
+  return `${hola} 💗 Acá va tu TEXMA.\n\nTu código de activación: ${l.code}\n\nEntrá por acá para instalarla y activarla:\n${linkEntrega(l) || PWA_URL}\n\nEl código queda atado a tu celular. ¡Que la disfrutes! ♥`;
 }
 
 /* wa.me necesita solo dígitos; un número argentino sin 54 se completa */
@@ -65,6 +65,16 @@ export default function Generador({ api, inicial, onUsado }: { api: Api; inicial
       }
     } catch (e) { setError(e instanceof Error ? e.message : 'No se pudo crear'); }
     finally { setCreando(false); }
+  };
+
+  /* respuesta a un ticket de «otro equipo o red»: suelta el dispositivo */
+  const liberar = async (l: Licencia) => {
+    if (!window.confirm(`¿Liberar el dispositivo de ${l.code}${l.nombre ? ` (${l.nombre})` : ''}? Podrá activarla en otro equipo y el anterior queda afuera la próxima vez que pida activar.`)) return;
+    setError('');
+    try {
+      const act = await api<Licencia>('licencias', { method: 'PATCH', body: JSON.stringify({ code: l.code, accion: 'liberar' }) });
+      setLista(v => v?.map(x => (x.code === l.code ? act : x)) ?? v);
+    } catch (e) { setError(e instanceof Error ? e.message : 'No se pudo liberar'); }
   };
 
   const copiar = async (l: Licencia) => {
@@ -133,18 +143,26 @@ export default function Generador({ api, inicial, onUsado }: { api: Api; inicial
       <div className="mt-4 overflow-x-auto rounded-2xl border border-white/10">
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead className="bg-white/[.03] font-mono text-[11px] uppercase tracking-[.15em] text-neutral-500">
-            <tr><th className="px-4 py-3">Código</th><th className="px-4 py-3">Clienta</th><th className="px-4 py-3">Precio</th><th className="px-4 py-3">Estado</th><th className="px-4 py-3">Creada</th></tr>
+            <tr><th className="px-4 py-3">Código</th><th className="px-4 py-3">Clienta</th><th className="px-4 py-3">Precio</th><th className="px-4 py-3">Estado</th><th className="px-4 py-3">Creada</th><th className="px-4 py-3 text-right">Dispositivo</th></tr>
           </thead>
           <tbody className="divide-y divide-white/5">
-            {lista === null && <tr><td colSpan={5} className="px-4 py-8 text-center text-neutral-500">Cargando…</td></tr>}
-            {lista?.length === 0 && <tr><td colSpan={5} className="px-4 py-8 text-center text-neutral-500">Todavía no hay licencias.</td></tr>}
+            {lista === null && <tr><td colSpan={6} className="px-4 py-8 text-center text-neutral-500">Cargando…</td></tr>}
+            {lista?.length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-neutral-500">Todavía no hay licencias.</td></tr>}
             {lista?.map(l => (
               <tr key={l.code} className="hover:bg-white/[.02]">
                 <td className="px-4 py-3 font-mono text-white">{l.code}</td>
-                <td className="px-4 py-3"><span className="text-neutral-200">{l.nombre || '—'}</span>{l.contacto && <span className="block text-xs text-neutral-500">{l.contacto}</span>}</td>
+                <td className="px-4 py-3"><span className="text-neutral-200">{l.nombre || '—'}</span>{l.contacto && <span className="block text-xs text-neutral-500">{l.contacto}</span>}{l.email && <span className="block text-xs text-neutral-500">{l.email}</span>}</td>
                 <td className="px-4 py-3 font-mono text-neutral-300">{pesos(l.precio)}</td>
                 <td className="px-4 py-3"><span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${ESTADO[l.status].c}`}>{ESTADO[l.status].t}</span></td>
                 <td className="px-4 py-3 text-neutral-500">{fecha(l.created_at)}</td>
+                <td className="px-4 py-3 text-right">
+                  {l.device ? (
+                    <button onClick={() => liberar(l)} title="Suelta el dispositivo para que la clienta active en otro equipo"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-xs font-semibold text-neutral-300 transition hover:border-white/30 hover:text-white">
+                      <Unlink className="h-3.5 w-3.5" aria-hidden="true" /> Liberar
+                    </button>
+                  ) : <span className="text-xs text-neutral-600">libre</span>}
+                </td>
               </tr>
             ))}
           </tbody>

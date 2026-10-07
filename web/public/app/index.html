@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="es">
 <head>
+<base href="/app/">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>TEXMA · Planner</title>
@@ -8210,7 +8211,7 @@ function arrancarAvisos(){
     navigator.serviceWorker.addEventListener('message',ev=>{
       if(ev.data&&ev.data.type==='push-resubscribe') pushSubscribe();
     });
-    navigator.serviceWorker.register('sw.js')
+    navigator.serviceWorker.register('sw.js',{scope:'/app'})
       .then(r=>{ swReg=r; r.update().catch(()=>{}); return navigator.serviceWorker.ready; })
       .then(r=>{ swReg=r||swReg; startNotifLoop(); })
       .catch(()=>startNotifLoop());

@@ -11,7 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     { url: u('/'), changeFrequency: 'weekly', priority: 1 },
     { url: u('/merceria'), changeFrequency: 'daily', priority: 0.9 },
-    { url: u('/app'), changeFrequency: 'monthly', priority: 0.8 },
+    { url: u('/planner'), changeFrequency: 'monthly', priority: 0.8 },
     { url: u('/blog'), changeFrequency: 'weekly', priority: 0.7 },
     { url: u('/contacto'), changeFrequency: 'yearly', priority: 0.5 },
     ...productos.map(p => ({ url: u(`/merceria/${p.slug}`), changeFrequency: 'daily' as const, priority: 0.6 })),

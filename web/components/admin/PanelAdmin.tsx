@@ -41,13 +41,13 @@ export default function PanelAdmin() {
     const sb = supabaseAuth();
     if (!sb) { router.replace('/'); return; }
     const revisar = (mail: string | null | undefined, conSesion: boolean) => {
-      if (!conSesion) router.replace('/login');
+      if (!conSesion) router.replace('/login?next=/admin');
       else if (!esAdmin(mail)) router.replace('/');
       else setEmail(mail ?? null);
     };
     sb.auth.getSession().then(({ data }) => revisar(data.session?.user.email, !!data.session));
     const { data } = sb.auth.onAuthStateChange((evento, s) => {
-      if (evento === 'SIGNED_OUT') router.replace('/login');
+      if (evento === 'SIGNED_OUT') router.replace('/login?next=/admin');
       else if (s) revisar(s.user.email, true);
     });
     return () => data.subscription.unsubscribe();
@@ -61,7 +61,7 @@ export default function PanelAdmin() {
       headers: { 'content-type': 'application/json', authorization: `Bearer ${data.session?.access_token ?? ''}`, ...init?.headers },
     });
     const j = await r.json().catch(() => ({}));
-    if (r.status === 401) router.replace('/login');
+    if (r.status === 401) router.replace('/login?next=/admin');
     if (r.status === 403) router.replace('/');
     if (!r.ok) throw new Error(j.error || `Error ${r.status}`);
     return j;

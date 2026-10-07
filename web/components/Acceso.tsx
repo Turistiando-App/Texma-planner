@@ -2,42 +2,27 @@
 /* ============================================================
    ACCESO · /login de TEXMA Planner
    ------------------------------------------------------------
-   Dos caminos:
-     · Google: Supabase Auth (OAuth). Vuelve a /login y el cliente
-       lee la sesión de la URL; con sesión, se ofrece abrir la app.
-       Requiere el proveedor Google activo en Supabase y /login en
-       Authentication → URL Configuration → Redirect URLs.
-     · Código de activación: el que se entrega al comprar (XXXX-XXXX-XXXX).
-   Regla híbrida:
-     · PC (navegador de escritorio): sesión de Google OBLIGATORIA (queda
-       el mail) y después el código creado desde el panel de admin.
-     · Celular: el código directo, sin Google.
-   /api/licencia/verificar comprueba que el código exista (sin canjearlo;
-   si hay sesión, guarda el mail en la licencia) y se pasa a la PWA con
-   ?k=. La PWA lo canjea (queda atado a ESE dispositivo) y muestra el
-   onboarding que explica la app antes de entrar. OJO: «celular o PC» se
-   decide en el navegador; es una regla de experiencia, no de seguridad.
+   Un solo paso: iniciar sesión con Google (Supabase Auth, OAuth).
+   Al volver con sesión se redirige SOLO a /app (la PWA, en este mismo
+   dominio) o a ?next= si viene (ej. /admin). El código de activación
+   NO se pide acá: lo pide, valida y canjea la PWA en su pantalla de
+   activación, atándolo al mail de esta sesión y a ese dispositivo.
+   Requiere el proveedor Google activo en Supabase y /login en
+   Authentication → URL Configuration → Redirect URLs.
 ============================================================ */
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowRight, KeyRound, Loader2, LogOut, MessageCircle, ShieldCheck, Smartphone, WifiOff } from 'lucide-react';
+import { Loader2, MessageCircle, ShieldCheck, Smartphone, WifiOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import type { User } from '@supabase/supabase-js';
-import { esAdmin } from '@/lib/admin';
 import { supabaseAuth } from '@/lib/supabase';
-import Link from 'next/link';
-import { SITIO, COMPRAR_APP } from '@/lib/sitio';
+import { COMPRAR_APP } from '@/lib/sitio';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/* mismo formato que normCodigo() de la app: mayúsculas, guiones cada 4 */
-const formatear = (v: string) =>
-  v.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12).match(/.{1,4}/g)?.join('-') ?? '';
-const completo = (c: string) => /^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(c);
-
-/* celular o tablet (incluye iPad, que se anuncia como Mac con pantalla táctil) */
-const esMovil = () =>
-  /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
-  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+/* adónde ir después del login: solo rutas internas (nada de //otro-sitio) */
+function destino() {
+  const n = new URLSearchParams(window.location.search).get('next') || '';
+  return /^\/(?![/\\])/.test(n) ? n : '/app';
+}
 
 function LogoGoogle() {
   return (
@@ -58,22 +43,17 @@ const PUNTOS = [
 
 export default function Acceso() {
   const quieto = useReducedMotion();
-  const [usuario, setUsuario] = useState<User | null>(null);
+  const [entrando, setEntrando] = useState(false);       // sesión lista, redirigiendo
   const [cargandoGoogle, setCargandoGoogle] = useState(false);
-  const [codigo, setCodigo] = useState('');
   const [error, setError] = useState('');
-  const [verificando, setVerificando] = useState(false);
-  const [movil, setMovil] = useState(false);
-  useEffect(() => { setMovil(esMovil()); }, []);
-  /* en el celular el código va directo; en la PC, recién con Google */
-  const puedeCodigo = movil || !!usuario;
 
-  /* sesión actual + la que vuelve de Google */
+  /* sesión actual o la que vuelve de Google → directo a la app */
   useEffect(() => {
     const sb = supabaseAuth();
     if (!sb) return;
-    sb.auth.getSession().then(({ data }) => setUsuario(data.session?.user ?? null));
-    const { data } = sb.auth.onAuthStateChange((_e, s) => setUsuario(s?.user ?? null));
+    const ir = () => { setEntrando(true); window.location.replace(destino()); };
+    sb.auth.getSession().then(({ data }) => { if (data.session) ir(); });
+    const { data } = sb.auth.onAuthStateChange((_e, s) => { if (s) ir(); });
     return () => data.subscription.unsubscribe();
   }, []);
 
@@ -82,37 +62,13 @@ export default function Acceso() {
     const sb = supabaseAuth();
     if (!sb) { console.error('[Acceso] Faltan NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY'); setError('No pudimos conectar con Google. Probá de nuevo.'); return; }
     setCargandoGoogle(true);
+    const vuelta = `${window.location.origin}/login?next=${encodeURIComponent(destino())}`;
     const { error: e } = await sb.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/login`, queryParams: { prompt: 'select_account' } },
+      options: { redirectTo: vuelta, queryParams: { prompt: 'select_account' } },
     });
     if (e) { setCargandoGoogle(false); setError('No pudimos conectar con Google. Probá de nuevo.'); }
     /* sin error, el navegador ya se fue a Google */
-  };
-
-  const salir = async () => { await supabaseAuth()?.auth.signOut(); setUsuario(null); };
-
-  const activar = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!puedeCodigo) { setError('Primero iniciá sesión con Google.'); return; }
-    if (!completo(codigo)) { setError('El código tiene 12 caracteres: XXXX-XXXX-XXXX.'); return; }
-    setError('');
-    setVerificando(true);
-    try {
-      const token = usuario ? (await supabaseAuth()?.auth.getSession())?.data.session?.access_token : undefined;
-      const r = await fetch('/api/licencia/verificar', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ code: codigo }),
-      });
-      const j = await r.json().catch(() => ({}));
-      if (!r.ok) { setError(j.error || 'No pudimos verificar el código. Probá de nuevo.'); setVerificando(false); return; }
-      /* la PWA canjea ?k= apenas abre, lo saca de la URL y muestra el onboarding */
-      window.location.href = `${SITIO.pwa}/?k=${encodeURIComponent(codigo)}`;
-    } catch {
-      setError('Sin conexión. Revisá internet y probá de nuevo.');
-      setVerificando(false);
-    }
   };
 
   const entrar = (d: number) => quieto
@@ -126,9 +82,7 @@ export default function Acceso() {
         <p className="kicker text-rosa">Acceso</p>
         <h1 className="titulo mt-3 text-4xl leading-[1.05] sm:text-5xl lg:text-6xl">Entrá a TEXMA Planner.</h1>
         <p className="mt-5 max-w-lg text-base text-tinta-suave sm:text-lg">
-          {movil
-            ? 'Poné el código único que te mandamos al comprarla y listo.'
-            : 'Desde la compu: iniciá sesión con tu cuenta de Google y activá la app con el código único que te mandamos al comprarla.'}
+          Iniciá sesión con tu cuenta de Google. Si es tu primera vez, la app te va a pedir el código único que te mandamos al comprarla.
         </p>
         <ul className="mt-8 grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
           {PUNTOS.map(p => (
@@ -150,26 +104,11 @@ export default function Acceso() {
         className="order-1 w-full rounded-[2rem] border border-linea bg-white p-6 shadow-[0_30px_80px_-30px_rgba(43,38,34,.3)] sm:p-9 lg:order-2">
         <h2 id="acceso" className="text-xl font-bold">Acceso a tu cuenta</h2>
 
-        {usuario ? (
-          <div className="mt-6 space-y-4">
-            <p className="rounded-2xl bg-lino px-4 py-3 text-sm">
-              Sesión iniciada como <b className="break-all">{usuario.email}</b>
-            </p>
-            <a href={SITIO.pwa}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-rosa px-6 py-4 font-bold text-white shadow-[0_10px_24px_rgba(236,25,104,.3)] transition hover:bg-rosa-oscuro">
-              Abrir TEXMA Planner <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </a>
-            {esAdmin(usuario.email) && (
-              <Link href="/admin" className="flex w-full items-center justify-center rounded-full bg-tinta px-6 py-3.5 font-bold text-papel transition hover:bg-rosa">
-                Ir al panel de administración
-              </Link>
-            )}
-            <button type="button" onClick={salir}
-              className="flex w-full items-center justify-center gap-2 rounded-full border border-linea px-6 py-3 text-sm font-semibold text-tinta-suave transition hover:border-tinta hover:text-tinta">
-              <LogOut className="h-4 w-4" aria-hidden="true" /> Cerrar sesión
-            </button>
-          </div>
-        ) : movil ? null : (
+        {entrando ? (
+          <p className="mt-6 flex items-center justify-center gap-2 rounded-2xl bg-lino px-4 py-4 text-sm font-semibold" role="status">
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Entrando a la app…
+          </p>
+        ) : (
           <button type="button" onClick={entrarConGoogle} disabled={cargandoGoogle}
             className="mt-6 flex w-full items-center justify-center gap-3 rounded-full border border-linea bg-white px-6 py-4 font-bold text-tinta shadow-sm transition hover:border-tinta/40 hover:shadow-md disabled:cursor-wait disabled:opacity-70">
             {cargandoGoogle ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" /> : <LogoGoogle />}
@@ -177,31 +116,11 @@ export default function Acceso() {
           </button>
         )}
 
-        <div className={`my-7 flex items-center gap-4 text-tinta-suave ${movil && !usuario ? 'hidden' : ''}`} aria-hidden="true">
-          <span className="h-px flex-1 bg-linea" /><span className="kicker">o</span><span className="h-px flex-1 bg-linea" />
-        </div>
-
-        <form onSubmit={activar} noValidate aria-disabled={!puedeCodigo} className={movil && !usuario ? 'mt-6' : ''}>
-          <label htmlFor="codigo" className="block text-sm font-semibold">Código de activación único</label>
-          <div className="relative mt-2">
-            <KeyRound className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-tinta-suave" aria-hidden="true" />
-            <input id="codigo" value={codigo} disabled={!puedeCodigo} onChange={e => { setCodigo(formatear(e.target.value)); setError(''); }}
-              placeholder="XXXX-XXXX-XXXX" inputMode="text" autoComplete="one-time-code" autoCapitalize="characters" spellCheck={false}
-              maxLength={14} aria-invalid={!!error} aria-describedby="codigo-ayuda"
-              className="w-full rounded-2xl border border-linea bg-lino py-4 pl-12 pr-4 font-mono text-lg tracking-[.2em] outline-none transition placeholder:text-tinta-suave/50 focus:border-rosa focus:bg-white focus:ring-4 focus:ring-rosa/10 disabled:cursor-not-allowed disabled:opacity-50" />
-          </div>
-          <p id="codigo-ayuda" className="mt-2 text-xs text-tinta-suave">
-            {puedeCodigo ? 'Te lo mandamos por WhatsApp cuando compraste la app.' : 'Primero iniciá sesión con Google para poner tu código.'}
-          </p>
-          <button type="submit" disabled={!puedeCodigo || !completo(codigo) || verificando}
-            className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-tinta px-6 py-4 font-bold text-papel transition hover:bg-rosa disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-tinta">
-            {verificando
-              ? <><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Verificando…</>
-              : <>Activar la app <ArrowRight className="h-4 w-4" aria-hidden="true" /></>}
-          </button>
-        </form>
-
         {error && <p className="mt-4 text-sm font-semibold text-[#B3261E]" role="alert">{error}</p>}
+
+        <p className="mt-5 text-center text-xs text-tinta-suave">
+          Tu cuenta de Google queda asociada a tu licencia y a este dispositivo.
+        </p>
 
         <p className="mt-7 border-t border-linea pt-5 text-center text-sm text-tinta-suave">
           ¿Todavía no la tenés?{' '}

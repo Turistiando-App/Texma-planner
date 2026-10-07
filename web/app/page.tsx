@@ -56,7 +56,7 @@ export default async function Home() {
                   Comprar la app
                 </a>
                 <Link href="/login" className="rounded-full border border-white/50 px-6 py-3.5 font-bold transition hover:bg-white/10">Abrir la app</Link>
-                <Link href="/app" className="px-2 py-3.5 font-bold underline-offset-4 hover:underline">Ver funciones</Link>
+                <Link href="/planner" className="px-2 py-3.5 font-bold underline-offset-4 hover:underline">Ver funciones</Link>
               </div>
             </div>
             <ul className="grid grid-cols-2 gap-3 text-sm">

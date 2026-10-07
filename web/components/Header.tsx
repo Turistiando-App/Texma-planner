@@ -7,7 +7,7 @@
    con framer-motion (opacidad + un poco de desplazamiento vertical).
    El tema sigue a lo que hay DEBAJO de la barra, no a la ruta:
      · oscuro: mientras la barra está sobre una sección marcada con
-       data-nav="oscuro" (el hero de la portada, /app entera): texto claro,
+       data-nav="oscuro" (el hero de la portada, /planner entera): texto claro,
        logo en blanco; arriba de todo transparente y al scrollear vidrio negro.
      · claro (todo lo demás): texto oscuro, logo original y, al scrollear
        o con un menú abierto, vidrio papel. Así el contraste no depende
@@ -58,28 +58,28 @@ const MEGA: Mega[] = [
     destacado: { kicker: 'Mercería', t: 'Lo que ves es lo que hay en el taller.', d: 'El stock se actualiza solo cuando algo se vende.', cta: 'Ver productos', href: '/merceria' },
   },
   {
-    id: 'app', txt: 'La app', href: '/app',
+    id: 'app', txt: 'La app', href: '/planner',
     columnas: [
       {
         titulo: 'Funciones',
         items: [
-          { href: '/app#funciones', t: 'Medidas por clienta', d: 'Con calculadora de patrón', i: Ruler },
-          { href: '/app#funciones', t: 'Entregas con alarma', d: 'Agenda semanal y mensual', i: CalendarClock },
-          { href: '/app#funciones', t: 'Cobros y señas', d: 'Lo que te deben, a la vista', i: Wallet },
-          { href: '/app#funciones', t: 'Stock y finanzas', d: 'Ventas, gastos y ganancia', i: LineChart },
+          { href: '/planner#funciones', t: 'Medidas por clienta', d: 'Con calculadora de patrón', i: Ruler },
+          { href: '/planner#funciones', t: 'Entregas con alarma', d: 'Agenda semanal y mensual', i: CalendarClock },
+          { href: '/planner#funciones', t: 'Cobros y señas', d: 'Lo que te deben, a la vista', i: Wallet },
+          { href: '/planner#funciones', t: 'Stock y finanzas', d: 'Ventas, gastos y ganancia', i: LineChart },
         ],
       },
       {
         titulo: 'Empezar',
         items: [
-          { href: '/app#como', t: 'Cómo la conseguís', d: 'Pago único, sin suscripción', i: Package },
+          { href: '/planner#como', t: 'Cómo la conseguís', d: 'Pago único, sin suscripción', i: Package },
           { href: '/login', t: 'Abrir la app', d: 'Android, iPhone o compu', i: Smartphone },
           { href: '/blog', t: 'Guías y consejos', d: 'Para ordenar tu taller', i: BookOpen },
         ],
       },
     ],
     destacado: { kicker: 'Texma Planner', t: 'Tu taller, ordenado en el celular.', d: 'Pago único. Funciona sin internet.', cta: 'Comprar la app', href: COMPRAR_APP },
-    verTodo: { t: 'Ver todo sobre la App', href: '/app' },
+    verTodo: { t: 'Ver todo sobre la App', href: '/planner' },
   },
 ];
 
@@ -162,7 +162,7 @@ export default function Header() {
   /* texto claro solo sobre el hero oscuro y sin menú abierto (el menú lleva vidrio papel) */
   const T = sobreOscuro && !menu ? TEMA.oscuro : TEMA.claro;
   const transparente = !menu && !bajo;
-  /* scrolleando sobre algo oscuro (resto del hero, /app entera): vidrio negro con texto claro */
+  /* scrolleando sobre algo oscuro (resto del hero, /planner entera): vidrio negro con texto claro */
   const fondo = transparente ? '' : T.fondo;
   const anim = quieto
     ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }

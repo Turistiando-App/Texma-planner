@@ -53,7 +53,7 @@ export default function Footer() {
         <div>
           <p className="kicker text-tinta-suave">TEXMA</p>
           <ul className="mt-4 space-y-2 text-sm">
-            <li><Link href="/app" className="hover:text-rosa">La app para modistas</Link></li>
+            <li><Link href="/planner" className="hover:text-rosa">La app para modistas</Link></li>
             <li><Link href="/blog" className="hover:text-rosa">Blog de costura</Link></li>
             <li><Link href="/contacto" className="hover:text-rosa">Contacto</Link></li>
             <li><Link href="/login" className="hover:text-rosa">Abrir la app</Link></li>

@@ -12,7 +12,7 @@ import { SITIO, COMPRAR_APP } from '@/lib/sitio';
 export const metadata: Metadata = {
   title: 'La app para modistas y costureras',
   description: 'TEXMA ordena tu taller de costura: medidas por clienta con calculadora de patrón, entregas con alarma, cobros, stock de mercería y finanzas. Funciona sin internet.',
-  alternates: { canonical: '/app' },
+  alternates: { canonical: '/planner' },
 };
 
 const EXTRAS = [
@@ -117,7 +117,7 @@ export default function PaginaApp() {
         '@context': 'https://schema.org', '@type': 'SoftwareApplication', name: 'TEXMA',
         applicationCategory: 'BusinessApplication', operatingSystem: 'Android, iOS, Web',
         description: 'Planner para modistas: medidas, entregas, cobros, stock de mercería y finanzas.',
-        offers: { '@type': 'Offer', priceCurrency: 'ARS' }, url: `${SITIO.url}/app`,
+        offers: { '@type': 'Offer', priceCurrency: 'ARS' }, url: `${SITIO.url}/planner`,
       }} />
     </div>
   );

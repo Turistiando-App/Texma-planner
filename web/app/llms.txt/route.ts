@@ -18,7 +18,7 @@ export async function GET() {
 ${cats.map(c => `- [${c}](${SITIO.url}/merceria?cat=${encodeURIComponent(c)})`).join('\n')}
 
 ## App
-- [TEXMA para modistas](${SITIO.url}/app): funciones, precio (pago único) y cómo conseguirla.
+- [TEXMA para modistas](${SITIO.url}/planner): funciones, precio (pago único) y cómo conseguirla.
 
 ## Blog: costura, patronaje, moldería digital, diseño de indumentaria, upcycling, asesoría de imagen y tendencias textiles
 ${CATEGORIAS.map(c => `### ${c}\n` + ARTICULOS.filter(a => a.categoria === c)

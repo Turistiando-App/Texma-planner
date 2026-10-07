@@ -4,6 +4,9 @@
   "private": true,
   "description": "TEXMA · sitio público + tienda de mercería (Next.js + Supabase)",
   "scripts": {
+    "pwa": "node scripts/copiar-pwa.mjs",
+    "predev": "node scripts/copiar-pwa.mjs",
+    "prebuild": "node scripts/copiar-pwa.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
