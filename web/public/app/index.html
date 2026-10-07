@@ -1034,6 +1034,33 @@ body.pdet-on{overflow:hidden}
 .wkstrip::-webkit-scrollbar{display:none}
 /* Mercería: título + buscador (en el celu, uno abajo del otro) */
 .stkhead .hsearch{margin-bottom:14px}
+
+/* ---------- LECTURA ---------- */
+.btabs{margin-bottom:16px}
+.btabs button i{font-style:normal;font-family:var(--mono);font-size:10.5px;opacity:.6;margin-left:3px}
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px 14px;margin-bottom:14px}
+.bcard{display:flex;flex-direction:column;cursor:pointer;min-width:0}
+.bcov{position:relative;aspect-ratio:2/3;border-radius:14px;overflow:hidden;background:var(--tint);
+  border:1px solid var(--line);box-shadow:0 8px 20px rgba(43,38,34,.12);transition:transform .2s}
+.bcard:hover .bcov{transform:translateY(-2px)}
+.bcov img{width:100%;height:100%;object-fit:cover;display:block}
+.bnoimg{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--deep);text-align:center;padding:12px}
+.bnoimg svg{width:40%;max-width:64px;height:auto;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:.7}
+.bnoimg span{font-size:12px;font-weight:700}
+.bok{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;
+  background:#2F9E6B;color:#FFF;font-weight:800;font-size:15px;box-shadow:0 3px 10px rgba(0,0,0,.2)}
+.bcard .bt{font-weight:700;font-size:14px;line-height:1.25;margin-top:9px}
+.bcard .ba{font-size:12.5px;color:var(--ink2);margin-top:2px}
+.bcard .bd{font-family:var(--mono);font-size:9.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--deep);margin-top:5px}
+.bcard .bq{margin-top:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;
+  padding:7px 8px;font-family:var(--sans);font-weight:700;font-size:12px;cursor:pointer}
+.bcard .bq:hover{border-color:var(--mid);background:var(--tint)}
+.bfpic{width:150px;aspect-ratio:2/3;margin:0 auto 16px;border-radius:14px;overflow:hidden;cursor:pointer;
+  background:var(--tint);border:1px dashed var(--mid)}
+.bfpic img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* el acceso a Lectura en el sidebar existe solo en tablet/compu */
+#nav button.dsk{display:none}
 .wday{
   flex:0 0 46px;height:66px;border-radius:22px;background:var(--paper);border:1px solid var(--line);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;
@@ -1498,6 +1525,14 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
 
   /* Ajustes: créditos centrados a lo ancho, abajo de todo */
   #view > .about.vc{grid-column:1/-1;padding-top:44px}
+
+  #nav button.dsk{display:flex}
+
+  /* Entreno: la cabecera naranja y el degradado de la racha llegan a los
+     bordes del área de contenido (en el celu lo hacen con -16px), así el
+     naranja no queda cortado ni corrido contra el sidebar */
+  body.en-racha #top{margin:0 calc(var(--app-px) * -1);width:auto;padding-left:var(--app-px);padding-right:var(--app-px)}
+  .rhead2{margin-left:calc(var(--app-px) * -1);margin-right:calc(var(--app-px) * -1);padding-left:var(--app-px);padding-right:var(--app-px)}
 }
 /* Onboarding en pantallas apaisadas (PC/tablet acostada): las fotos son
    verticales (720×1080). Estiradas a todo el ancho quedaban ampliadas al
@@ -1537,6 +1572,25 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
   #view > *{grid-column:1/-1}
   #view > .vc{grid-column:auto}
   #view > .vc:first-child,#view > .aghead,#view > .hero,#view > .hhero{grid-column:1/-1}
+
+  /* Mercería: izquierda el resumen y el stock; derecha Movimientos, que arranca
+     a la misma altura, queda fija al scrollear, la lista scrollea ADENTRO y el
+     «Total recaudado» queda siempre visible abajo de la caja */
+  body[data-vista="stock"] #view{grid-template-columns:minmax(0,1.45fr) minmax(0,1fr)}
+  body[data-vista="stock"] #view > .scol{grid-column:1;min-width:0}
+  body[data-vista="stock"] #view > .smoves.vc{
+    grid-column:2;position:sticky;top:20px;margin:0;
+    display:flex;flex-direction:column;max-height:calc(100dvh - 40px);
+  }
+  .smoves .smlist{flex:1 1 auto;min-height:0;overflow-y:auto;margin:0 -6px;padding:0 6px;overscroll-behavior:contain}
+  .smoves .stot{flex:none}
+
+  /* Entreno: tarjetas apiladas en columnas (masonry), sin huecos entre
+     Racha, Calorías, Calendario y Rutinas. La cabecera de racha va a lo ancho. */
+  body[data-vista="entreno"] #view{display:block;columns:3 340px;column-gap:24px}
+  body[data-vista="entreno"] #view > *{break-inside:avoid}
+  body[data-vista="entreno"] #view > .rhead2{column-span:all}
+  body[data-vista="entreno"] #view > .rtit{break-after:avoid}
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -1650,6 +1704,7 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
   <button data-v="cal"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg><span class="nlb">Agenda</span></button>
   <button data-v="fin"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.2"/><path d="M12 7.6v8.8M14.6 9.6c-.5-.9-1.5-1.4-2.6-1.4-1.6 0-2.9.9-2.9 2.1 0 2.7 5.6 1.3 5.6 4 0 1.2-1.3 2.1-2.9 2.1-1.2 0-2.2-.6-2.7-1.5"/></svg><span class="nlb">Finanzas</span></button>
   <button data-v="costura"><svg viewBox="0 0 24 24"><circle cx="6" cy="6.5" r="2.6"/><circle cx="6" cy="17.5" r="2.6"/><path d="M8.3 8.1 20 19.5M8.3 15.9 20 4.5"/></svg><span class="nlb">Costura</span></button>
+  <button data-v="lectura" class="dsk"><svg viewBox="0 0 24 24"><path d="M12 6.6C10.2 5.2 7.6 4.6 4.2 4.8v13.4c3.4-.2 6 .4 7.8 1.8 1.8-1.4 4.4-2 7.8-1.8V4.8c-3.4-.2-6 .4-7.8 1.8Z"/><path d="M12 6.6V20"/></svg><span class="nlb">Lectura</span></button>
   <div class="nprof" id="navProf">
     <span class="npav" id="npAv">♥</span>
     <span class="nptx"><b id="npNom">Bienvenida</b><i id="npMail"></i></span>
@@ -1727,6 +1782,7 @@ const DEF={
   events:[],tasks:[],notes:[],routines:[],workoutLogs:[],trainLogs:[],
   meds:[],medLog:{},hobbies:[],hobbyLogs:[],finance:[],investments:[],sewing:[],treatments:[],
   shopping:[],gratitude:[],recurring:[],priceBook:[],stock:[],stockMoves:[],periods:[],cycleLogs:[],
+  books:[],
   fitDays:{},
   fired:{}
 };
@@ -2184,7 +2240,8 @@ function navMark(){
   $$('#nav button[data-v]').forEach(b=>{
     const on = b.dataset.v===cur;
     b.classList.toggle('on',on);
-    if(on) act=b;
+    /* un botón oculto (Lectura en el celu) no tiene dónde marcar */
+    if(on&&b.offsetParent) act=b;
   });
   const gl=$('#navgl');
   if(!gl) return;
@@ -2223,6 +2280,7 @@ function go(v,fromPop){
   document.body.classList.toggle('en-home',v==='hoy');
   /* en Entreno la cabecera se tiñe del naranja de la racha */
   document.body.classList.toggle('en-racha',v==='entreno');
+  document.body.dataset.vista=v;   /* para estilos por sección (Mercería, Entreno…) */
   pintarBarra();
   cerrarCalc(true);
   if(v!=='costura') calcFab(false);
@@ -2289,6 +2347,7 @@ const MICONS={
   cal:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/>',
   ciclo:'<path d="M12 3.4c3.4 3 5.6 5.6 5.6 8.4a5.6 5.6 0 0 1-11.2 0c0-2.8 2.2-5.4 5.6-8.4Z"/>',
   stock:'<path d="M3.6 7.6 12 3.6l8.4 4v8.8L12 20.4l-8.4-4Z"/><path d="M3.6 7.6 12 11.7l8.4-4.1M12 11.7v8.7"/>',
+  lectura:'<path d="M12 6.6C10.2 5.2 7.6 4.6 4.2 4.8v13.4c3.4-.2 6 .4 7.8 1.8 1.8-1.4 4.4-2 7.8-1.8V4.8c-3.4-.2-6 .4-7.8 1.8Z"/><path d="M12 6.6V20"/>',
   ajustes:'<path d="M4 7.3h3.2M11.2 7.3H20M4 12h8.6M16.4 12H20M4 16.7h5.4M13.2 16.7H20"/><circle cx="9.2" cy="7.3" r="1.9"/><circle cx="14.4" cy="12" r="1.9"/><circle cx="11.2" cy="16.7" r="1.9"/>'
 };
 function micon(k){ return `<span class="micon"><svg viewBox="0 0 24 24">${MICONS[k]}</svg></span>`; }
@@ -2306,6 +2365,7 @@ const TILES=[
   ['meds','Remedios','#3FA3A3'],
   ['trata','Tratamientos','#5E9E8F'],
   ['gracias','Gracias','#E06A6A'],
+  ['lectura','Lectura','#7A5AA8'],
 ];
 /* lo escrito en el buscador del Home (sobrevive a los re-dibujos; se borra al salir) */
 let homeQ='';
@@ -2393,6 +2453,7 @@ function masSheet(){
     ...(S.settings.stockOn?[['stock','Mercería y stock','Cintas, cierres, botones y precios']]:[]),
     ...(S.settings.cycleOn?[['ciclo','Ciclo menstrual','Registro informativo']]:[]),
     ['notas','Notas','Ideas y apuntes'],
+    ['lectura','Lectura','Leyendo, futuros y terminados'],
     ['meds','Remedios','Tomas del día'],
     ['trata','Tratamientos','Fotos del antes y el después'],
     ['gracias','Agradecimientos','Costumbre diaria'],
@@ -4288,6 +4349,99 @@ VIEWS.notas={
     }));
   }
 };
+
+/* ============================================================
+   LECTURA · libros en 3 estantes
+   ------------------------------------------------------------
+   S.books: {id, img, title, author, start, end, review, status, created}
+   status: 'leyendo' (actuales) · 'futuro' (para leer / comprar)
+           · 'terminado' (historial, con check)
+   La portada se guarda como JPEG chico (pedirFoto, 600 px).
+============================================================ */
+const BOOK_TABS=[['leyendo','Leyendo'],['futuro','Futuros'],['terminado','Terminados']];
+let bookTab='leyendo';
+const BOOK_VACIO=`<svg viewBox="0 0 24 24">${MICONS.lectura}</svg>`;
+VIEWS.lectura={
+  fab(){ bookForm(null,bookTab); },
+  render(){
+    const cuenta=st=>S.books.filter(b=>b.status===st).length;
+    const list=S.books.filter(b=>b.status===bookTab)
+      .sort((a,b)=>bookTab==='terminado'?String(b.end||'').localeCompare(String(a.end||'')):(b.created||0)-(a.created||0));
+    const vacio={leyendo:'¿Qué estás leyendo? Tocá + para sumarlo',futuro:'Anotá los libros que querés leer o comprar',terminado:'Acá van los libros que terminaste ✓'}[bookTab];
+    V.innerHTML=`
+      <h1 class="vt vc">Lectura</h1>
+      <div class="seg btabs vc">${BOOK_TABS.map(([k,t])=>
+        `<button data-bt="${k}" class="${bookTab===k?'on':''}">${t} <i>${cuenta(k)}</i></button>`).join('')}</div>
+      ${list.length?`<div class="bgrid">${list.map(b=>`
+        <div class="bcard" data-bk="${b.id}">
+          <div class="bcov">${b.img?`<img src="${b.img}" alt="">`:`<div class="bnoimg">${BOOK_VACIO}</div>`}
+            ${b.status==='terminado'?'<span class="bok" title="Terminado">✓</span>':''}</div>
+          <div class="bt">${esc(b.title)}</div>
+          ${b.author?`<div class="ba">${esc(b.author)}</div>`:''}
+          <div class="bd">${b.status==='futuro'?'Para leer'
+            :b.status==='terminado'?(b.end?'Terminado el '+fShort(b.end):'Terminado')
+            :(b.start?'Desde el '+fShort(b.start):'Leyendo')}</div>
+          ${b.status==='leyendo'?`<button class="bq" data-bfin="${b.id}">✓ Lo terminé</button>`
+            :b.status==='futuro'?`<button class="bq" data-bini="${b.id}">Empezar a leer</button>`:''}
+        </div>`).join('')}</div>`
+      :`<div class="empty vc">${vacio}</div>`}`;
+    V.querySelectorAll('[data-bt]').forEach(x=>x.addEventListener('click',()=>{ bookTab=x.dataset.bt; VIEWS.lectura.render(); }));
+    V.querySelectorAll('[data-bk]').forEach(c=>c.addEventListener('click',e=>{
+      if(e.target.closest('.bq')) return;
+      const b=S.books.find(x=>x.id===c.dataset.bk); if(b) bookForm(b);
+    }));
+    V.querySelectorAll('[data-bfin]').forEach(x=>x.addEventListener('click',()=>{
+      const b=S.books.find(y=>y.id===x.dataset.bfin); if(!b) return;
+      b.status='terminado'; b.end=b.end||hoyISO(); save();
+      bookTab='terminado'; VIEWS.lectura.render();
+      toast('¡Libro terminado! ✓'); bookForm(b);   /* para dejar la reseña */
+    }));
+    V.querySelectorAll('[data-bini]').forEach(x=>x.addEventListener('click',()=>{
+      const b=S.books.find(y=>y.id===x.dataset.bini); if(!b) return;
+      b.status='leyendo'; b.start=b.start||hoyISO(); save(); bookTab='leyendo'; VIEWS.lectura.render(); toast('A leer 📖');
+    }));
+  }
+};
+function bookForm(bk,estado){
+  const m=bk||{title:'',author:'',start:'',end:'',review:'',img:'',status:estado||'leyendo'};
+  let img=m.img||'';
+  const b=sheet(bk?'Editar libro':'Nuevo libro',`
+    <div class="bfpic" id="bfPic">
+      ${img?`<img src="${img}" alt="">`:`<div class="bnoimg">${BOOK_VACIO}<span>Tocá para poner la portada</span></div>`}
+    </div>
+    <div class="fld"><label>Nombre del libro</label><input id="bT" value="${esc(m.title)}" placeholder="Cien años de soledad" maxlength="80"></div>
+    <div class="fld"><label>Autor (opcional)</label><input id="bA" value="${esc(m.author||'')}" placeholder="Gabriel García Márquez" maxlength="60"></div>
+    <div class="fld"><label>Estante</label><div class="seg bSt">${BOOK_TABS.map(([k,t])=>
+      `<button data-val="${k}" class="${m.status===k?'on':''}">${t}</button>`).join('')}</div></div>
+    <div class="grid2">
+      <div class="fld"><label>Fecha de inicio</label><input id="bS" type="date" value="${m.start||''}"></div>
+      <div class="fld"><label>Fecha de fin</label><input id="bE" type="date" value="${m.end||''}"></div>
+    </div>
+    <div class="fld"><label>Reseña</label><textarea id="bR" placeholder="¿Qué te pareció? ¿Lo recomendarías?" style="min-height:110px">${esc(m.review||'')}</textarea></div>
+    <div class="btnrow">${bk?delBtn():''}<button class="btn primary" data-ok>Guardar</button></div>`);
+  segWire(b,'.bSt');
+  b.querySelector('#bfPic').addEventListener('click',()=>{
+    pedirFoto(d=>{ img=d; sheetDirty=true; b.querySelector('#bfPic').innerHTML=`<img src="${d}" alt="">`; },600);
+  });
+  b.querySelector('[data-ok]').addEventListener('click',()=>{
+    const title=b.querySelector('#bT').value.trim();
+    if(!title) return toast('Falta el nombre del libro');
+    const status=segVal(b,'.bSt')||'leyendo';
+    let start=b.querySelector('#bS').value||'', end=b.querySelector('#bE').value||'';
+    if(start&&end&&end<start) return toast('La fecha de fin es anterior a la de inicio');
+    if(status==='terminado'&&!end) end=hoyISO();
+    if(status==='leyendo'&&!start) start=hoyISO();
+    const data={title,author:b.querySelector('#bA').value.trim(),start,end,review:b.querySelector('#bR').value.trim(),img,status};
+    if(bk) Object.assign(bk,data); else S.books.unshift({id:uid(),created:Date.now(),...data});
+    bookTab=status; save(); closeSheet(); go('lectura'); toast('Libro guardado ✓');
+  });
+  b.querySelector('[data-del]')?.addEventListener('click',()=>{
+    dlg({title:'¿Eliminar este libro?',okTxt:'Eliminar',danger:true},ok=>{
+      if(!ok) return;
+      S.books=S.books.filter(x=>x.id!==bk.id); save(); closeSheet(); go('lectura'); toast('Libro eliminado');
+    });
+  });
+}
 
 /* ---------- LISTA DE COMPRAS ---------- */
 let shopHist=false;
@@ -6466,6 +6620,7 @@ VIEWS.stock={
                  autocomplete="off" enterkeyhint="search" aria-label="Buscar en mercería">
         </div>
       </div>
+      <div class="scol">
       <div class="card vc sbal" id="sBal"></div>
       <div class="lbl" style="margin:2px 2px 8px">Tu stock</div>
       <div class="stkres vc">
@@ -6475,7 +6630,8 @@ VIEWS.stock={
       </div>
       <div class="schips vc" id="sChips"></div>
       <div class="sgrid vc" id="sGrid"></div>
-      <div class="card vc" id="sMoves"></div>`;
+      </div>
+      <div class="card vc smoves" id="sMoves"></div>`;
     /* chips + grilla se re-pintan solos al buscar o filtrar (el input no
        se re-crea, así no se pierde el foco ni el teclado) */
     const sChips=V.querySelector('#sChips'), sGrid=V.querySelector('#sGrid');
@@ -6506,8 +6662,8 @@ VIEWS.stock={
         ${B.est?`<div class="snota">La ganancia de ventas viejas se calcula con el costo que tiene hoy el producto.</div>`:''}`;
       sMoves.innerHTML=`
         <div class="lbl">Movimientos · ${esc(B.P.txt)} · tocá uno para eliminarlo</div>
-        ${B.movs.length?B.movs.slice(0,60).map(m=>movRow(m,true)).join('')
-          :'<div class="empty">No hubo movimientos en este período</div>'}
+        <div class="smlist">${B.movs.length?B.movs.slice(0,60).map(m=>movRow(m,true)).join('')
+          :'<div class="empty">No hubo movimientos en este período</div>'}</div>
         ${B.ventas.length?`<div class="stot"><span>Total recaudado · ${B.ventas.length} venta${B.ventas.length===1?'':'s'}</span><b>${fMoney(B.plata)}</b></div>`:''}`;
     };
     paintBal();

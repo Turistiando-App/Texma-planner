@@ -69,14 +69,12 @@ export default function Footer() {
           </ul>
         </div>
       </div>
+      {/* créditos: apilados y centrados abajo de todo */}
       <div className="border-t border-linea">
-        <p className="kicker mx-auto max-w-6xl px-5 pt-5 text-tinta-suave">
-          © {new Date().getFullYear()} TEXMA · Hecho con amor ♥
-        </p>
-        {/* firma, centrada abajo de todo */}
-        <p className="px-5 pb-6 pt-4 text-center font-mono text-[11px] tracking-[.12em] text-tinta-suave">
-          Copyright © 2026 — Maxing Agent
-        </p>
+        <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-center gap-2 px-5 py-6 text-center">
+          <p className="kicker text-tinta-suave">© {new Date().getFullYear()} TEXMA · Hecho con amor ♥</p>
+          <p className="font-mono text-[11px] tracking-[.12em] text-tinta-suave">Copyright © 2026 — Maxing Agent</p>
+        </div>
       </div>
     </footer>
   );
