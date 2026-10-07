@@ -8279,6 +8279,13 @@ async function licActivate(code){
   if(!j.token) throw falla('No pude activar', `status ${r.status} pero sin token en la respuesta: ${txt.slice(0,300)}`);
   const diag={};
   if(!await licVerify(j.token,diag)){
+    /* el servidor ya la marcó «Activa» con este dispositivo, pero acá no
+       sirve: se revierte a «Sin activar» para que el panel no mienta y se
+       pueda reintentar (solo la suelta si es ESTE mismo dispositivo) */
+    try{
+      await fetch(LIC_API+'/api/revertir-licencia',{method:'POST',headers:{'content-type':'application/json'},
+        body:JSON.stringify({code:String(code).trim().toUpperCase(),device:deviceId()})});
+    }catch(e){ console.warn('[TEXMA licencia] no pude revertir la activación',e); }
     /* firma inválida = esta copia de la app tiene claves públicas viejas
        (service worker con el HTML anterior). Se limpia todo y se recarga
        con el mismo código, UNA sola vez: si vuelve a fallar, es otra cosa. */

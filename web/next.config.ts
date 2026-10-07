@@ -14,6 +14,19 @@ const config: NextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
+  /* un solo dominio: todo lo que entre por texma.vercel.app va (308, conserva
+     método y ruta) a texmaplanner.vercel.app. Así hay UN solo service worker,
+     UNA sola sesión de Google y UN solo localStorage por dispositivo. */
+  async redirects() {
+    return [
+      {
+        source: '/:ruta*',
+        has: [{ type: 'host', value: 'texma.vercel.app' }],
+        destination: 'https://texmaplanner.vercel.app/:ruta*',
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     return [
       /* /app es la PWA (la landing de la app pasó a /planner) */

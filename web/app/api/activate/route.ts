@@ -14,7 +14,7 @@
    afuera a clientas legítimas.
 ============================================================ */
 import { dbAdmin, verificarSesion } from '@/lib/admin-server';
-import { BLOQUEO_DISPOSITIVO, firmarLicencia, ipDe, jsonCors, preflight } from '@/lib/licencias-server';
+import { BLOQUEO_DISPOSITIVO, claveQueValida, firmarLicencia, ipDe, jsonCors, preflight, SIN_PAREJA } from '@/lib/licencias-server';
 
 export const dynamic = 'force-dynamic';
 export const OPTIONS = preflight;
@@ -61,6 +61,9 @@ export async function POST(req: Request) {
     /* se firma ANTES de tocar la base: si falta LIC_PRIV, el código no queda
        atado a medias a un dispositivo que después no recibe su licencia */
     const token = await firmarLicencia({ id: code, device, name: lic.nombre || '', email: email || lic.email || '', ts: Date.now(), v: 1 });
+    /* y se comprueba que la app la va a aceptar: si no, NO se marca nada
+       en la base (antes quedaba «Activa» con una licencia que la app rechazaba) */
+    if (await claveQueValida(token) < 0) throw new Error(SIN_PAREJA);
 
     /* el filtro «device libre o este mismo» evita que dos dispositivos
        canjeando el mismo código a la vez se queden los dos con la licencia */
@@ -99,6 +102,7 @@ export async function POST(req: Request) {
 function motivoReal(e: unknown): string {
   const o = (e && typeof e === 'object' ? e : {}) as { message?: string; code?: string; details?: string; hint?: string };
   const msg = String(o.message || (typeof e === 'string' ? e : '') || 'error desconocido');
+  if (msg === SIN_PAREJA) return msg;
   if (/LIC_PRIV/.test(msg)) return `Faltan variables de entorno (${msg})`;
   if (/SUPABASE|SERVICE_ROLE/.test(msg)) return `Faltan variables de entorno (${msg})`;
   if (o.code) {
@@ -117,8 +121,13 @@ export async function GET() {
     const { error } = await dbAdmin().from('licenses').select('code', { head: true, count: 'exact' }).limit(1);
     base = error ? `error: ${motivoReal(error)}` : 'ok';
   } catch (e) { base = `error: ${motivoReal(e)}`; }
+  /* firma: no alcanza con que LIC_PRIV se pueda leer, tiene que ser PAREJA
+     de alguna clave pública de la app */
   let firma = 'ok';
-  try { await firmarLicencia({ prueba: true }); } catch (e) { firma = `error: ${motivoReal(e)}`; }
+  try {
+    const i = await claveQueValida(await firmarLicencia({ prueba: true }));
+    firma = i < 0 ? `error: ${SIN_PAREJA}` : `ok (valida con la clave pública #${i + 1} de la app)`;
+  } catch (e) { firma = `error: ${motivoReal(e)}`; }
   return jsonCors({
     supabase_url: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
     service_role: !!process.env.SUPABASE_SERVICE_ROLE,

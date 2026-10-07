@@ -4,7 +4,7 @@
    Si viene de Pre-ventas («Generar licencia»), llega `inicial` con la
    clienta y el contacto ya cargados; al crear el código, el lead pasa a
    «Código enviado» con el código vinculado. */
-import { Check, Copy, KeyRound, LoaderCircle, MessageCircle, Unlink } from 'lucide-react';
+import { Ban, Check, Copy, KeyRound, LoaderCircle, MessageCircle, MoreHorizontal, RotateCcw, Unlink } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import type { Licencia, Prefill } from '@/lib/admin';
 import { pesos, PWA_URL, SITIO } from '@/lib/sitio';
@@ -13,7 +13,7 @@ import { Aviso, fecha, Titulo, type Api } from './ui';
 const ESTADO: Record<Licencia['status'], { t: string; c: string }> = {
   pending: { t: 'Sin activar', c: 'border-amber-400/30 bg-amber-400/10 text-amber-300' },
   active: { t: 'Activa', c: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300' },
-  revoked: { t: 'Dada de baja', c: 'border-red-400/30 bg-red-400/10 text-red-300' },
+  revoked: { t: 'Baneada', c: 'border-red-400/30 bg-red-400/10 text-red-300' },
 };
 
 const linkEntrega = (l: Licencia) => (l.claim_token ? `${SITIO.url}/d/${l.claim_token}` : '');
@@ -31,6 +31,7 @@ function waDe(contacto: string) {
   return d;
 }
 
+const ITEM = 'flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-semibold text-neutral-200 transition hover:bg-white/[.06]';
 const campo = 'w-full rounded-xl border border-white/10 bg-white/[.04] px-4 py-3 text-white outline-none transition placeholder:text-neutral-600 focus:border-rosa focus:bg-white/[.06]';
 
 export default function Generador({ api, inicial, onUsado }: { api: Api; inicial?: Prefill | null; onUsado?: () => void }) {
@@ -41,6 +42,7 @@ export default function Generador({ api, inicial, onUsado }: { api: Api; inicial
   const [creando, setCreando] = useState(false);
   const [copiado, setCopiado] = useState(false);
   const [error, setError] = useState('');
+  const [menu, setMenu] = useState<string | null>(null);   // código con el menú de acciones abierto
 
   const cargar = useCallback(async () => {
     try { setLista(await api<Licencia[]>('licencias')); }
@@ -67,15 +69,23 @@ export default function Generador({ api, inicial, onUsado }: { api: Api; inicial
     finally { setCreando(false); }
   };
 
-  /* respuesta a un ticket de «otro equipo o red»: suelta el dispositivo */
-  const liberar = async (l: Licencia) => {
-    if (!window.confirm(`¿Liberar el dispositivo de ${l.code}${l.nombre ? ` (${l.nombre})` : ''}? Podrá activarla en otro equipo y el anterior queda afuera la próxima vez que pida activar.`)) return;
+  /* acciones de cada licencia (menú «⋯» de la tabla) */
+  const accion = async (l: Licencia, accion: 'liberar' | 'banear' | 'desbanear', pregunta: string) => {
+    setMenu(null);
+    if (!window.confirm(pregunta)) return;
     setError('');
     try {
-      const act = await api<Licencia>('licencias', { method: 'PATCH', body: JSON.stringify({ code: l.code, accion: 'liberar' }) });
+      const act = await api<Licencia>('licencias', { method: 'PATCH', body: JSON.stringify({ code: l.code, accion }) });
       setLista(v => v?.map(x => (x.code === l.code ? act : x)) ?? v);
-    } catch (e) { setError(e instanceof Error ? e.message : 'No se pudo liberar'); }
+    } catch (e) { setError(e instanceof Error ? e.message : 'No se pudo cambiar la licencia'); }
   };
+  const quien = (l: Licencia) => `${l.code}${l.nombre ? ` (${l.nombre})` : ''}`;
+  /* respuesta a un ticket de «otro equipo o red»: suelta el dispositivo */
+  const liberar = (l: Licencia) => accion(l, 'liberar',
+    `¿Liberar el dispositivo de ${quien(l)}? Podrá activarla en otro equipo y el anterior queda afuera la próxima vez que pida activar.`);
+  const banear = (l: Licencia) => accion(l, 'banear',
+    `¿Banear ${quien(l)}? El código queda inutilizado: nadie más lo puede activar. (Un dispositivo que ya la tenía activada sigue andando sin internet hasta que se reinstale la app.)`);
+  const desbanear = (l: Licencia) => accion(l, 'desbanear', `¿Volver a habilitar ${quien(l)}? Queda «Sin activar» y sin dispositivo.`);
 
   const copiar = async (l: Licencia) => {
     try { await navigator.clipboard.writeText(mensaje(l)); setCopiado(true); setTimeout(() => setCopiado(false), 1800); } catch { /* sin permiso */ }
@@ -143,11 +153,11 @@ export default function Generador({ api, inicial, onUsado }: { api: Api; inicial
       <div className="mt-4 overflow-x-auto rounded-2xl border border-white/10">
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead className="bg-white/[.03] font-mono text-[11px] uppercase tracking-[.15em] text-neutral-500">
-            <tr><th className="px-4 py-3">Código</th><th className="px-4 py-3">Clienta</th><th className="px-4 py-3">Precio</th><th className="px-4 py-3">Estado</th><th className="px-4 py-3">Creada</th><th className="px-4 py-3 text-right">Dispositivo</th></tr>
+            <tr><th className="px-4 py-3">Código</th><th className="px-4 py-3">Clienta</th><th className="px-4 py-3">Precio</th><th className="px-4 py-3">Estado</th><th className="px-4 py-3">Creada</th><th className="px-4 py-3">Dispositivo</th><th className="px-4 py-3 text-right">Acciones</th></tr>
           </thead>
           <tbody className="divide-y divide-white/5">
-            {lista === null && <tr><td colSpan={6} className="px-4 py-8 text-center text-neutral-500">Cargando…</td></tr>}
-            {lista?.length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-neutral-500">Todavía no hay licencias.</td></tr>}
+            {lista === null && <tr><td colSpan={7} className="px-4 py-8 text-center text-neutral-500">Cargando…</td></tr>}
+            {lista?.length === 0 && <tr><td colSpan={7} className="px-4 py-8 text-center text-neutral-500">Todavía no hay licencias.</td></tr>}
             {lista?.map(l => (
               <tr key={l.code} className="hover:bg-white/[.02]">
                 <td className="px-4 py-3 font-mono text-white">{l.code}</td>
@@ -155,13 +165,48 @@ export default function Generador({ api, inicial, onUsado }: { api: Api; inicial
                 <td className="px-4 py-3 font-mono text-neutral-300">{pesos(l.precio)}</td>
                 <td className="px-4 py-3"><span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${ESTADO[l.status].c}`}>{ESTADO[l.status].t}</span></td>
                 <td className="px-4 py-3 text-neutral-500">{fecha(l.created_at)}</td>
-                <td className="px-4 py-3 text-right">
-                  {l.device ? (
-                    <button onClick={() => liberar(l)} title="Suelta el dispositivo para que la clienta active en otro equipo"
-                      className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-xs font-semibold text-neutral-300 transition hover:border-white/30 hover:text-white">
-                      <Unlink className="h-3.5 w-3.5" aria-hidden="true" /> Liberar
-                    </button>
-                  ) : <span className="text-xs text-neutral-600">libre</span>}
+                <td className="px-4 py-3 text-xs">{l.device ? <span className="text-neutral-400">atada</span> : <span className="text-neutral-600">libre</span>}</td>
+                <td className="relative px-4 py-3 text-right">
+                  <button onClick={() => setMenu(m => (m === l.code ? null : l.code))} aria-haspopup="menu" aria-expanded={menu === l.code}
+                    aria-label={`Acciones de ${l.code}`}
+                    className="inline-grid h-8 w-8 place-items-center rounded-full border border-white/10 text-neutral-300 transition hover:border-white/30 hover:text-white">
+                    <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                  {menu === l.code && (
+                    <>
+                      {/* clic afuera cierra */}
+                      <div className="fixed inset-0 z-10" onClick={() => setMenu(null)} aria-hidden="true" />
+                      <div role="menu" className="absolute right-4 top-12 z-20 w-56 overflow-hidden rounded-2xl border border-white/10 bg-[#141416] p-1.5 text-left shadow-2xl">
+                        {waDe(l.contacto) ? (
+                          <a role="menuitem" href={`https://wa.me/${waDe(l.contacto)}?text=${encodeURIComponent(mensaje(l))}`} target="_blank" rel="noopener"
+                            onClick={() => setMenu(null)} className={ITEM}>
+                            <MessageCircle className="h-4 w-4 text-emerald-400" aria-hidden="true" /> Reenviar por WhatsApp
+                          </a>
+                        ) : (
+                          <span className={`${ITEM} cursor-not-allowed opacity-40`} title="La licencia no tiene un número de WhatsApp en «contacto»">
+                            <MessageCircle className="h-4 w-4" aria-hidden="true" /> Reenviar por WhatsApp
+                          </span>
+                        )}
+                        <button role="menuitem" onClick={() => { setMenu(null); copiar(l); }} className={ITEM}>
+                          <Copy className="h-4 w-4" aria-hidden="true" /> Copiar mensaje
+                        </button>
+                        {l.device && l.status !== 'revoked' && (
+                          <button role="menuitem" onClick={() => liberar(l)} className={ITEM}>
+                            <Unlink className="h-4 w-4" aria-hidden="true" /> Liberar dispositivo
+                          </button>
+                        )}
+                        {l.status === 'revoked' ? (
+                          <button role="menuitem" onClick={() => desbanear(l)} className={ITEM}>
+                            <RotateCcw className="h-4 w-4" aria-hidden="true" /> Volver a habilitar
+                          </button>
+                        ) : (
+                          <button role="menuitem" onClick={() => banear(l)} className={`${ITEM} text-red-300 hover:bg-red-500/10`}>
+                            <Ban className="h-4 w-4" aria-hidden="true" /> Banear código
+                          </button>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </td>
               </tr>
             ))}

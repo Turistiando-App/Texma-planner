@@ -3,6 +3,8 @@
      GET                               → últimas 100 licencias
      POST {nombre, contacto, precio, email?}   → crea un código nuevo
      PATCH {code, accion: 'liberar'}   → suelta el dispositivo para reactivar
+     PATCH {code, accion: 'banear'}    → status 'revoked': el código queda inutilizable
+     PATCH {code, accion: 'desbanear'} → vuelve a 'pending' (sin dispositivo)
                                        (email: el del lead de /checkout, si vino de Pre-ventas)
    Escribe en la MISMA tabla `licenses` que usa la PWA (/api/activate),
    con los mismos campos que el panel viejo, así el código funciona
@@ -60,11 +62,18 @@ export const PATCH = seguro(async req => {
   if (corte) return corte;
   const b = await req.json().catch(() => ({}));
   const code = String(b.code || '').trim().toUpperCase();
-  if (!code || b.accion !== 'liberar') return json({ error: 'Faltan datos' }, 400);
-  const { data, error } = await dbAdmin().from('licenses')
-    .update({ device: null, email: null, status: 'pending' })
-    .eq('app_id', 'texma').eq('code', code).neq('status', 'revoked')
-    .select(CAMPOS).single();
+  const CAMBIOS: Record<string, Record<string, unknown>> = {
+    liberar: { device: null, email: null, status: 'pending' },
+    /* baneada: /api/activate rechaza los códigos 'revoked'. Ojo: un dispositivo
+       que YA la tenía activada sigue andando offline hasta que la app se reinstale */
+    banear: { status: 'revoked' },
+    desbanear: { device: null, status: 'pending' },
+  };
+  const cambios = CAMBIOS[String(b.accion)];
+  if (!code || !cambios) return json({ error: 'Faltan datos' }, 400);
+  let q = dbAdmin().from('licenses').update(cambios).eq('app_id', 'texma').eq('code', code);
+  if (b.accion === 'liberar') q = q.neq('status', 'revoked');
+  const { data, error } = await q.select(CAMPOS).single();
   if (error) throw error;
   return json(data as Licencia);
 });

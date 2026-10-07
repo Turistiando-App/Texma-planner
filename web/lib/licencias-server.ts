@@ -12,6 +12,7 @@
 ============================================================ */
 import { webcrypto } from 'node:crypto';
 import { dbAdmin } from './admin-server';
+import LIC_PUBS from './lic-pubs.json';
 
 /* el APK (Capacitor) llama desde https://localhost: necesita CORS */
 export const CORS = {
@@ -31,6 +32,19 @@ export const env = (k: string) => String(process.env[k] ?? '').replace(/^﻿/, '
 
 const enc = new TextEncoder();
 const b64u = (buf: ArrayBuffer | Uint8Array) => Buffer.from(buf as ArrayBuffer).toString('base64url');
+
+/* ¿la app aceptaría este token? Se verifica contra las MISMAS claves públicas
+   que trae la PWA (lib/lic-pubs.json, generado desde TEXMA.html). Devuelve el
+   índice de la clave que valida, o -1 si ninguna (LIC_PRIV no es pareja). */
+export async function claveQueValida(token: string): Promise<number> {
+  const [body, sig] = token.split('.');
+  for (let i = 0; i < LIC_PUBS.length; i++) {
+    const k = await webcrypto.subtle.importKey('jwk', LIC_PUBS[i], { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
+    if (await webcrypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, k, Buffer.from(sig, 'base64url'), enc.encode(body))) return i;
+  }
+  return -1;
+}
+export const SIN_PAREJA = 'LIC_PRIV de Vercel no es pareja de ninguna clave pública de la app (LIC_PUBS): la app rechazaría la licencia';
 
 /* firma ECDSA P-256 · la app la verifica offline con LIC_PUBS */
 export async function firmarLicencia(payload: Record<string, unknown>) {

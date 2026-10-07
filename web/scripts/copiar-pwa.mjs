@@ -73,4 +73,12 @@ const man = JSON.parse(await readFile(join(raiz, 'manifest.json'), 'utf8'));
 Object.assign(man, { id: '/app', start_url: '/app', scope: '/app' });
 await writeFile(join(destino, 'manifest.json'), JSON.stringify(man, null, 2) + '\n');
 
-console.log('[pwa] PWA copiada a public/app');
+/* las claves PÚBLICAS de licencia de la app → lib/lic-pubs.json. /api/activate
+   verifica su propia firma contra ESTA lista antes de tocar la base: si
+   LIC_PRIV no es pareja, corta ahí y el código no queda «Activo» a medias. */
+const pubs = [...html.matchAll(/const LIC_PUB[A-Z0-9_]*=\{kty:'EC',crv:'P-256',x:'([^']+)',y:'([^']+)'\}/g)]
+  .map(m => ({ kty: 'EC', crv: 'P-256', x: m[1], y: m[2] }));
+if (!pubs.length) throw new Error('[pwa] no encontré ninguna LIC_PUB en TEXMA.html');
+await writeFile(join(web, 'lib', 'lic-pubs.json'), JSON.stringify(pubs, null, 2) + '\n');
+
+console.log(`[pwa] PWA copiada a public/app · ${pubs.length} claves públicas en lib/lic-pubs.json`);
