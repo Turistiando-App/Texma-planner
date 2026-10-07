@@ -1389,6 +1389,9 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
   font-family:var(--mono);font-size:9.5px;letter-spacing:1.4px;text-transform:uppercase;
 }
 #lic .lsep:before,#lic .lsep:after{content:'';flex:1;height:1px;background:var(--line)}
+#lic .linfo{max-width:340px;margin:2px auto 14px;padding:12px 14px;border-radius:14px;background:var(--tint);
+  border:1px solid var(--mid);color:var(--ink);font-size:13px;line-height:1.5;text-align:center}
+#lic .linfo a{display:block;margin-top:8px;color:var(--deep);font-weight:800}
 #lic .lses{font-size:12.5px;color:var(--ink2);margin:0 0 10px;max-width:340px;line-height:1.5}
 #lic .lses b{color:var(--ink)}
 #lic .lses a{color:var(--deep);font-weight:700}
@@ -8189,6 +8192,60 @@ function sesionGoogle(){
 /* el login de la web vuelve solo a /app con la sesión fresca */
 const irALogin=()=>{ location.href='/login?next=/app'; };
 
+/* ---------- EMBUDO DE PRE-VENTAS (web con sesión de Google) ----------
+   En el muro, con sesión de Google, se le pregunta al servidor quién es:
+     · sin licencia y sin pre-venta → /checkout (solo pide el WhatsApp;
+       nombre y mail salen de Google) y queda en el panel de Pre-ventas
+     · con pre-venta y sin licencia → «Ya tenemos tus datos…»
+     · con licencia → nada: se pide el código como siempre
+   ?tengo=1 (link «Ya tenés tu código?» del checkout) apaga el desvío. */
+const TENGOK='texma_tengo_codigo';
+async function embudoPreventa(w){
+  if(!WEB_CON_LOGIN) return;
+  try{
+    const u=new URL(location.href);
+    if(u.searchParams.get('tengo')){ localStorage.setItem(TENGOK,'1'); u.searchParams.delete('tengo'); history.replaceState({},'',u.pathname+u.search); }
+  }catch(e){}
+  const s=sesionGoogle();
+  if(!s||s.vencida) return;
+  let st;
+  try{
+    const r=await fetch('/api/mi-estado',{headers:{authorization:'Bearer '+s.token}});
+    if(!r.ok) return;
+    st=await r.json();
+  }catch(e){ return; }                       /* sin red: el muro sigue igual */
+  if(st.licencia) return;
+  const pre=new URL(location.href).searchParams.get('k');
+  if(!st.preventa){
+    if(pre||localStorage.getItem(TENGOK)) return;   /* ya tiene código en mano */
+    location.href='/checkout';
+    return;
+  }
+  const box=w.querySelector('#licInfo'); if(!box) return;
+  const [n]=LIC_TELS[0];
+  box.innerHTML=`Ya tenemos tus datos. Escribinos por WhatsApp para recibir tu código único de activación.
+    <a href="https://wa.me/${n}?text=${encodeURIComponent('Hola María, ya dejé mis datos ('+(st.email||s.email)+'). ¿Me pasás mi código de TEXMA Planner?')}" target="_blank" rel="noopener">Escribir por WhatsApp</a>`;
+  box.hidden=false;
+}
+
+/* ---------- recarga forzada para traer las claves públicas nuevas ---------- */
+const RECK='texma_recarga_claves';
+function recargaClavesReciente(){
+  try{ return Date.now()-Number(sessionStorage.getItem(RECK)||0)<10*60000; }catch(e){ return true; }
+}
+async function recargarConClavesNuevas(code){
+  try{ sessionStorage.setItem(RECK,String(Date.now())); }catch(e){}
+  try{ const ks=await caches.keys(); await Promise.all(ks.map(k=>caches.delete(k))); }catch(e){}
+  try{
+    const rs=navigator.serviceWorker?await navigator.serviceWorker.getRegistrations():[];
+    await Promise.all(rs.map(r=>r.unregister()));
+  }catch(e){}
+  /* vuelve con ?k=: la app nueva reintenta el MISMO código sola */
+  const u=new URL(location.href); u.searchParams.set('k',code);
+  location.replace(u.pathname+u.search);
+  await new Promise(()=>{});                 /* no seguir: la página se va */
+}
+
 async function licActivate(code){
   code=normCodigo(code);
   const url=LIC_API+'/api/activate';
@@ -8222,7 +8279,15 @@ async function licActivate(code){
   if(!j.token) throw falla('No pude activar', `status ${r.status} pero sin token en la respuesta: ${txt.slice(0,300)}`);
   const diag={};
   if(!await licVerify(j.token,diag)){
-    throw falla('La licencia que mandó el servidor no es válida. Avisanos.', 'token rechazado: '+diag.motivo);
+    /* firma inválida = esta copia de la app tiene claves públicas viejas
+       (service worker con el HTML anterior). Se limpia todo y se recarga
+       con el mismo código, UNA sola vez: si vuelve a fallar, es otra cosa. */
+    if(/^firma inválida/.test(diag.motivo||'')&&!NATIVO&&!recargaClavesReciente()){
+      console.warn('[TEXMA licencia] firma inválida: limpio el caché y recargo para traer las claves nuevas');
+      await recargarConClavesNuevas(code);
+    }
+    throw falla(NATIVO?'Esta versión de la app está desactualizada. Bajate la última versión y probá de nuevo.'
+      :'La licencia que mandó el servidor no es válida. Avisanos.', 'token rechazado: '+diag.motivo);
   }
   localStorage.setItem(LICK,j.token);
   return j.token;
@@ -8245,6 +8310,7 @@ function licScreen(msg){
     <div class="lt">Para entrar necesitás tu código</div>
     <div class="ls">TEXMA no se baja de ninguna tienda: se compra una vez y te damos un
       código de acceso para tu celular. Escribinos y te lo pasamos al toque ♥</div>
+    <div class="linfo" id="licInfo" hidden></div>
     <div class="lcta">
       ${LIC_TELS.map(([n,lindo])=>`<a href="https://wa.me/${n}" target="_blank" rel="noopener">${waIco}<b>${lindo}</b></a>`).join('')}
       <a href="mailto:${LIC_MAIL}" target="_blank" rel="noopener">${mailIco}<b>${LIC_MAIL}</b></a>
@@ -8310,6 +8376,7 @@ function licScreen(msg){
     ses.querySelector('#licOtra')?.addEventListener('click',e=>{ e.preventDefault(); cambiarCuentaGoogle(); });
   };
   pintarSes();
+  embudoPreventa(w);
   const entrar=async ()=>{
     const code=inp.value.trim();
     if(code.length<4){ fallar('Poné el código completo'); return; }

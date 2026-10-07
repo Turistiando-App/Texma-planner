@@ -27,7 +27,7 @@ export function dbAdmin(): SupabaseClient {
 
 /* sesión de Google (Supabase Auth) de cualquier usuario: devuelve el
    usuario o la respuesta de error lista para devolver */
-export async function verificarSesion(req: Request): Promise<{ email: string } | Response> {
+export async function verificarSesion(req: Request): Promise<{ email: string; nombre: string } | Response> {
   const token = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '').trim();
   if (!token) return json({ error: 'Iniciá sesión con Google' }, 401);
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -35,7 +35,8 @@ export async function verificarSesion(req: Request): Promise<{ email: string } |
   const sb = createClient(URL_SB(), anon, { auth: { persistSession: false, autoRefreshToken: false } });
   const { data, error } = await sb.auth.getUser(token);
   if (error || !data.user?.email) return json({ error: 'Tu sesión venció. Volvé a iniciar sesión con Google.' }, 401);
-  return { email: data.user.email };
+  const meta = data.user.user_metadata || {};
+  return { email: data.user.email, nombre: String(meta.full_name || meta.name || '').trim() };
 }
 
 /* null = pasa; si no, la respuesta de error lista para devolver */
