@@ -24,6 +24,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { COMPRAR_APP, waLink } from '@/lib/sitio';
+import PerfilMenu, { Avatar, PerfilLinks, useSesion } from './PerfilMenu';
 
 type Item = { href: string; t: string; d: string; i: LucideIcon; externo?: boolean };
 type Columna = { titulo: string; items: Item[] };
@@ -129,6 +130,7 @@ export default function Header() {
   const [sobreOscuro, setSobreOscuro] = useState(false);
   const cierre = useRef<ReturnType<typeof setTimeout>>(undefined);
   const caja = useRef<HTMLElement>(null); // todo el header: barra + mega-menú + menú mobile
+  const usuario = useSesion();            // con sesión de Google: foto + menú de perfil
 
   useEffect(() => { setAbierto(false); setPanel(null); }, [ruta]);
   useEffect(() => {
@@ -205,10 +207,12 @@ export default function Header() {
         </ul>
 
         <div className="hidden items-center gap-2 md:flex" onMouseEnter={cerrarLuego}>
-          <Link href="/login"
-            className={`rounded-full border px-4 py-2 text-sm font-bold transition ${T.borde}`}>
-            Abrir la app
-          </Link>
+          {usuario ? <PerfilMenu usuario={usuario} /> : (
+            <Link href="/login"
+              className={`rounded-full border px-4 py-2 text-sm font-bold transition ${T.borde}`}>
+              Abrir la app
+            </Link>
+          )}
           <a href={COMPRAR_APP}
             className="rounded-full bg-rosa px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-rosa/30 transition hover:-translate-y-0.5 hover:bg-rosa-oscuro">
             Comprar App
@@ -302,9 +306,18 @@ export default function Header() {
             {SIMPLES.map(l => (
               <Link key={l.href} href={l.href} className="block rounded-2xl px-3 py-2.5 font-semibold hover:bg-lino">{l.txt}</Link>
             ))}
+            {usuario && (
+              <div className="mt-2 border-t border-linea pt-2">
+                <div className="flex items-center gap-3 px-3 py-2">
+                  <Avatar usuario={usuario} className="h-9 w-9 shrink-0" />
+                  <p className="min-w-0 truncate text-sm text-tinta-suave">{usuario.email}</p>
+                </div>
+                <PerfilLinks usuario={usuario} onElegir={() => setAbierto(false)} />
+              </div>
+            )}
             <div className="mt-2 grid gap-2">
               <a href={COMPRAR_APP} className="block rounded-2xl bg-rosa px-4 py-3 text-center font-bold text-white shadow-lg shadow-rosa/30">Comprar App</a>
-              <Link href="/login" className="block rounded-2xl border border-linea px-4 py-3 text-center font-bold">Abrir la app</Link>
+              {!usuario && <Link href="/login" className="block rounded-2xl border border-linea px-4 py-3 text-center font-bold">Abrir la app</Link>}
             </div>
           </motion.div>
         )}

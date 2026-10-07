@@ -1583,6 +1583,17 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
   }
   .smoves .smlist{flex:1 1 auto;min-height:0;overflow-y:auto;margin:0 -6px;padding:0 6px;overscroll-behavior:contain}
   .smoves .stot{flex:none}
+  /* la caja más baja: el «Total recaudado» queda por encima del + flotante */
+  body[data-vista="stock"] #view > .smoves.vc{max-height:calc(100dvh - 280px)}
+  /* catálogo de productos: 4 por fila */
+  body[data-vista="stock"] .sgrid{grid-template-columns:repeat(4,minmax(0,1fr))}
+
+  /* Costura: todo a la izquierda y el figurín a la derecha, arrancando a la
+     MISMA altura que la primera tarjeta (antes quedaba en la fila de abajo,
+     con un hueco arriba) */
+  body[data-vista="costura"] #view{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
+  body[data-vista="costura"] #view > *:not(:first-child){grid-column:1}
+  body[data-vista="costura"] #view > .cfig.vc{grid-column:2;grid-row:2 / span 40;align-self:start;position:sticky;top:20px}
 
   /* Entreno: tarjetas apiladas en columnas (masonry), sin huecos entre
      Racha, Calorías, Calendario y Rutinas. La cabecera de racha va a lo ancho. */
@@ -4180,7 +4191,7 @@ VIEWS.costura={
         </div>`).join('')}</div>
       </div>`:''}
       ${cerr.length?`<div class="lbl">Cerrados · ${cerr.length}</div><div class="card plist vc">${cerr.map(row).join('')}</div>`:''}
-      <div class="card vc" style="text-align:center;padding:20px">
+      <div class="card vc cfig" style="text-align:center;padding:20px">
         ${maniqui()}
         <div class="lbl" style="margin-top:8px;text-align:center">Cada proyecto guarda sus medidas · en cm</div>
       </div>`;
@@ -8382,7 +8393,10 @@ function pintarPerfilNav(){
    sesión local; la licencia de este dispositivo NO se toca. */
 async function cerrarSesionGoogle(){
   const ses=sesionGoogle();
-  if(ses&&!ses.vencida&&SUPA_URL&&SUPA_ANON){
+  /* la sesión es del Supabase de la web: solo se le avisa si es el mismo
+     proyecto que SUPA_URL (si no, la key no sirve y alcanza con borrarla) */
+  const mismo=Object.keys(localStorage).some(k=>k==='sb-'+(SUPA_URL.match(/https:\/\/([^.]+)/)||[])[1]+'-auth-token');
+  if(ses&&!ses.vencida&&mismo&&SUPA_ANON){
     try{ await fetch(SUPA_URL+'/auth/v1/logout',{method:'POST',headers:{apikey:SUPA_ANON,authorization:'Bearer '+ses.token}}); }catch(e){}
   }
   try{

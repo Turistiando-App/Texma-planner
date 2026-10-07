@@ -2,7 +2,7 @@
    ADMIN · lo compartido por las rutas /api/admin/* (solo servidor)
    ------------------------------------------------------------
    1. verificarAdmin(): lee el Bearer (access_token de Supabase Auth),
-      le pregunta a Supabase quién es y deja pasar solo a ADMIN_EMAIL.
+      le pregunta a Supabase quién es y deja pasar solo a ADMIN_EMAILS.
    2. dbAdmin(): cliente con la SERVICE ROLE (saltea el RLS). La key
       vive en SUPABASE_SERVICE_ROLE, SIN NEXT_PUBLIC_: nunca llega al
       navegador. Este archivo no se importa desde componentes 'use client'.

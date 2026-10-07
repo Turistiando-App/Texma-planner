@@ -1,8 +1,11 @@
-/* El único mail que entra a /admin. Lo usan el cliente (para redirigir)
-   y las rutas /api/admin (que son las que de verdad protegen los datos). */
-export const ADMIN_EMAIL = 'texma.ok@gmail.com';
+/* Los mails que entran a /admin. Lo usan el cliente (para redirigir y
+   mostrar el atajo del menú de perfil) y las rutas /api/admin, que son las
+   que de verdad protegen los datos. */
+export const ADMIN_EMAILS = ['texma.ok@gmail.com', 'soporte.suniup@gmail.com'];
+/* el principal: figura como vendedor en las licencias nuevas */
+export const ADMIN_EMAIL = ADMIN_EMAILS[0];
 
-export const esAdmin = (email?: string | null) => (email || '').trim().toLowerCase() === ADMIN_EMAIL;
+export const esAdmin = (email?: string | null) => ADMIN_EMAILS.includes((email || '').trim().toLowerCase());
 
 export type Licencia = {
   code: string; status: 'pending' | 'active' | 'revoked';
