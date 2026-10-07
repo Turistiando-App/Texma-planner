@@ -2364,6 +2364,7 @@ const MICONS={
   ciclo:'<path d="M12 3.4c3.4 3 5.6 5.6 5.6 8.4a5.6 5.6 0 0 1-11.2 0c0-2.8 2.2-5.4 5.6-8.4Z"/>',
   stock:'<path d="M3.6 7.6 12 3.6l8.4 4v8.8L12 20.4l-8.4-4Z"/><path d="M3.6 7.6 12 11.7l8.4-4.1M12 11.7v8.7"/>',
   lectura:'<path d="M12 6.6C10.2 5.2 7.6 4.6 4.2 4.8v13.4c3.4-.2 6 .4 7.8 1.8 1.8-1.4 4.4-2 7.8-1.8V4.8c-3.4-.2-6 .4-7.8 1.8Z"/><path d="M12 6.6V20"/>',
+  soporte:'<path d="M5.5 6.5h13a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-7l-4.5 3v-3h-1.5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2Z"/><path d="M9.6 10.4a2.4 2.4 0 1 1 3.3 2.2c-.6.3-.9.7-.9 1.3M12 15.6v.1"/>',
   ajustes:'<path d="M4 7.3h3.2M11.2 7.3H20M4 12h8.6M16.4 12H20M4 16.7h5.4M13.2 16.7H20"/><circle cx="9.2" cy="7.3" r="1.9"/><circle cx="14.4" cy="12" r="1.9"/><circle cx="11.2" cy="16.7" r="1.9"/>'
 };
 function micon(k){ return `<span class="micon"><svg viewBox="0 0 24 24">${MICONS[k]}</svg></span>`; }
@@ -2458,8 +2459,14 @@ function trabajosRecientes(){
     .sort((a,b)=>(b.updated||b.doneAt||b.created||0)-(a.updated||a.doneAt||a.created||0))
     .slice(0,10);
 }
+/* soporte: el formulario de tickets vive en la web (/contacto, con la misma
+   sesión de Google). En el APK se abre en el navegador. */
+function abrirSoporte(){
+  if(NATIVO||!/^https?:$/.test(location.protocol)){ try{ window.open(LIC_API_URL+'/contacto','_blank'); }catch(e){} return; }
+  location.href='/contacto';
+}
 function masSheet(){
-  const CL={...Object.fromEntries(TILES.map(([v,,c])=>[v,c])),hobbies:'#B0883F',ajustes:'#7A8B99'};
+  const CL={...Object.fromEntries(TILES.map(([v,,c])=>[v,c])),hobbies:'#B0883F',ajustes:'#7A8B99',soporte:'#3E7BD6'};
   const items=[
     ['costura','Costura','Proyectos, medidas y plata'],
     ['inv','Inversiones','Metas con foto: la casa, el auto, un viaje'],
@@ -2475,6 +2482,7 @@ function masSheet(){
     ['gracias','Agradecimientos','Costumbre diaria'],
     ['hobbies','Pasatiempos','Metas semanales'],
     ['ajustes','Perfil y ajustes','Tu foto, colores y datos'],
+    ['soporte','Ayuda y soporte','Escribinos: te respondemos por mail'],
   ];
   const fab=$('#fab'); fab.classList.add('open');
   const b=sheet('Todas las secciones',`<div class="pillist">`+items.map(([v,t,s])=>`
@@ -2483,7 +2491,7 @@ function masSheet(){
       <div class="pgrow"><div class="t">${t}</div><div class="s">${s}</div></div>
       <span class="ch">›</span>
     </div>`).join('')+`</div>`);
-  b.querySelectorAll('[data-go]').forEach(r=>r.addEventListener('click',()=>go(r.dataset.go)));
+  b.querySelectorAll('[data-go]').forEach(r=>r.addEventListener('click',()=>r.dataset.go==='soporte'?abrirSoporte():go(r.dataset.go)));
   const g=G();
   if(g) g.from(b.querySelectorAll('.pillrow'),{y:16,opacity:0,duration:.32,stagger:.032,ease:'power2.out',delay:.08});
 }

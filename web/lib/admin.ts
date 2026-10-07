@@ -15,8 +15,9 @@ export type Licencia = {
 };
 
 export type Ticket = {
-  id: string; nombre: string; contacto: string; motivo: string; mensaje: string;
+  id: string; nombre: string; contacto: string; email: string | null; motivo: string; mensaje: string;
   estado: 'pendiente' | 'resuelto'; created_at: string; resuelto_at: string | null;
+  respuesta: string | null; respondido_at: string | null;
 };
 
 export type Metricas = {

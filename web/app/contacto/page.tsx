@@ -4,7 +4,7 @@ import { SITIO } from '@/lib/sitio';
 
 export const metadata: Metadata = {
   title: 'Contacto',
-  description: 'Escribinos por WhatsApp para pedidos de mercería, comprar la app TEXMA o consultas de costura.',
+  description: 'Abrí una consulta con tu cuenta de Google y te respondemos por mail: ayuda con la app TEXMA, tu licencia, pedidos de mercería o costura.',
   alternates: { canonical: '/contacto' },
 };
 
@@ -15,7 +15,7 @@ export default function Contacto() {
         <p className="kicker text-rosa">Contacto</p>
         <h1 className="titulo mt-3 text-5xl md:text-6xl">Hablemos.</h1>
         <p className="mt-5 max-w-md text-lg text-tinta-suave">
-          Pedidos, dudas de costura o la app: te respondemos por WhatsApp, normalmente en el día.
+          Dudas con la app, tu licencia, pedidos o costura: dejanos tu consulta y te respondemos por mail, normalmente en el día.
         </p>
         <ul className="mt-8 space-y-3">
           {SITIO.whatsapp.map(w => (
