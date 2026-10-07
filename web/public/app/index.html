@@ -8047,7 +8047,11 @@ const LIC_API=(NATIVO||!/^https?:$/.test(location.protocol))?LIC_API_URL:'';
    Si algún día se rota la clave, se AGREGA la nueva a la lista y la vieja se deja:
    si no, todas las licencias ya activadas dejan de valer. */
 const LIC_PUB={kty:'EC',crv:'P-256',x:'nbx_HFNYdj08pC-3NvFnww1Tk_xDgAOssXK4hD98vxw',y:'cSi1eaLa8s2MIhPuywcLQtflNYlb7AGCCxVq8S289sI'};
-const LIC_PUBS=[LIC_PUB];
+/* 2026-10-07 · se rotó la clave: LIC_PRIV de Vercel no era pareja de LIC_PUB
+   y la app rechazaba toda licencia nueva («firma inválida»). La vieja QUEDA
+   en la lista: las licencias ya activadas están firmadas con ella. */
+const LIC_PUB_2026_10={kty:'EC',crv:'P-256',x:'Y8srXfDwE7hohgzcZTi7VS5IvRT6p64XIpp9AtcyLKs',y:'W9l07_vf_68k2S6HgkT897I4FHHiP6-YT42NkHct3Is'};
+const LIC_PUBS=[LIC_PUB,LIC_PUB_2026_10];
 const DEVK='texma_dev', LICK='texma_lic', MSTK='texma_mk';
 
 /* ---------- datos de contacto del muro ---------- */
@@ -8299,10 +8303,11 @@ function licScreen(msg){
     if(!WEB_CON_LOGIN){ ses.hidden=true; return; }
     const s=sesionGoogle();
     ses.innerHTML=s&&!s.vencida
-      ?`Cuenta: <b>${esc(s.email||'Google')}</b> · <a href="/login?next=/app" id="licOtra">cambiar</a>`
+      ?`Cuenta: <b>${esc(s.email||'Google')}</b> · <a href="/login?salir=1&amp;next=/app" id="licOtra">cambiar</a>`
       :`<button class="btn lgoo" type="button" id="licGoo">Iniciar sesión con Google</button>
         <span>Necesario para activar tu código en esta compu o celular.</span>`;
     ses.querySelector('#licGoo')?.addEventListener('click',irALogin);
+    ses.querySelector('#licOtra')?.addEventListener('click',e=>{ e.preventDefault(); cambiarCuentaGoogle(); });
   };
   pintarSes();
   const entrar=async ()=>{
@@ -8390,21 +8395,12 @@ function pintarPerfilNav(){
   $('#npMail').textContent=ses&&ses.email?ses.email:'';
   $('#npLog').hidden=!ses;
 }
-/* cerrar sesión de Google: se avisa a Supabase (si responde) y se borra la
-   sesión local; la licencia de este dispositivo NO se toca. */
-async function cerrarSesionGoogle(){
-  const ses=sesionGoogle();
-  /* la sesión es del Supabase de la web: solo se le avisa si es el mismo
-     proyecto que SUPA_URL (si no, la key no sirve y alcanza con borrarla) */
-  const mismo=Object.keys(localStorage).some(k=>k==='sb-'+(SUPA_URL.match(/https:\/\/([^.]+)/)||[])[1]+'-auth-token');
-  if(ses&&!ses.vencida&&mismo&&SUPA_ANON){
-    try{ await fetch(SUPA_URL+'/auth/v1/logout',{method:'POST',headers:{apikey:SUPA_ANON,authorization:'Bearer '+ses.token}}); }catch(e){}
-  }
-  try{
-    Object.keys(localStorage).filter(k=>/^sb-.+-auth-token/.test(k)).forEach(k=>localStorage.removeItem(k));
-  }catch(e){}
-  location.href='/login';
-}
+/* cerrar sesión de Google: la PWA no carga supabase-js, así que lo hace
+   /login?salir=1 con await supabase.auth.signOut() (cierre COMPLETO, también
+   en el servidor). La licencia de este dispositivo NO se toca. */
+function cerrarSesionGoogle(){ location.href='/login?salir=1'; }
+/* «cambiar» cuenta: igual, pero al volver a entrar con otra cuenta vuelve a /app */
+function cambiarCuentaGoogle(){ location.href='/login?salir=1&next=/app'; }
 function paintTop(){
   pintarPerfilNav();
   const d=new Date();

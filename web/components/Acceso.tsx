@@ -47,14 +47,32 @@ export default function Acceso() {
   const [cargandoGoogle, setCargandoGoogle] = useState(false);
   const [error, setError] = useState('');
 
-  /* sesión actual o la que vuelve de Google → directo a la app */
+  /* sesión actual o la que vuelve de Google → directo a la app.
+     Con ?salir=1 (el «cambiar» / «Cerrar sesión» de la PWA) primero se cierra
+     la sesión COMPLETA de Supabase y se queda acá para elegir otra cuenta:
+     si no, /login veía la sesión vieja y devolvía a /app sin cambiar nada. */
   useEffect(() => {
     const sb = supabaseAuth();
     if (!sb) return;
+    let vivo = true;
+    let desuscribir = () => {};
     const ir = () => { setEntrando(true); window.location.replace(destino()); };
-    sb.auth.getSession().then(({ data }) => { if (data.session) ir(); });
-    const { data } = sb.auth.onAuthStateChange((_e, s) => { if (s) ir(); });
-    return () => data.subscription.unsubscribe();
+    (async () => {
+      const q = new URLSearchParams(window.location.search);
+      if (q.get('salir')) {
+        try { await sb.auth.signOut(); } catch (e) { console.warn('[Acceso] signOut falló, limpio la sesión local', e); }
+        /* por si el servidor no respondió: que no quede ninguna sesión guardada */
+        Object.keys(localStorage).filter(k => /^sb-.+-auth-token/.test(k)).forEach(k => localStorage.removeItem(k));
+        q.delete('salir');
+        window.history.replaceState(null, '', window.location.pathname + (q.toString() ? `?${q}` : ''));
+      }
+      if (!vivo) return;
+      const { data: ses } = await sb.auth.getSession();
+      if (ses.session) { ir(); return; }
+      const { data } = sb.auth.onAuthStateChange((_e, s) => { if (s) ir(); });
+      desuscribir = () => data.subscription.unsubscribe();
+    })();
+    return () => { vivo = false; desuscribir(); };
   }, []);
 
   const entrarConGoogle = async () => {
