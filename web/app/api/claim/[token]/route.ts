@@ -34,8 +34,18 @@ export async function GET(req: Request, { params }: Params) {
     const estado: EstadoLink = !lic || lic.status === 'revoked' ? 'muerto'
       : vencido(lic) ? 'vencido'
       : lic.claimed_at ? 'listo' : 'nuevo';
-    const info = estado === 'listo' || estado === 'nuevo' ? await apkInfo() : { url: '', version: '' };
-    return paginaLink({ estado, token: t, pwa, code: estado === 'listo' ? lic.code : '', apk: info.url, version: info.version });
+    /* link válido → directo a la app con el código puesto (?k=): el muro lo
+       autocompleta y, con sesión de Google, lo activa solo. No se marca
+       claimed_at acá: las vistas previas de WhatsApp también hacen GET.
+       (El canje de verdad lo hace /api/activate, atado al dispositivo.) */
+    if (estado === 'nuevo' || estado === 'listo') {
+      return new Response(null, {
+        status: 303,
+        headers: { location: `${origen(req)}/app?k=${encodeURIComponent(lic.code)}`, 'cache-control': 'no-store', 'x-robots-tag': 'noindex, nofollow' },
+      });
+    }
+    /* acá solo llegan los links muertos o vencidos: página con el aviso */
+    return paginaLink({ estado, token: t, pwa });
   } catch (e) {
     console.error('claim GET', e);
     return paginaLink({ estado: 'muerto', pwa });

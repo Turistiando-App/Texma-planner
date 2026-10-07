@@ -1389,6 +1389,8 @@ body.en-racha #addfab{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + v
   font-family:var(--mono);font-size:9.5px;letter-spacing:1.4px;text-transform:uppercase;
 }
 #lic .lsep:before,#lic .lsep:after{content:'';flex:1;height:1px;background:var(--line)}
+#lic .lpista{font-size:12.5px;font-weight:700;color:#2F7A55;margin-top:8px}
+#lic .btn.listo{box-shadow:0 0 0 4px color-mix(in srgb,var(--deep) 22%,transparent),0 10px 24px rgba(43,38,34,.18)}
 #lic .linfo{max-width:340px;margin:2px auto 14px;padding:12px 14px;border-radius:14px;background:var(--tint);
   border:1px solid var(--mid);color:var(--ink);font-size:13px;line-height:1.5;text-align:center}
 #lic .linfo a{display:block;margin-top:8px;color:var(--deep);font-weight:800}
@@ -8046,15 +8048,14 @@ const LIC_ON=true;                        /* ← false vuelve a dejar la app lib
    hace falta la URL completa. */
 const LIC_API_URL='https://texmaplanner.vercel.app';   /* ← dominio único de producción, sin barra al final */
 const LIC_API=(NATIVO||!/^https?:$/.test(location.protocol))?LIC_API_URL:'';
-/* claves PÚBLICAS de verificación · la privada vive solo como LIC_PRIV en Vercel.
-   Si algún día se rota la clave, se AGREGA la nueva a la lista y la vieja se deja:
-   si no, todas las licencias ya activadas dejan de valer. */
-const LIC_PUB={kty:'EC',crv:'P-256',x:'nbx_HFNYdj08pC-3NvFnww1Tk_xDgAOssXK4hD98vxw',y:'cSi1eaLa8s2MIhPuywcLQtflNYlb7AGCCxVq8S289sI'};
-/* 2026-10-07 · se rotó la clave: LIC_PRIV de Vercel no era pareja de LIC_PUB
-   y la app rechazaba toda licencia nueva («firma inválida»). La vieja QUEDA
-   en la lista: las licencias ya activadas están firmadas con ella. */
-const LIC_PUB_2026_10={kty:'EC',crv:'P-256',x:'Y8srXfDwE7hohgzcZTi7VS5IvRT6p64XIpp9AtcyLKs',y:'W9l07_vf_68k2S6HgkT897I4FHHiP6-YT42NkHct3Is'};
-const LIC_PUBS=[LIC_PUB,LIC_PUB_2026_10];
+/* clave PÚBLICA de verificación · UNA sola. La privada vive solo como LIC_PRIV
+   en Vercel. Para rotarla: node scripts/clave-licencias.mjs (escribe esta línea
+   e imprime la LIC_PRIV). Además, cada build de la web la DERIVA de la LIC_PRIV
+   del entorno (web/scripts/copiar-pwa.mjs), así app y servidor no se desincronizan.
+   Las licencias firmadas con una clave anterior se vuelven a activar (mismo
+   dispositivo: el servidor lo permite). */
+const LIC_PUB={kty:'EC',crv:'P-256',x:'T9SojBiyVBGelcHb9MXZuf2WjYwzOrdXB5zUErgNpqg',y:'cow1g3sAMDifVgsLKDy8ZoAUjbzApujMCOdnBi9DdHE'};
+const LIC_PUBS=[LIC_PUB];
 const DEVK='texma_dev', LICK='texma_lic', MSTK='texma_mk';
 
 /* ---------- datos de contacto del muro ---------- */
@@ -8364,7 +8365,16 @@ function licScreen(msg){
 
   const inp=w.querySelector('#licIn'), er=w.querySelector('#licEr'), bt=w.querySelector('#licGo');
   const url=new URL(location.href), pre=url.searchParams.get('k')||url.searchParams.get('codigo');
-  if(pre) inp.value=pre.toUpperCase();
+  /* llegó por el link de WhatsApp (/d/<token> → /app?k=…): el código ya
+     está puesto y el botón queda listo para tocar */
+  if(pre){
+    inp.value=normCodigo(pre);
+    bt.classList.add('listo');
+    const pista=document.createElement('div'); pista.className='lpista';
+    pista.textContent='Tu código ya está puesto ✓ Tocá «Activar mi TEXMA»';
+    inp.insertAdjacentElement('afterend',pista);
+    setTimeout(()=>{ try{ bt.focus({preventScroll:true}); }catch(e){} },700);
+  }
   const fallar=t=>{
     er.textContent=t;
     const g2=G();

@@ -2,13 +2,7 @@
   {
     "kty": "EC",
     "crv": "P-256",
-    "x": "nbx_HFNYdj08pC-3NvFnww1Tk_xDgAOssXK4hD98vxw",
-    "y": "cSi1eaLa8s2MIhPuywcLQtflNYlb7AGCCxVq8S289sI"
-  },
-  {
-    "kty": "EC",
-    "crv": "P-256",
-    "x": "Y8srXfDwE7hohgzcZTi7VS5IvRT6p64XIpp9AtcyLKs",
-    "y": "W9l07_vf_68k2S6HgkT897I4FHHiP6-YT42NkHct3Is"
+    "x": "T9SojBiyVBGelcHb9MXZuf2WjYwzOrdXB5zUErgNpqg",
+    "y": "cow1g3sAMDifVgsLKDy8ZoAUjbzApujMCOdnBi9DdHE"
   }
 ]
